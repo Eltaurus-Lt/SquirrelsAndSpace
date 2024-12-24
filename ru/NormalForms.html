@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Нормальные формы</title>
+<!--  <meta name="author" content="Eltaurus"> -->
+
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles/paper.css">
+
+  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+</head>
+<body>
+<!--
+<div class="header">
+  <a class="button bck off" href="program.html">⮜ Program</a>
+  <a class="button prg" href="program.html">⮝ Program</a>
+  <select id="language-selector">
+    <option lang="en" value="en">Eng</option>
+    <option lang="ru" value="ru">Rus</option>
+  </select>
+  <a class="off" href="../ru/chapter-01.html">rus</a>
+  <a class="button fwd" href="chapter-02.html">Forward ⮞</a>
+</div>
+-->
+
+<hr class="discont">
+
+<p> 
+ <b>Упражнение.</b> Укажите резонансные слагаемые в системе
+$$
+\dot{x}_1 = x_2 + x_{1}^2 + x_1x_2 + x_2^2, \quad \dot{x}_2 = 2 x_1 + x_{1}^2 + x_1x_2 + x_2^2
+$$
+и выпишите ее нормальную форму вплоть до слагаемых третьего порядка.
+</p>
+
+  <div class="iframe-container" style="background: white">
+    <iframe class="iframe-content square" src="../iframes/NormalForms/Diagram.html" frameborder="0" style="width: 450px; height: 450px; scale: 47.5%"></iframe>
+  </div>
+
+caption{Прямая $k_2 = \lambda \left(1 - k_1\right)$ на плоскости $k_1$, $k_2$}
+label{pic1}
+
+<p>
+Выведем теперь общее правило нахождения резонансных слагаемых для случая двух уравнений \((n=2)\). Резонансные условия в первом и втором уравнениях соответственно:
+$$
+\lambda_1 = k_1 \lambda_1 + k_2 \lambda_2, \quad \lambda_2 = k_1 \lambda_1 + k_2 \lambda_2.
+$$
+Пусть \(\lambda_2 \neq 0\). Для новой переменной \(\lambda = \lambda_1 / \lambda_2\) получим эквивалентные условия:
+$$
+k_2 = \lambda \left(1 - k_1\right), \quad k_2 = 1-\lambda k_1.
+$$
+Эти уравнения задают две прямые на плоскости \(k_1, k_2\), проходящие через точки \(\left(1,0\right)\) и \(\left(0,1\right)\) соответственно. Угол наклона прямых определяется отношением \(\lambda\). Изобразим на плоскости \(k_1,k_2\) целочисленную решетку, узлы которой удовлетворяют условиям \(k_1, k_2 \geqslant 0\),  \(k_1+k_2 \geqslant 2\) (рис. \ref{pic1}). Для прямой \(k_2 = \lambda \left(1 - k_1\right)\) рассмотрим все возможные варианты.
+
+<ol class="rb">
+  <li> \(\lambda\) &mdash; комплексное число с ненулевой мнимой частью. Тогда единственное решение \(k_1=1\) и \(k_2=0\), следовательно, резонансов нет.</li>
+  <li>\(\lambda > 0\). Если \(\lambda = m\) &mdash; натуральное число большее единицы (рис. \ref{pic1}), то в первом уравнении присутствует резонансное слагаемое порядка \(m \geqslant 2\). Нормальная форма:
+$$
+\dot{y}_1 = \lambda_1 y_1 + g_{m, 0}^1 y_2^m.
+$$
+
+Если \(\lambda\) &mdash; не целое число, резонансных слагаемых нет.</li>
+</ol>
+
+</p>
+
+<hr class="discont">
+
+<p class="noindent">
+Здесь коэффициенты \(a\), \(b\), \(c\), \(d\), \(e\), \(f\) &mdash; некоторые константы. Слагаемые в этой формуле сгруппированы так, чтобы гамильтониан \(\hat{H}\) имел наиболее общий действительный вид.
+</p>
+
+  <div class="iframe-container" style="background: white">
+    <iframe class="iframe-content square" src="../iframes/NormalForms/Flow.html" frameborder="0" style="width: 450px; height: 450px; scale: 47.5%"></iframe>
+  </div>
+caption{Фазовый портрет системы с гамильтонианом $\hat{H}'$}
+label{pic2}
+
+<p>
+Важным является обстоятельство, что гамильтониан \(\hat{H}\), кроме импульсов \(I_1, I_2\), зависит лишь от разности углов \( \varphi_1 -  \varphi_2\), так называемой резонансной фазы. Это позволяет понизить порядок системы до одной степени свободы, выполнив еще одно унивалентное каноническое преобразование \( \varphi_1,  \varphi_2, I_1, I_2 \rightarrow \psi_1, \psi_2, J_1, J_2\):
+$$
+\psi_1 =  \varphi_1 -  \varphi_2, \quad \psi_2 =  \varphi_2, \quad J_1 = I_1, \quad J_2 = I_1 + I_2.
+$$
+Окончательно получаем гамильтониан
+\begin{gather*}
+\hat{H}'\left(\psi_1,\psi_2,J_1,J_2\right) = \omega J_2 + a' J_1^2 + b' J_1 J_2 + c' J_2^2 + \\
++ d' J_1(J_2-J_1)\cos 2\psi_1 + (e' J_1 + f' J_2)\sqrt{J_1(J_2-J_1)} \cos\psi_1,
+\end{gather*}
+где \(a'\), \(b'\), \(c'\), \(d'\), \(e'\), \(f'\) &mdash; вновь некоторые константы.
+
+
+
+Координата \(\psi_2\) в гамильтониане \(\hat{H}'\) циклическая, следовательно, сопряженный ей импульс \(J_2\) &mdash; первый интеграл системы. Величины \(J_2\) и \(J_1\) можно интерпретировать как суммарную энергию двух осцилляторов и энергию первого осциллятора соответственно. Выберем уровень интеграла \(J_2=1\). Тогда импульсы находятся в диапазоне \(0 \leqslant J_1,\,J_2 \leqslant 1\). Для численного построения примера типичного фазового портрета системы зафиксируем константы:
+</p>
+
+<hr class="discont">
+
+</body>
+</html>

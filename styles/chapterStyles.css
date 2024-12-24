@@ -1,0 +1,151 @@
+h1 {
+    margin-bottom: 1em;
+}
+
+h4 {
+    font-family: Arial, sans-serif;
+}
+
+/* slides */
+
+.slide {
+    background: white;
+    border-radius: 3px;
+    margin: .5em 0;
+    width: 100%;
+}
+
+/* references */
+
+.references {
+    margin: 1em;
+}
+
+.references a {
+    text-decoration-thickness: 1px;
+}
+
+*:has(>ol.references) {
+    counter-reset: refN;
+}
+ol.references li {
+    display: block;
+}
+ol.references li::before {
+    content: "[" counter(refN) "] ";
+    counter-increment: refN;
+}
+
+ul.references {
+    list-style-type: square;
+}
+
+/* downloads */
+
+.downloads-block {
+    margin-top: 2em;
+
+    padding: .75em 1em;
+    border: 1px solid var(--border-col);
+    border-radius: .5em;
+
+    background: var(--substrate-col);
+    box-shadow: 5px 0px 15px #0005 inset;
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75em;
+}
+
+.downloads-block legend {
+    font-family: sans-serif;
+    font-size: 15px;
+    color: var(--text-col);
+
+    width: min-content;
+    max-width: 100%;
+
+    padding: .25em;
+    border: 1px solid var(--border-col);
+    border-radius: .25em;
+
+
+    background: var(--bg-col);
+
+    box-shadow: 5px 0px 15px #0005;
+}
+
+.downloads-block a {
+    font-family: "Segoe UI", "Segoe UI Symbol", "Noto Sans", courier;
+    font-size: 1rem;
+
+    display: inline-block;
+    position: relative;
+
+    padding: .3em .6em;
+    border-radius: .55em;
+    width: max-content;
+    overflow: hidden;
+
+    color: var(--section-col) !important;
+    text-decoration: none;
+
+    background: var(--hover-col);
+    box-shadow: 5px 0px 15px #0005;
+    
+    transition: background-color .1s;
+}
+
+.downloads-block a:hover {
+    background: var(---subsection-col, #22242f);
+    text-decoration: underline;
+}
+
+.downloads-block a:is(
+    [href$='.nb'],
+    [href$='.pdf'],
+    [href$='.psd'],
+    [href$='.ai'],
+    [href$='.aep'],
+    [href$='.pptx'],
+) {
+    padding-left: 2em;
+}
+
+.downloads-block a::after {
+    content: "";
+    position: absolute; 
+    display: inline-block;
+    top: 50%; 
+    transform: translateY(-50%);
+
+    background-size: contain;
+
+    width: 1.12em;
+    height: 1.12em;
+    left: .5em;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crips-edges;
+}
+
+.downloads-block a[href$='.nb']::after {
+    background-image: url("../imgs/file_icons/nb.png");
+}
+.downloads-block a[href$='.pdf']::after {
+    background-image: url("../imgs/file_icons/pdf.png");
+}
+.downloads-block a[href$='.txt']::after {
+    background-image: url("../imgs/file_icons/txt.png");
+}
+.downloads-block a[href$='.psd']::after {
+    background-image: url("../imgs/file_icons/psd.png");
+}
+.downloads-block a[href$='.ai']::after {
+    background-image: url("../imgs/file_icons/ai.png");
+}
+.downloads-block a[href$='.aep']::after {
+    background-image: url("../imgs/file_icons/aep.png");
+}
+.downloads-block a[href$='.pptx']::after {
+    background-image: url("../imgs/file_icons/pptx.png");
+}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Program</title>
+  <meta name="author" content="Eltaurus">
+
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="../styles/Lt.css">
+  <link rel="icon" type="image/svg+xml" href="">
+</head>
+<body rnd="0" class="Lt">
+
+<script>
+  const variantsN = 2;
+  var rnd = localStorage.getItem("catsRND") || Math.floor(Math.random() * variantsN);
+  document.body.setAttribute("rnd", rnd);
+  localStorage.setItem("catsRND", (parseInt(rnd) + 1) % variantsN);
+</script>
+
+<div class="header">
+  <select id="language-selector">
+    <option lang="en" value="en">Eng</option>
+    <option lang="ru" value="ru">Rus</option>
+  </select>
+  <a class="off" href="../ru/program.html">rus</a>
+  <a class="button fwd" href="chapter-01.html">Start ⮞</a>
+</div>
+
+  <h1>Program</h1>
+
+
+  <h2>Physics</h2>
+
+  <a href="CurvilinearCoordinates.html">
+    <h3>Curvilinear Coordinates</h3>
+  </a>
+  <div class="section">
+    <p>
+    
+    </p>
+  </div>
+
+  <a href="NormalForms.html">
+    <h3>Normal Forms</h3>
+  </a>
+  <div class="section">
+    <p>
+    
+    </p>
+  </div>
+
+  <a href="KAM.html">
+    <h3>KAM Theory</h3>
+  </a>
+  <div class="section">
+    <p>
+    
+    </p>
+  </div>
+
+
+  <a href="Problems.html">
+    <h3>Problems</h3>
+  </a>
+  <div class="section">
+    <p>
+    
+    </p>
+  </div>
+
+  <h2>Math</h2>
+
+  <a href="RNG.html">
+    <h3>Random Number Generators</h3>
+  </a>
+  <div class="section">
+    <p>
+    
+    </p>
+  </div>
+
+  <a href="Goedel.html">
+    <h3>Gödel incompleteness theorem</h3>
+  </a>
+  <div class="section">
+    <p>
+    
+    </p>
+  </div>
+
+  <h2>Neural Networks</h2>
+
+  <a href="Attention.html">
+    <h3>Attention Mechanism</h3>
+  </a>
+  <div class="section">
+    <p>
+    
+    </p>
+  </div>
+
+  <a href="Diffusion.html">
+    <h3>Diffusion</h3>
+  </a>
+  <div class="section">
+    <p>
+    
+    </p>
+  </div>
+
+  <script src="../scripts/main.js"></script>
+</body>
+</html>
