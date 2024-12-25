@@ -67,6 +67,8 @@ body {
     font-family: "Source Serif 4", Georgia, Cambria, "Times New Roman", Times, serif;
     font-size: 20px;
     color: Black;
+
+    counter-reset: fig;
 }
 @media (min-width: 50em) {
     body {
@@ -94,21 +96,79 @@ ol.rb {
 ol.rb > li {
     list-style: none;
 }
-ol.rb > li:before {
+ol.rb > li::before {
     content: counter(list) ") ";
     counter-increment: list;
 }
 
 
 
-.iframe-container {
+.figure-container {
     overflow: hidden;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    width: 100%;
+min-height: 100%;
+    align-content: center;
+    justify-content: center;
+    margin: 2em 0;
 }
 
-.iframe-container iframe.square {
+.figure-container iframe {
+heigth: 100%;
+}
+
+.caption {
+    margin-top: 1em;
+    width: max-content;
+    max-width: 100%;
+    text-align: center;
+}
+
+.figure-container .caption::before {
+    content: "Fig. " counter(fig) ". ";
+    counter-increment: fig;
+}
+html[lang="ru"] .figure-container .caption::before {
+    content: "Рис. " counter(fig) ". ";
+}
+
+
+figref::before {
+    content: "(fig. ";
+}
+html[lang="ru"] figref::before {
+    content: "(рис. ";
+}
+figref::after {
+    content: ")";
+}
+
+hr {
+    border: none;
+    border-bottom: 1px #999 solid;
+}
+
+hr.discont {
+    position: relative;
+    overflow: visible;
+    --fade: 7em;
+    z-index: 100;
+    border-bottom: 2px #999 dotted;
+}
+
+hr.discont::before,
+hr.discont::after {
+    content: '';
     position: absolute;
-    left: 50%;
-    top: 50%;
-    translate: -50% -50%;
+    left: 0;
+    right: 0;
+
+    height: calc(2 * var(--fade));
+    z-index: -1;
+
+    top: calc(-1 * var(--fade) + 1px);
+    background: linear-gradient(transparent, white 49%, transparent 50%, white 51%, transparent 100%);
 }

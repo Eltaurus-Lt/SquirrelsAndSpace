@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +28,7 @@
 </div>
 -->
 
-<hr class="discont">
+<hr>
 
 <p> 
  <b>Упражнение.</b> Укажите резонансные слагаемые в системе
@@ -38,12 +38,10 @@ $$
 и выпишите ее нормальную форму вплоть до слагаемых третьего порядка.
 </p>
 
-  <div class="iframe-container" style="background: white">
-    <iframe class="iframe-content square" src="../iframes/NormalForms/Diagram.html" frameborder="0" style="width: 450px; height: 450px; scale: 47.5%"></iframe>
-  </div>
-
-caption{Прямая $k_2 = \lambda \left(1 - k_1\right)$ на плоскости $k_1$, $k_2$}
-label{pic1}
+<div class="figure-container" id="pic1">
+  <iframe class="iframe-content" src="C:\Science\Хаос и котики\Git\ChaosAndCats\iframes\wheel.html" frameborder="0"></iframe>
+  <div class="caption">Прямая \(k_2 = \lambda \left(1 - k_1\right)\) на плоскости \(k_1\), \(k_2\)</div>
+</div>
 
 <p>
 Выведем теперь общее правило нахождения резонансных слагаемых для случая двух уравнений \((n=2)\). Резонансные условия в первом и втором уравнениях соответственно:
@@ -54,11 +52,11 @@ $$
 $$
 k_2 = \lambda \left(1 - k_1\right), \quad k_2 = 1-\lambda k_1.
 $$
-Эти уравнения задают две прямые на плоскости \(k_1, k_2\), проходящие через точки \(\left(1,0\right)\) и \(\left(0,1\right)\) соответственно. Угол наклона прямых определяется отношением \(\lambda\). Изобразим на плоскости \(k_1,k_2\) целочисленную решетку, узлы которой удовлетворяют условиям \(k_1, k_2 \geqslant 0\),  \(k_1+k_2 \geqslant 2\) (рис. \ref{pic1}). Для прямой \(k_2 = \lambda \left(1 - k_1\right)\) рассмотрим все возможные варианты.
+Эти уравнения задают две прямые на плоскости \(k_1, k_2\), проходящие через точки \(\left(1,0\right)\) и \(\left(0,1\right)\) соответственно. Угол наклона прямых определяется отношением \(\lambda\). Изобразим на плоскости \(k_1,k_2\) целочисленную решетку, узлы которой удовлетворяют условиям \(k_1, k_2 \geqslant 0\),  \(k_1+k_2 \geqslant 2\) <figref ref="pic1"></figref>. Для прямой \(k_2 = \lambda \left(1 - k_1\right)\) рассмотрим все возможные варианты.
 
 <ol class="rb">
   <li> \(\lambda\) &mdash; комплексное число с ненулевой мнимой частью. Тогда единственное решение \(k_1=1\) и \(k_2=0\), следовательно, резонансов нет.</li>
-  <li>\(\lambda > 0\). Если \(\lambda = m\) &mdash; натуральное число большее единицы (рис. \ref{pic1}), то в первом уравнении присутствует резонансное слагаемое порядка \(m \geqslant 2\). Нормальная форма:
+  <li>\(\lambda > 0\). Если \(\lambda = m\) &mdash; натуральное число большее единицы <figref ref="pic1"></figref>, то в первом уравнении присутствует резонансное слагаемое порядка \(m \geqslant 2\). Нормальная форма:
 $$
 \dot{y}_1 = \lambda_1 y_1 + g_{m, 0}^1 y_2^m.
 $$
@@ -74,11 +72,10 @@ $$
 Здесь коэффициенты \(a\), \(b\), \(c\), \(d\), \(e\), \(f\) &mdash; некоторые константы. Слагаемые в этой формуле сгруппированы так, чтобы гамильтониан \(\hat{H}\) имел наиболее общий действительный вид.
 </p>
 
-  <div class="iframe-container" style="background: white">
-    <iframe class="iframe-content square" src="../iframes/NormalForms/Flow.html" frameborder="0" style="width: 450px; height: 450px; scale: 47.5%"></iframe>
-  </div>
-caption{Фазовый портрет системы с гамильтонианом $\hat{H}'$}
-label{pic2}
+<div class="figure-container" id="pic2">
+  <iframe class="iframe-content" src="../iframes/NormalForms/Flow.html" frameborder="0"></iframe>
+  <div class="caption">Фазовый портрет системы с гамильтонианом \(\hat{H}'\)</div>
+</div>
 
 <p>
 Важным является обстоятельство, что гамильтониан \(\hat{H}\), кроме импульсов \(I_1, I_2\), зависит лишь от разности углов \( \varphi_1 -  \varphi_2\), так называемой резонансной фазы. Это позволяет понизить порядок системы до одной степени свободы, выполнив еще одно унивалентное каноническое преобразование \( \varphi_1,  \varphi_2, I_1, I_2 \rightarrow \psi_1, \psi_2, J_1, J_2\):
@@ -99,5 +96,6 @@ $$
 
 <hr class="discont">
 
+  <script src="../scripts/refs.js"></script>
 </body>
 </html>
