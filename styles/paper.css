@@ -104,43 +104,49 @@ ol.rb > li::before {
 
 
 .figure-container {
-    overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    width: 100%;
-min-height: 100%;
     align-content: center;
     justify-content: center;
     margin: 2em 0;
 }
 
 .figure-container iframe {
-heigth: 100%;
+    max-width: 100%;
+//    heigth: auto;
+//    aspect-ratio: 1;
+}
+
+.figure-container.wide iframe {
+    width: 14cm;
+}
+.figure-container.square iframe {
+    width: 9cm;
 }
 
 .caption {
     margin-top: 1em;
-    width: max-content;
+//    width: max-content;
     max-width: 100%;
     text-align: center;
 }
 
 .figure-container .caption::before {
-    content: "Fig. " counter(fig) ". ";
+    content: "Fig.\00A0" counter(fig) ". ";
     counter-increment: fig;
 }
 html[lang="ru"] .figure-container .caption::before {
-    content: "Рис. " counter(fig) ". ";
+    content: "Рис.\00A0" counter(fig) ". ";
 }
 
 
 figref::before {
-    content: "(fig. ";
+    content: "(fig.\00A0";
 }
 html[lang="ru"] figref::before {
-    content: "(рис. ";
+    content: "(рис.\00A0";
 }
 figref::after {
     content: ")";
@@ -154,9 +160,10 @@ hr {
 hr.discont {
     position: relative;
     overflow: visible;
-    --fade: 7em;
+    --fade: 10em;
     z-index: 100;
     border-bottom: 2px #999 dotted;
+    margin: 4em 0;
 }
 
 hr.discont::before,
@@ -170,5 +177,38 @@ hr.discont::after {
     z-index: -1;
 
     top: calc(-1 * var(--fade) + 1px);
-    background: linear-gradient(transparent, white 49%, transparent 50%, white 51%, transparent 100%);
+    background: linear-gradient(transparent, white 39%, white 49%, transparent 50%, white 51%, white 61%, transparent 100%);
+}
+
+
+
+/* mathjax */
+:root {
+    --scrollbar-width: 5px;
+}
+
+mjx-container[jax="CHTML"][display="true"][display="true"] {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: var(--scrollbar-width) 0;
+    margin: calc(1em - var(--scrollbar-width)) 0;
+}
+
+/* (Chrome, Safari) */
+
+mjx-container[jax="CHTML"][display="true"]::-webkit-scrollbar {
+  height: var(--scrollbar-width);
+}
+mjx-container[jax="CHTML"][display="true"]::-webkit-scrollbar-thumb {
+  background: #f1f1f1;
+  border-radius: var(--scrollbar-width);
+}
+mjx-container[jax="CHTML"][display="true"]::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+/* Firefox */
+.element-with-scrollbar {
+  scrollbar-width: var(--scrollbar-width);
+  scrollbar-color: #f1f1f1 white;
 }
