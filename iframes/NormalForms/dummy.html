@@ -1,55 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="debug">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-  <title>Hamiltonian flow</title>
-<!--  <meta name="author" content="Eltaurus"> -->
+  <title>Dummy plot</title>
+  <meta name="author" content="Eltaurus">
 
-  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
-  <link rel="icon" type="image/svg+xml" href="">
+  <link rel="stylesheet" href="../../styles/pLTs.css">
 
-  <style>
-    body {
-      height: 220px;
-      width: 220px;
-      margin: 0;
-    }
+  <style> /* PlotStyle */
+    :root {
+      --PlotRange-left: -1;
+      --PlotRange-right: 4;
+      --PlotRange-top: 4.5;
+      --PlotRange-bottom: -1;
 
-    html {
-      overflow: hidden;
+      --PlotRangePadding: 0.5;
+      
+      font-size: calc(100vw / (2 * var(--PlotRangePadding) + var(--PlotWidth))); /* rem = plot horizontal unit */
+      line-height: .5rem; /* rlh = plot vertical unit */
+
+      --PointSize: .5em;
     }
   </style>
 
 
   <style>
 
-svg { 
-  width: auto;
-  height: auto;
-//  position: absolute;
-//  left: 30vw;
-//  top: calc(50vh - 20vw);
-  border: 1px black solid;
-}
 
-
-body {
-   background: coral;
-
-}
-
-html {
-   background: green;
-}
 
   </style>
 </head>
 <body>
 
-<svg id="svg-container" viewBox="0 -1 1 1" xmlns="http://www.w3.org/2000/svg"></svg>
+<div class="point" style="bottom: 0rlh; left: 0rem; --PointColor: yellow;"></div>
+<div class="point" style="bottom: 1rlh; left: 0rem;"></div>
+<div class="point" style="bottom: 0rlh; left: 1rem;"></div>
+<div class="point" style="bottom: 1rlh; left: 1rem;"></div>
+<div class="point" style="bottom: 3rlh; left: 3rem; --PointColor: blue;"></div>
 
+
+
+
+<svg class="plot framed" xmlns="http://www.w3.org/2000/svg">
+<path d="M0,0 C1,0 2,1.5 3,1.5" fill="transparent" stroke="red" stroke-width="0.5"/>
+</svg>
+
+
+  <script src="../../scripts/pLTs.js"></script>
 </body>
 </html>

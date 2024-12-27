@@ -56,6 +56,7 @@ body {
     min-width: var(--minwidth);
     max-width: var(--maxwidth);
     margin: 0 auto;
+    overflow-x: hidden;
 
     padding: 2em;
     padding-bottom: 6em;
@@ -108,7 +109,7 @@ ol.rb > li::before {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    align-content: center;
+    align-items: center;
     justify-content: center;
     margin: 2em 0;
 }
@@ -116,14 +117,15 @@ ol.rb > li::before {
 .figure-container iframe {
     max-width: 100%;
 //    heigth: auto;
-//    aspect-ratio: 1;
 }
 
 .figure-container.wide iframe {
-    width: 14cm;
+    width: 14.5cm;
+    aspect-ratio: 1.66;
 }
 .figure-container.square iframe {
-    width: 9cm;
+    width: 11cm;
+    aspect-ratio: 1;
 }
 
 .caption {

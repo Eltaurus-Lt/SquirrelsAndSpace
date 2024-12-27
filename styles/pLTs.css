@@ -1,0 +1,66 @@
+:root {
+      --PlotWidth: calc(var(--PlotRange-right) - var(--PlotRange-left));
+      --PlotHeight: calc(var(--PlotRange-top) - var(--PlotRange-bottom));
+}
+
+body {
+    font-size: 16px;
+    line-height: normal;
+
+    overflow: visible;
+    position: absolute;
+    margin: 0;
+    height: calc(var(--PlotRange-top) * 1rlh);
+    width: calc(var(--PlotRange-right) * 1rem);
+    top: calc(50vh - var(--PlotHeight) * 1rlh / 2);
+    left: calc((var(--PlotRangePadding) - var(--PlotRange-left)) * 1rem);
+}
+
+html {
+    overflow: hidden;
+    position: relative;
+}
+
+
+
+
+/* plot styles */
+
+
+.point {
+    background: var(--PointColor, black);
+
+    width: var(--PointSize, .5em);
+    height: var(--PointSize, .5em);
+    border-radius: var(--PointSize, .5em);
+    
+    position: absolute;
+    transform: translate(-50%, 50%);
+    z-index: 100;
+}
+
+svg.plot { 
+    position: absolute;
+    left: calc(var(--PlotRange-left) * 1rem);
+    bottom: calc(var(--PlotRange-bottom) * 1rlh);
+    width: calc(var(--PlotWidth) * 1rem);
+    height: calc(var(--PlotHeight) * 1rlh);
+    scale: 1 -1;
+}
+
+svg.framed {
+    border: var(--frameThickness, 1px) var(--frameColor, black) solid;    
+}
+
+
+
+
+
+
+
+.debug body {
+    background: lightgreen;
+}
+html.debug {
+    background: lightgray;
+}
