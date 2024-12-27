@@ -1,6 +1,10 @@
 :root {
       --PlotWidth: calc(var(--PlotRange-right) - var(--PlotRange-left));
       --PlotHeight: calc(var(--PlotRange-top) - var(--PlotRange-bottom));
+
+      
+      font-size: calc(100vw / (2 * var(--PlotRangePadding) + var(--PlotWidth))); /* rem = plot horizontal unit */
+      line-height: 1rem;
 }
 
 body {
@@ -49,7 +53,7 @@ svg.plot {
 }
 
 svg.framed {
-    border: var(--frameThickness, 1px) var(--frameColor, black) solid;    
+    border: var(--frameThickness, 2px) var(--frameColor, black) solid;    
 }
 
 
