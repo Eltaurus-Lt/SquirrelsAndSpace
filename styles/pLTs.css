@@ -26,10 +26,59 @@ html {
 }
 
 
+/* TeX */
 
+.TeXfont { 
+  width: min-content;
+  font-family: MJXZERO, MJXTEX-I, MJXTEX, "MathJax_Main", math;
+  z-index: 100;
+//  font-size: 103%;
+//  line-height: 1.5em;
+}
+.TeXfont:not(.selectable) {
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.MathJax_Display {
+  margin: 0 !important;
+}
+
+/* plot labels */
+
+.tickLabel {
+    position: absolute;
+    --padding: 0.5em;
+    padding: calc(0.68 * 1em + var(--padding)) var(--padding) var(--padding);
+}
+
+.tickLabel.x {
+    translate: -50% 100%;
+}
+.tickLabel.y {
+    translate: 0 50%;
+}
+.tickLabel.x.y {
+    translate: 0 100%;
+}
 
 /* plot styles */
 
+.axisLine, #axisArrowhead, .tick {
+  stroke: var(--AxisColor, black);
+  fill: var(--AxisColor, black);
+  stroke-width: 0.03;
+}
+
+.frame {
+  fill: transparent;
+  stroke: var(--AxisColor, black);
+  stroke-width: 0.03;
+}
 
 .point {
     background: var(--PointColor, black);
@@ -43,6 +92,14 @@ html {
     z-index: 100;
 }
 
+.gridLine {
+  stroke: var(--GridColor, black);
+  stroke-width: 0.015;
+  stroke-dasharray: var(--GridDashing, 0.1 0.15);
+  stroke-dashoffset: 0.05;
+  z-index: -10;
+}
+
 svg.plot { 
     position: absolute;
     left: calc(var(--PlotRange-left) * 1rem);
@@ -52,8 +109,17 @@ svg.plot {
     scale: 1 -1;
 }
 
+svg.axes { 
+    position: absolute;
+    left: calc((var(--PlotRange-left) - var(--PlotRangePadding)) * 1rem);
+    bottom: calc((var(--PlotRange-bottom) - var(--PlotRangePadding)) * 1rlh);
+    width: calc((var(--PlotWidth) + 2* var(--PlotRangePadding)) * 1rem);
+    height: calc((var(--PlotHeight) + 2* var(--PlotRangePadding)) * 1rlh);
+    scale: 1 -1;
+}
+
 svg.framed {
-    border: var(--frameThickness, 2px) var(--frameColor, black) solid;    
+//    outline: var(--frameThickness, 2px) var(--frameColor, black) solid;    
 }
 
 

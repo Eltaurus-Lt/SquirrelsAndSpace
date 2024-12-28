@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="debug">
+<html lang="en" class="-debug">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,31 +10,252 @@
 
   <link rel="stylesheet" href="../../styles/pLTs.css">
 
+  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> 
+
   <style> /* PlotStyle */
     :root {
       --PlotRange-left: 0;
-      --PlotRange-right: 8;
-      --PlotRange-top: 5;
+      --PlotRange-right: 8.3;
+      --PlotRange-top: 5.3;
       --PlotRange-bottom: 0;
 
-      --PlotRangePadding: 1;
+      --PlotRangePadding: .5;
 
       --PointSize: .5em;
+      --TickLength: 0;
+      --MergeOrigin: true;
+      --Grid: true;
+    }
+
+    @media(min-width: 800px) {
+      body {
+        font-size: 24px;
+      }
+    }
+
+    @media(min-width: 1100px) {
+      body {
+        font-size: 32px;
+      }
     }
   </style>
 
 
   <style>
 
+#lambda {
+  width: 6.5em;
+  position: absolute;
+  left: 50vw;
+  bottom: calc(100% + .1rlh + .1em);
+  transform: translate(-50%);
+
+  font-size: 1.5em;
+}
+
+#rotating-line {
+  stroke: #2b3747;
+  stroke-width: 0.07;
+  transition: transform .1s;
+}
+
+#rotating-line.resonance {
+  stroke: #ffc000;
+}
+
+#rotating-line:not(.resonance) {
+  transition: stroke 0.5s;
+  transition: stroke 0.5s, transform .1s;
+}
+
+
+.axes {
+  cursor: grab;
+}
+
+.axes.dragging {
+  cursor: grabbing;
+}
+
+
+.resonancePoint {
+  fill: black;
+  r: 0.05;
+  transition: r .2s;
+  //stroke: red;
+  //stroke-width: 0.04;
+}
+ 
+/* .resonancePoint:hover, */
+.resonancePoint.resonance {
+  r: 0.08;
+  fill: #ffc000;
+}
 
   </style>
 </head>
 <body>
 
+<div id="lambda" class="TeXfont">&lambda; = -0.863…</div>
+
 <svg class="plot" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<svg class="axes" xmlns="http://www.w3.org/2000/svg">
+<defs>
+    <clipPath id="lineclip">
+      <rect x="-3" y="-4.6" width="11.65" height="10" rx="0.8" ry="0.8"/>  
+    </clipPath>
+  </defs>
+  <g clip-path="url(#lineclip)">
+    <line id="rotating-line" x1="-12" y1="0" x2="12" y2="0" transform="rotate(40.8)" style="transform-origin: 1px 0px"/>
+  </g>
+  <g id="pointsContainer" class="epilog">
+  </g>
 </svg>
 
 
-  <script src="../../scripts/pLTs.js" defer></script>
+<script src="../../scripts/pLTs.js" defer></script>
+
+<script>
+
+const pointsContainer = document.getElementById("pointsContainer");
+
+for (let i = 0; i <= 8; i++) {
+  for (let j = 0; j <= 5; j++) {
+    if (i + j > 1)  {
+      let circleTemp = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circleTemp.setAttribute("cx", i);
+      circleTemp.setAttribute("cy", j);
+      circleTemp.classList.add("resonancePoint");
+      pointsContainer.appendChild(circleTemp);
+      circleTemp = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      circleTemp.setAttribute("cx", i);
+      circleTemp.setAttribute("cy", j);
+      circleTemp.classList.add("ripple");
+      pointsContainer.appendChild(circleTemp);
+    }
+  }
+}
+
+
+// line controls
+const eps = 0.032; //resonance matching accuracy 
+
+svgContainer = document.getElementsByClassName('axes')[0];
+
+const gridPoints = document.getElementsByClassName("resonancePoint");
+const resonancePoints = Array.from(gridPoints).map(point => {
+    return {
+        el: point,
+        dx: parseInt(point.getAttribute('cx'), 10) - 1,
+        dy: parseInt(point.getAttribute('cy'), 10)
+    };
+});
+const xmax = Math.max(...resonancePoints.map(res => res.dx));
+const ymax = Math.max(...resonancePoints.map(res => res.dy));
+
+const resonances = resonancePoints.map(res => {
+  let lfull = Math.min(Math.max(xmax/res.dx, -1/res.dx), Math.abs(ymax/res.dy)) * Math.sqrt(Math.pow(res.dx, 2) + Math.pow(res.dy, 2));
+  let resentr = res;
+  let alpha = Math.atan2(res.dy, res.dx);
+  let da = eps / lfull;
+  resentr["amin"] = alpha - da; 
+  resentr["amax"] = alpha + da; 
+  return resentr;
+})
+
+
+
+
+
+
+
+
+
+//// interaction
+
+const rotatingLine = svgContainer.getElementById('rotating-line');
+const lambdaLabel = document.getElementById('lambda');
+
+let isMouseDown = false;
+
+function getRotation() {
+  const transform = window.getComputedStyle(rotatingLine).getPropertyValue('transform');
+  let phi0 = 0;
+  if (transform && transform !== 'none') {
+    const matrixValues = transform.match(/matrix\(([^)]+)\)/)[1].split(', ');
+    phi0 = Math.atan2(matrixValues[1], matrixValues[0]);
+  }
+  return phi0;
+}
+
+let phi_old = getRotation();
+
+function rotateLine(mouseXabs, mouseYabs) {
+  
+    const mousePointAbs = svgContainer.createSVGPoint();
+    mousePointAbs.x = mouseXabs;
+    mousePointAbs.y = mouseYabs;
+
+    const mousePointRel = mousePointAbs.matrixTransform(svgContainer.getScreenCTM().inverse());
+
+    const phi = Math.atan2(mousePointRel.y, mousePointRel.x - 1);
+    phi_old = phi + Math.round((phi_old - phi) / Math.PI) * Math.PI;
+    rotatingLine.setAttribute('transform', `rotate(${phi_old*180/Math.PI})`);
+  
+  //resonance points
+    let p = Infinity;
+    let q = Infinity;
+   resonances.forEach(res => {
+     //if (res.dx == 2 && res.dy == 0) {console.log(res.amin, phi, res.amax)}
+     if (phi > res.amin && phi < res.amax) {
+       res.el.classList.add("resonance");
+       p = Math.min(p, res.dx);
+       q = Math.min(q, res.dy);
+     } else {
+       res.el.classList.remove("resonance");
+     }
+   });
+  
+   let resstr = "";
+   if (p < Infinity) {
+     rotatingLine.classList.add("resonance");
+     if (p == 0) {
+       resstr = "∞";
+     } else if (q == 0) {
+       resstr = "0";
+     } else {
+      resstr = (-Math.sign(p) * q) + "/" + Math.abs(p);
+     }
+   } else {
+     rotatingLine.classList.remove("resonance");
+       resstr = ("" + Math.tan(-phi)).slice(0, 6) + "…";
+   }
+   if (lambdaLabel) {
+     lambdaLabel.innerHTML = "&lambda; = " + resstr;
+   }
+}
+
+
+svgContainer.addEventListener('mousedown', (e) => {
+    e.preventDefault();
+    if (e.button === 0) { // Left mouse button
+      isMouseDown = true;
+      svgContainer.classList.add('dragging');
+      rotateLine(e.clientX, e.clientY);
+    }
+});
+window.addEventListener('mouseup', () => {
+  isMouseDown = false;
+  svgContainer.classList.remove('dragging');
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (isMouseDown) {
+    rotateLine(e.clientX, e.clientY);
+  }
+});
+</script>
+
 </body>
 </html>
