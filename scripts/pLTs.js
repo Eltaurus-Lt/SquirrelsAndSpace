@@ -64,7 +64,7 @@ for (i = tickStartX; i <= tickEndX; i++) {
         horTemp.setAttribute("x2", plotRangeRight + plotRangePadding);
         horTemp.setAttribute("y1", axisY / scaleRatio);
         horTemp.setAttribute("y2", axisY / scaleRatio);
-        axesSVG?.appendChild(horTemp);
+        axesSVG?.insertBefore(horTemp, axesSVG.getElementsByClassName('epilog')[0]);
       } else if (
           gridToggle &&
           Math.abs(axisY + j * tickStepY - plotRangeBottom) > 0.1 * tickStepY &&
@@ -122,7 +122,7 @@ for (i = tickStartX; i <= tickEndX; i++) {
       vertTemp.setAttribute("y2", plotRangeTop / scaleRatio + plotRangePadding);
       vertTemp.setAttribute("y1", plotRangeBottom / scaleRatio - plotRangePadding);
       vertTemp.classList.add("axisLine");
-      axesSVG?.appendChild(vertTemp);
+      axesSVG?.insertBefore(vertTemp, axesSVG.getElementsByClassName('epilog')[0]);
     } else if (
           gridToggle &&
           Math.abs(axisX + i * tickStepX - plotRangeLeft) > 0.1 * tickStepX &&

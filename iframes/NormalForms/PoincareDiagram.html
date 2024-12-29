@@ -80,7 +80,7 @@
 
 .resonancePoint {
   fill: black;
-  r: 0.05;
+  r: 0.05px;
   transition: r .2s;
   //stroke: red;
   //stroke-width: 0.04;
@@ -88,7 +88,7 @@
  
 /* .resonancePoint:hover, */
 .resonancePoint.resonance {
-  r: 0.08;
+  r: 0.08px;
   fill: #ffc000;
 }
 
@@ -106,7 +106,7 @@
       <rect x="-3" y="-4.6" width="11.65" height="10" rx="0.8" ry="0.8"/>  
     </clipPath>
   </defs>
-  <g clip-path="url(#lineclip)">
+  <g clip-path="url(#lineclip)" class="epilog">
     <line id="rotating-line" x1="-12" y1="0" x2="12" y2="0" transform="rotate(40.8)" style="transform-origin: 1px 0px"/>
   </g>
   <g id="pointsContainer" class="epilog">
@@ -154,6 +154,7 @@ const resonancePoints = Array.from(gridPoints).map(point => {
 const xmax = Math.max(...resonancePoints.map(res => res.dx));
 const ymax = Math.max(...resonancePoints.map(res => res.dy));
 
+/* unify trigger conditions for resonances on the same line */
 const resonances = resonancePoints.map(res => {
   let lfull = Math.min(Math.max(xmax/res.dx, -1/res.dx), Math.abs(ymax/res.dy)) * Math.sqrt(Math.pow(res.dx, 2) + Math.pow(res.dy, 2));
   let resentr = res;
@@ -206,16 +207,16 @@ function rotateLine(mouseXabs, mouseYabs) {
   //resonance points
     let p = Infinity;
     let q = Infinity;
-   resonances.forEach(res => {
-     //if (res.dx == 2 && res.dy == 0) {console.log(res.amin, phi, res.amax)}
-     if (phi > res.amin && phi < res.amax) {
-       res.el.classList.add("resonance");
-       p = Math.min(p, res.dx);
-       q = Math.min(q, res.dy);
-     } else {
-       res.el.classList.remove("resonance");
-     }
-   });
+    const phi1 = phi - Math.PI * Math.floor(phi / Math.PI);
+    resonances.forEach(res => {
+      if (phi1 > res.amin && phi1 < res.amax) {
+        res.el.classList.add("resonance");
+        p = Math.min(p, res.dx);
+        q = Math.min(q, res.dy);
+      } else {
+        res.el.classList.remove("resonance");
+      }
+    });
   
    let resstr = "";
    if (p < Infinity) {

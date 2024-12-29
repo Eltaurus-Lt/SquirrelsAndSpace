@@ -37,6 +37,7 @@
 
 :root {
   --length: .75;
+  --length-dash: .25; /* FF quirk; =1 - var(--length) */
   --col: blue;
   --duration: 2s;
   --phase: 0;
@@ -47,7 +48,7 @@
   stroke: var(--col);
   stroke-width: .035;
   fill: none;
-  stroke-dasharray: var(--length) calc(1 - var(--length));
+  stroke-dasharray: var(--length) var(--length-dash);
   animation: flowloop var(--duration) infinite linear;
 }
 
