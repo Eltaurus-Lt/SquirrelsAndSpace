@@ -92,6 +92,25 @@
   fill: #ffc000;
 }
 
+#instruction.hidden {
+  display: none;
+}
+#instruction {
+  font-size: .4px;
+  font-family: sans-serif;
+  transition: opacity .1s;
+}
+#instruction rect {
+//  fill: lightgray;
+  opacity: .5;
+}
+#instruction text {
+  fill: white;
+}
+.axes:hover #instruction {
+  opacity: 0;
+}
+
   </style>
 </head>
 <body>
@@ -103,13 +122,17 @@
 <svg class="axes" xmlns="http://www.w3.org/2000/svg">
 <defs>
     <clipPath id="lineclip">
-      <rect x="-3" y="-4.6" width="11.65" height="10" rx="0.8" ry="0.8"/>  
+      <rect x="-3" y="-4.6" width="11.65" height="10" rx="0.8"/>  
     </clipPath>
   </defs>
   <g clip-path="url(#lineclip)" class="epilog">
     <line id="rotating-line" x1="-12" y1="0" x2="12" y2="0" transform="rotate(40.8)" style="transform-origin: 1px 0px"/>
   </g>
   <g id="pointsContainer" class="epilog">
+  </g>
+  <g id="instruction">
+    <rect x=".75" y="2.1" width="6.5" height=".8" rx=".5" ry=".5"/>
+    <text x="4" y="-2.47" text-anchor="middle" dominant-baseline="middle" style="scale: 1 -1;">click and drag for demonstration</text>
   </g>
 </svg>
 
@@ -237,6 +260,7 @@ function rotateLine(mouseXabs, mouseYabs) {
    }
 }
 
+const instr = document.getElementById('instruction');
 
 svgContainer.addEventListener('mousedown', (e) => {
     e.preventDefault();
@@ -244,6 +268,7 @@ svgContainer.addEventListener('mousedown', (e) => {
       isMouseDown = true;
       svgContainer.classList.add('dragging');
       rotateLine(e.clientX, e.clientY);
+      instr.classList.add('hidden');
     }
 });
 window.addEventListener('mouseup', () => {

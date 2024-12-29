@@ -212,5 +212,5 @@ mjx-container[jax="CHTML"][display="true"]::-webkit-scrollbar-thumb:hover {
 /* Firefox */
 mjx-container[jax="CHTML"][display="true"] {
   scrollbar-width: var(--scrollbar-width);
-  scrollbar-color: #ddd transparent;
+  scrollbar-color: #ddd #fff6;
 }
