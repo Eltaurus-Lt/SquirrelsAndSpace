@@ -57,7 +57,7 @@ body {
     min-width: var(--minwidth);
     max-width: var(--maxwidth);
     margin: 0 auto;
-    /*overflow-x: hidden;*/
+    overflow-x: hidden;
 
     padding: 1em;
     padding-bottom: 6em;

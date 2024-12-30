@@ -19,7 +19,9 @@
       --PlotRange-top: 1;
       --PlotRange-bottom: 0;
 
-      --PlotRangePadding: 0.5;
+      --PlotRangePadding: .5;
+      --PlotOffsetRight: .4;
+      --PlotOffsetTop: .25;
 
       /* rem = plot horizontal unit */
       line-height: calc(var(--PlotWidth) / var(--PlotHeight) * 1rem); /* rlh = plot vertical unit */
@@ -82,6 +84,9 @@
   </style>
 </head>
 <body>
+
+<div class="tickLabel x" style="bottom: -.03rlh; left: 1.5rem">$$\psi_1$$</div>
+<div class="tickLabel y" style="bottom: 0.5rlh; left: -2rem">$$J_1$$</div>
 
 <svg class="plot framed" xmlns="http://www.w3.org/2000/svg">
   <defs>

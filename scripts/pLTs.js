@@ -118,7 +118,7 @@ for (i = tickStartX; i <= tickEndX; i++) {
           }
 	}
         divTemp.style.bottom = `${axisY + j * tickStepY}rlh`;
-        divTemp.style.right = `calc(100% - ${tickAlignX}rem)`;
+        divTemp.style.left = `${tickAlignX}rem`;
         document.body.appendChild(divTemp);
       }
     }

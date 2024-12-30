@@ -10,14 +10,16 @@
 body {
     font-size: 16px;
     line-height: normal;
+    --PlotOffsetX: var(--PlotOffsetRight, var(--PlotOffset, 0));
+    --PlotOffsetY: var(--PlotOffsetTop, var(--PlotOffset, 0));
 
     overflow: visible;
     position: absolute;
     margin: 0;
     height: calc(var(--PlotRange-top) * 1rlh);
     width: calc(var(--PlotRange-right) * 1rem);
-    top: calc(50vh - var(--PlotHeight) * 1rlh / 2);
-    left: calc((var(--PlotRangePadding) - var(--PlotRange-left)) * 1rem);
+    top: calc(50vh - var(--PlotOffsetY) * 1rem - var(--PlotHeight) * 1rlh / 2);
+    left: calc((var(--PlotRangePadding) + var(--PlotOffsetX) - var(--PlotRange-left)) * 1rem);
 }
 
 html {
@@ -61,10 +63,14 @@ html {
     translate: -50% 100%;
 }
 .tickLabel.y {
-    translate: 0 50%;
+    translate: -100% 50%;
 }
 .tickLabel.x.y {
-    translate: 0 100%;
+    translate: -100% 100%;
+}
+
+.tickLabel > mjx-container[jax="CHTML"][display="true"] {
+    margin: 0;
 }
 
 /* plot styles */
