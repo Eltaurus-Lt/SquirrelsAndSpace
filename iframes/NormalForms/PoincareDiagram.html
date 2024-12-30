@@ -82,14 +82,28 @@
   fill: black;
   r: 0.05px;
   transition: r .2s;
-  //stroke: red;
-  //stroke-width: 0.04;
 }
  
 /* .resonancePoint:hover, */
 .resonancePoint.resonance {
   r: 0.08px;
   fill: #ffc000;
+}
+
+.ripple {
+  r: 0.05px;
+  fill: transparent;
+  stroke: #3388FF;
+  stroke-width: 0;
+  opacity: 1;
+  transition: none;
+}
+
+.ripple.play {
+  transition: .2s;
+  r: 0.3px;
+  stroke-width: 0.05;
+  opacity: 0;
 }
 
 #instruction.hidden {
@@ -101,13 +115,13 @@
   transition: opacity .1s;
 }
 #instruction rect {
-//  fill: lightgray;
+  fill: gray;
   opacity: .5;
 }
 #instruction text {
   fill: white;
 }
-.axes:hover #instruction {
+body:hover #instruction {
   opacity: 0;
 }
 
@@ -131,7 +145,7 @@
   <g id="pointsContainer" class="epilog">
   </g>
   <g id="instruction">
-    <rect x=".75" y="2.1" width="6.5" height=".8" rx=".5" ry=".5"/>
+    <rect x=".75" y="2.1" width="6.5" height=".8" rx=".4" ry=".4"/>
     <text x="4" y="-2.47" text-anchor="middle" dominant-baseline="middle" style="scale: 1 -1;">click and drag for demonstration</text>
   </g>
 </svg>
@@ -170,6 +184,7 @@ const gridPoints = document.getElementsByClassName("resonancePoint");
 const resonancePoints = Array.from(gridPoints).map(point => {
     return {
         el: point,
+        bg: point.nextElementSibling,
         dx: parseInt(point.getAttribute('cx'), 10) - 1,
         dy: parseInt(point.getAttribute('cy'), 10)
     };
@@ -236,8 +251,15 @@ function rotateLine(mouseXabs, mouseYabs) {
         res.el.classList.add("resonance");
         p = Math.min(p, res.dx);
         q = Math.min(q, res.dy);
+        if (!res.bg.classList.contains("hot")) {
+          res.bg.classList.remove("play");
+          res.bg.classList.add("hot");
+          void res.bg.offsetHeight;
+          setTimeout(()=>{res.bg.classList.add("play");},10);
+	}
       } else {
         res.el.classList.remove("resonance");
+          res.bg.classList.remove("hot");
       }
     });
   

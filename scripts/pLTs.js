@@ -2,6 +2,16 @@ setTimeout(() => {
 const plotSVGs = document.querySelectorAll('svg.plot');
 const axesSVG = document.querySelector('svg.axes');
 
+// arrowheads def
+let arrowheadDef = `
+  <defs>
+    <marker id="axisArrowhead" markerWidth="14" markerHeight="5" refX="7" refY="3.5" orient="auto-start-reverse" viewBox="0 0 10 7">
+      <polygon points="10 3.5, 0 0, 1.5 3.5, 0 7"/>
+    </marker>
+  </defs>
+`;
+axesSVG.insertAdjacentHTML('afterbegin', arrowheadDef);
+
 
 // plot style
 const plotStyle = getComputedStyle(document.documentElement);
@@ -61,9 +71,10 @@ for (i = tickStartX; i <= tickEndX; i++) {
       if (j == 0 && axesToggle) {
         horTemp.classList.add("axisLine");
         horTemp.setAttribute("x1", plotRangeLeft - plotRangePadding);
-        horTemp.setAttribute("x2", plotRangeRight + plotRangePadding);
+        horTemp.setAttribute("x2", plotRangeRight + plotRangePadding - 0.09); // 0.09 = stroke-width * (arrowhead.xmax - arrowhead.refx)
         horTemp.setAttribute("y1", axisY / scaleRatio);
         horTemp.setAttribute("y2", axisY / scaleRatio);
+        horTemp.setAttribute("marker-end", 'url(#axisArrowhead)');
         axesSVG?.insertBefore(horTemp, axesSVG.getElementsByClassName('epilog')[0]);
       } else if (
           gridToggle &&
@@ -119,8 +130,9 @@ for (i = tickStartX; i <= tickEndX; i++) {
     if (i == 0 && axesToggle) {
       vertTemp.setAttribute("x1", axisX);
       vertTemp.setAttribute("x2", axisX);
-      vertTemp.setAttribute("y2", plotRangeTop / scaleRatio + plotRangePadding);
+      vertTemp.setAttribute("y2", plotRangeTop / scaleRatio + plotRangePadding - 0.09);
       vertTemp.setAttribute("y1", plotRangeBottom / scaleRatio - plotRangePadding);
+     vertTemp.setAttribute("marker-end", 'url(#axisArrowhead)');
       vertTemp.classList.add("axisLine");
       axesSVG?.insertBefore(vertTemp, axesSVG.getElementsByClassName('epilog')[0]);
     } else if (

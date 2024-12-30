@@ -30,10 +30,12 @@ html {
 
 .TeXfont { 
   width: min-content;
-  font-family: MJXZERO, MJXTEX-I, MJXTEX, "MathJax_Main", math;
+  font-family: MJXZERO, MJXTEX-I, MJXTEX, "MathJax_Main";
   z-index: 100;
-//  font-size: 103%;
-//  line-height: 1.5em;
+
+  /* overwrite bad font metrics */
+  line-height: 0;
+  border-top: calc(0.68 * 1em) transparent solid; 
 }
 .TeXfont:not(.selectable) {
   user-select: none;
@@ -52,8 +54,7 @@ html {
 
 .tickLabel {
     position: absolute;
-    --padding: 0.5em;
-    padding: calc(0.68 * 1em + var(--padding)) var(--padding) var(--padding);
+    padding: .5em;
 }
 
 .tickLabel.x {
@@ -126,11 +127,12 @@ svg.framed {
 
 
 
-
-
 .debug body {
     background: lightgreen;
 }
 html.debug {
     background: lightgray;
+}
+html.debug svg.axes {
+    outline: solid 1px red;
 }

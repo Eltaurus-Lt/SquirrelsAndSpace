@@ -15,6 +15,7 @@
     --hover-col: #2b2f37;#484b53;
 
     --maxwidth: 860px;
+    --minwidth: 380px;
 }
 
 ::selection {
@@ -56,9 +57,9 @@ body {
     min-width: var(--minwidth);
     max-width: var(--maxwidth);
     margin: 0 auto;
-    overflow-x: hidden;
+    /*overflow-x: hidden;*/
 
-    padding: 2em;
+    padding: 1em;
     padding-bottom: 6em;
 
     background: white;
@@ -70,6 +71,12 @@ body {
     color: Black;
 
     counter-reset: fig;
+}
+@media (min-width: 30em) {
+    body {
+        padding: 2em;
+        padding-bottom: 6em;
+    }
 }
 @media (min-width: 50em) {
     body {
@@ -209,8 +216,11 @@ mjx-container[jax="CHTML"][display="true"]::-webkit-scrollbar-thumb:hover {
   background: #888;
 }
 
+
 /* Firefox */
-mjx-container[jax="CHTML"][display="true"] {
-  scrollbar-width: var(--scrollbar-width);
-  scrollbar-color: #ddd #fff6;
+@-moz-document url-prefix() {
+  mjx-container[jax="CHTML"][display="true"] {
+    scrollbar-width: var(--scrollbar-width);
+    scrollbar-color: #ddd #fff6;
+  }
 }
