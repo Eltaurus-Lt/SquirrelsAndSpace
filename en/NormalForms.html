@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Normal Forms</title>
+<!--  <meta name="author" content="Eltaurus"> -->
+
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles/paper.css">
+
+  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+</head>
+<body>
+<!--
+<div class="header">
+  <a class="button bck off" href="program.html">⮜ Program</a>
+  <a class="button prg" href="program.html">⮝ Program</a>
+  <select id="language-selector">
+    <option lang="en" value="en">Eng</option>
+    <option lang="ru" value="ru">Rus</option>
+  </select>
+  <a class="off" href="../ru/chapter-01.html">rus</a>
+  <a class="button fwd" href="chapter-02.html">Forward ⮞</a>
+</div>
+-->
+
+<hr>
+
+<p> 
+ <b>Exercise.</b> Indicate the resonant terms in the system
+$$
+\dot{x}_1 = x_2 + x_{1}^2 + x_1x_2 + x_2^2, \quad \dot{x}_2 = 2 x_1 + x_{1}^2 + x_1x_2 + x_2^2
+$$
+and write out its normal form up to the terms of the third order.
+</p>
+
+<div class="figure-container wide" id="pic1">
+  <iframe class="iframe-content" src="../iframes/NormalForms/PoincareDiagram.html" frameborder="0" style="aspect-ratio: 1.45"></iframe>
+  <div class="caption">The line \(k_2 = \lambda \left(1 - k_1\right)\) on the \(k_1\), \(k_2\) plane</div>
+</div>
+
+<p>
+Let us now derive the general rule for finding resonant terms in the case of two equations \((n=2)\). The resonance conditions in the first and second equations, respectively, are:
+$$
+\lambda_1 = k_1 \lambda_1 + k_2 \lambda_2, \quad \lambda_2 = k_1 \lambda_1 + k_2 \lambda_2.
+$$
+Let \(\lambda_2 \neq 0\). For the new variable \(\lambda = \lambda_1 / \lambda_2\) we obtain the equivalent conditions:
+$$
+k_2 = \lambda \left(1 - k_1\right), \quad k_2 = 1-\lambda k_1.
+$$
+These equations define two straight lines on the plane \(k_1, k_2\), passing through the points \(\left(1,0\right)\) and \(\left(0,1\right)\) respectively. The slope of the lines is determined by the ratio \(\lambda\). Let us depic on the \(k_1,k_2\) plane an integer grid, with nodes satisfying the conditions \(k_1, k_2 \geqslant 0\), \(k_1+k_2 \geqslant 2\) <figref ref="pic1"></figref>. For the line \(k_2 = \lambda \left(1 - k_1\right)\), we will consider all possible options.
+</p>
+
+<ol class="rb">
+  <li> \(\lambda\) is a complex number with a non-zero imaginary part. Then the only solution is \(k_1=1\) and \(k_2=0\), hence, there are no resonances.</li>
+  <li>\(\lambda > 0\). If \(\lambda = m\) is a natural number greater than one <figref ref="pic1"></figref>, then the first equation contains a resonant term of order \(m \geqslant 2\). The normal form:
+$$
+\dot{y}_1 = \lambda_1 y_1 + g_{m, 0}^1 y_2^m.
+$$
+
+If \(\lambda\) is not an integer, there are no resonant terms.</li>
+</ol>
+
+<hr class="discont">
+
+<p class="noindent">
+Here \(a\), \(b\), \(c\), \(d\), \(e\), \(f\) are constant coefficients. The terms in this formula are grouped so that the Hamiltonian \(\hat{H}\) has the most general form in real numbers.
+</p>
+
+<div class="figure-container square" id="pic2">
+  <iframe class="iframe-content" src="../iframes/NormalForms/Flow.html" frameborder="0"></iframe>
+  <div class="caption">Phase portrait of the system with Hamiltonian \(\hat{H}'\)</div>
+</div>
+
+<p>
+It is important to note that the Hamiltonian \(\hat{H}\), besides the momenta \(I_1, I_2\), depends only on the difference of angles \( \varphi_1 -  \varphi_2\), the so-called resonance phase. This allows us to reduce the order of the system to one degree of freedom by performing another canonical transformation \( \varphi_1,  \varphi_2, I_1, I_2 \rightarrow \psi_1, \psi_2, J_1, J_2\):
+$$
+\psi_1 =  \varphi_1 -  \varphi_2, \quad \psi_2 =  \varphi_2, \quad J_1 = I_1, \quad J_2 = I_1 + I_2.
+$$
+Finally, we obtain the Hamiltonian
+\begin{gather*}
+\hat{H}'\left(\psi_1,\psi_2,J_1,J_2\right) = \omega J_2 + a' J_1^2 + b' J_1 J_2 + c' J_2^2 + \\
++ d' J_1(J_2-J_1)\cos 2\psi_1 + (e' J_1 + f' J_2)\sqrt{J_1(J_2-J_1)} \cos\psi_1,
+\end{gather*}
+where \(a'\), \(b'\), \(c'\), \(d'\), \(e'\), \(f'\) are also constant coefficients.
+
+The coordinate \(\psi_2\) in the Hamiltonian \(\hat{H}'\) is cyclic, hence its conjugate momentum \(J_2\) is a first integral of the system. The quantities \(J_2\) and \(J_1\) can be interpreted as the total energy of the two oscillators and the energy of the first oscillator, respectively. Let us consider \(J_2=1\). Then the impulses are in the range \(0 \leqslant J_1,\,J_2 \leqslant 1\). For the numerical plotting of the system's typical phase portrait, let us fix the constants:
+</p>
+
+<hr class="discont">
+
+  <script src="../scripts/refs.js"></script>
+
+</body>
+</html>
