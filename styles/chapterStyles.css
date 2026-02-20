@@ -6,15 +6,6 @@ h4 {
     font-family: Arial, sans-serif;
 }
 
-/* slides */
-
-.slide {
-    background: white;
-    border-radius: 3px;
-    margin: .5em 0;
-    width: 100%;
-}
-
 /* references */
 
 .references {
@@ -39,6 +30,35 @@ ol.references li::before {
 ul.references {
     list-style-type: square;
 }
+
+
+/* content formats */
+
+.centerpiece {
+    display: block;
+    width: 640px;
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
+    margin: auto;
+}
+
+.spaceship {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+}
+
+.slide {
+    background: white;
+    border-radius: 3px;
+    margin: .5em 0;
+    width: 100%;
+}
+
+.free {
+    display: block;
+    margin: auto;
+}
+
 
 /* downloads */
 

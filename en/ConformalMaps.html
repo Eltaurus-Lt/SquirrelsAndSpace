@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Conformal Maps</title>
+  <meta name="author" content="Eltaurus">
+
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="../styles/chapterStyles.css">
+  <link rel="icon" type="image/svg+xml" href="">
+
+  <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+</head>
+<body>
+<!--
+<div class="header">
+  <a class="button bck off" href="program.html">⮜ Program</a>
+  <a class="button prg" href="program.html">⮝ Program</a>
+  <select id="language-selector">
+    <option lang="en" value="en">Eng</option>
+    <option lang="ru" value="ru">Rus</option>
+  </select>
+  <a class="off" href="../ru/chapter-01.html">rus</a>
+  <a class="button fwd" href="chapter-02.html">Forward ⮞</a>
+</div>
+-->
+
+  <h1>Conformal Maps</h1>
+
+  <br>
+
+  <h3 id="ex01">Power Transform</h3>
+  <h4>\(w=z^2\)</h4>
+  <p>
+     Continuous conformal transform with polar coordinate grid. Radial lines spread uniformily, circle radii scale parabolically (\(r>1\) – expand, \(r=1\) – constant, \(r<1\) – shrink):
+  </p>
+  <img src="../imgs/conform/squaring.gif" class="free" style="width: 640px;"/>
+
+  <br>
+  <p>
+     Same transform with a Cartesian grid. All coordinate lines bend into parabolae:
+  </p>
+  <img src="../imgs/conform/parabolic.gif" class="free" style="width: 640px;"/>
+
+  <br>
+  <h3 id="ex02">Exponential Transform</h3>
+  <h4>\(w=e^z\)</h4>
+  <p>
+     Transfrom through non-conformal intermediate states. Horizontal coordinate change into radial (\(log\)), vertical coordinate change into polar
+  </p>
+  <img src="../imgs/conform/exponential.gif" class="free" style="width: 640px;"/>
+
+  <br>
+  <h3 id="ex03">Zhukovsky Transform</h3>
+  <h4>\(w=\frac{1}{2}\left(z+z^{-1}\right)\)</h4>
+  <p>
+     Continuous mapping through the <a href="https://en.wikipedia.org/wiki/Joukowsky_transform#K%C3%A1rm%C3%A1n%E2%80%93Trefftz_transform">Karman-Trefftz generalization</a>. Radial lines bend into hyperbolae, concentric circles transform into ellipses:
+  </p>
+  <img src="../imgs/conform/KarmanTrefftz.gif" class="free"/>
+
+  <br>
+  <p>
+     Same transform applied to a circle, bending it into an airfoil profile:
+  </p>
+  <img src="../imgs/conform/Airfloil.gif" class="free"/>
+
+  <br>	
+  <p>
+     Airflow around the wing obtained by transforming solution around a cylinder:
+  </p>
+  <video class="centerpiece" controls loop autoplay muted playsinline poster="../imgs/conform/ZhukovskyAirflow_thumb.png">
+    <source src="../imgs/conform/ZhukovskyAirflow.mp4" type="video/mp4">
+  </video>
+
+  <ol class="references">
+    <h4>References</h4> 
+    <li><a href="https://www.shadertoy.com/view/W3yXRy" target="_blank">Interactive version</a></li>
+  </ol>
+
+</body>
+</html>
