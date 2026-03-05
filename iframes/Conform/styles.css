@@ -1,0 +1,49 @@
+#plotContainer {
+  background: black;
+}
+
+.bgSec1 {
+  fill: #ff9c59; /* orange */
+}
+.bgSec1.pale {
+  fill: #ffc8a3;
+}
+
+.bgSec2 {
+  fill: #ffdf57; /* yellow */
+}
+.bgSec2.pale {
+  fill: #ffefa3;
+}
+
+.bgSec3 {
+  fill: #59c7ff; /* blue */
+}
+.bgSec3.pale {
+  fill: #b5e6ff;
+}
+
+.bgSec4 {
+  fill: #62ffc6; /* green */
+}
+.bgSec4.pale {
+  fill: #a3ffde;
+}
+
+
+.thickGrid {
+  fill: none;
+  stroke: white;
+  stroke-width: 2px;
+}
+
+.seam {
+  stroke: black;
+  stroke-width: 5px;
+  stroke-linecap: round;
+}
+
+.axes {
+  outline: 5px solid white;
+  outline-offset: -5px;
+}
