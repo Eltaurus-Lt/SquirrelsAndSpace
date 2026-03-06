@@ -1,35 +1,81 @@
-const plotSettings = JSON.parse(document.getElementById("PlotSettings")?.textContent || "{}");
-/* settings docstring:
+const plotDefaults = { // default PlotSettings
+  PlotRange: [0, 10], // (number = symmetric interval; [x1, x2] = explicit interval; ex: [0, x2] = one-sided plot)
+  AspectRatio: 1.618,
+  ScaleRatio: 1, // ratio of pixel values for axes units
 
-  PlotRange: horizontal range (number = symmetric interval; [x1, x2] = explicit interval; [0, x2] = one-sided plot)
-  CanvasAspect: w/h of the image (default = 1.618; 1 = square; vertical alignment ??)
-todo  ScaleAspect: ratio of plot unit lengths in horizontal and vertical directions (default = 1)
+  PlotOffset: 0 // todo
+};
+const layerDefaults = {
+};
+const axesDefaults = {
+};
+const gridDefaults = {
+};
 
-todo  PlotRangePadding: 0;
-todo  PlotOffset: 0;
-
-.axes .frame .grid .arrowheads
-  
-todo  Ticks .... (grid.ticks ...)
-todo  SubTicks
-todo  MergeOrigin: true;
-
-*/
-// default values:
-plotSettings["PlotRange"] ??= 10;
-plotSettings["CanvasAspect"] ??= 1.618;
-plotSettings["ScaleAspect"] ??= 1;
-if (Array.isArray(plotSettings["PlotRange"]) && plotSettings["PlotRange"].length > 1) {
-  plotSettings["Left"] ??= plotSettings["PlotRange"][0];  
-  plotSettings["Right"] ??= plotSettings["PlotRange"][1];
-} else if (typeof plotSettings["PlotRange"] === "number" && !isNaN(plotSettings["PlotRange"])) {
-  plotSettings["Left"] ??= -plotSettings["PlotRange"];
-  plotSettings["Right"] ??= plotSettings["PlotRange"];
-} else {
-  console.error("PlotRange format isn't recognized ", plotSettings["PlotRange"]);
+function attributeParse(value) {
+  if (typeof value === "string" && !isNaN(value) && value.trim() !== "") {
+    return Number(value);
+  }
+  return value;
 }
-plotSettings["Top"] ??= plotSettings["Right"] / plotSettings["CanvasAspect"];
-plotSettings["Bottom"] ??= plotSettings["Left"] / plotSettings["CanvasAspect"];
+
+function getPlotSettings(plotL) {
+  const plotSettings = {};
+
+  for (const setting of Object.keys(plotDefaults)) {
+    plotSettings[setting] = attributeParse(plotL.getAttribute(setting)) || plotDefaults[setting];
+  }
+
+  if (Array.isArray(plotSettings["PlotRange"]) && plotSettings["PlotRange"].length > 1) {
+    plotSettings["Left"] = plotSettings["PlotRange"][0];  
+    plotSettings["Right"] = plotSettings["PlotRange"][1];
+  } else if (typeof plotSettings["PlotRange"] === "number" && !isNaN(plotSettings["PlotRange"])) {
+    plotSettings["Left"] = -plotSettings["PlotRange"];
+    plotSettings["Right"] = plotSettings["PlotRange"];
+  } else {
+    console.error("PlotRange format isn't recognized ", plotSettings["PlotRange"]);
+  }
+  plotSettings["Left"] = plotL.getAttribute("Left") || plotSettings["Left"];
+  plotSettings["Right"] = plotL.getAttribute("Right") || plotSettings["Right"];
+  plotSettings["Top"] = plotL.getAttribute("Top") || (plotSettings["Right"] / plotSettings["AspectRatio"]);
+  plotSettings["Bottom"] = plotL.getAttribute("Bottom") || (plotSettings["Left"] / plotSettings["AspectRatio"]);
+
+  return plotSettings;
+}
+
+document.querySelectorAll("div.plot").forEach(plotL => {
+  const plotSettings = getPlotSettings(plotL);
+  plotL.querySelectorAll("svg.layer").forEach(layer => {
+
+    /* general method for adding elements */
+    layer.add = (childType) => {
+      const childL = document.createElementNS("http://www.w3.org/2000/svg", childType);
+      layer.appendChild(childL);
+      return childL;
+    }
+
+    // set viewboxes
+    layer.setAttribute('viewBox', `
+      ${plotSettings["Left"]}
+      ${plotSettings["Bottom"]}
+      ${plotSettings["Right"] - plotSettings["Left"]}
+      ${plotSettings["Top"] - plotSettings["Bottom"]}
+    `);
+  });
+});
+
+
+
+let arrowheadDef = `
+  <defs>
+    <marker id="axisArrowhead" markerWidth="14" markerHeight="5" refX="7" refY="3.5" orient="auto-start-reverse" viewBox="0 0 10 7">
+      <polygon points="10 3.5, 0 0, 1.5 3.5, 0 7"/>
+    </marker>
+  </defs>
+`;
+
+
+
 
 
 
@@ -38,7 +84,7 @@ const controls = document.getElementById("controlPanel")?.querySelectorAll("inpu
 const vars = {};
 function updateVars() {
   controls.forEach(control => {
-    vars[control.getAttribute("var")] = Number(control.value);
+    vars[control.getAttribute("var")] = attributeParse(control.value);
   });
 }
 const dynamic = [];
@@ -54,33 +100,6 @@ controls.forEach(control => {
 
 
 
-document.querySelectorAll("svg.plot").forEach((plotCanvasL) => {
-
-  // general method for adding elements to plots
-  plotCanvasL.add = (childType) => {
-    const childL = document.createElementNS("http://www.w3.org/2000/svg", childType);
-    plotCanvasL.appendChild(childL);
-    return childL;
-  }
-
-  // set viewboxes
-  plotCanvasL.setAttribute('viewBox', `
-    ${plotSettings["Left"]}
-    ${plotSettings["Bottom"]}
-    ${plotSettings["Right"] - plotSettings["Left"]}
-    ${plotSettings["Top"] - plotSettings["Bottom"]}
-  `);
-});
-
-
-
-let arrowheadDef = `
-  <defs>
-    <marker id="axisArrowhead" markerWidth="14" markerHeight="5" refX="7" refY="3.5" orient="auto-start-reverse" viewBox="0 0 10 7">
-      <polygon points="10 3.5, 0 0, 1.5 3.5, 0 7"/>
-    </marker>
-  </defs>
-`;
 
 
 

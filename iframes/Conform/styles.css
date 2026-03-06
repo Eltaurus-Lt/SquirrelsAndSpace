@@ -1,5 +1,10 @@
-#plotContainer {
+.plot {
   background: black;
+}
+
+.plot > :last-child {
+  outline: 5px solid white;
+  outline-offset: -5px;
 }
 
 .bgSec1 {
@@ -41,9 +46,4 @@
   stroke: black;
   stroke-width: 5px;
   stroke-linecap: round;
-}
-
-.axes {
-  outline: 5px solid white;
-  outline-offset: -5px;
 }

@@ -14,22 +14,39 @@ body {
 }
 
 
-/* Plot Canvases */
-#plotContainer {
+/* Plot Layers */
+div.plot {
   position: relative;
 }
-#plotContainer svg { 
+div.plot svg.layer { 
   position: absolute;
   display: block;
   width: 100%;
   inset: 0;
   scale: 1 -1;
 }
-#plotContainer svg:first-child {
+div.plot svg.layer:first-child {
   position: relative;
 }
-#plotContainer svg * { 
+div.plot svg.layer * { 
   vector-effect: non-scaling-stroke;
+}
+
+/* axes */
+div.plot div.axes {
+  position: absolute;
+  inset: 0;
+}
+
+/* Text labels (todo) */
+#plotlabel {
+  width: 6.5em;
+  position: absolute;
+  left: 50vw;
+  bottom: calc(100% + .1rlh + .1em);
+  transform: translate(-50%);
+
+  font-size: 1.5em;
 }
 
 
@@ -43,7 +60,7 @@ body {
 }
 
 
-/* Plot Styles */
+/* Plot Styles (todo) */
 .plotline {
   stroke-width: 0.07;
 }
@@ -51,17 +68,23 @@ body {
   r: 0.05px;
 }
 
+/* WM colors */
+.plot .layer .plotLine:nth-child(15n+1) {stroke: #5e81b5;}
+.plot .layer .plotLine:nth-child(15n+2) {stroke: #e19c24;}
+.plot .layer .plotLine:nth-child(15n+3) {stroke: #8fb032;}
+.plot .layer .plotLine:nth-child(15n+4) {stroke: #eb6235;}
+.plot .layer .plotLine:nth-child(15n+5) {stroke: #8778b3;}
+.plot .layer .plotLine:nth-child(15n+6) {stroke: #c56e1a;}
+.plot .layer .plotLine:nth-child(15n+7) {stroke: #5d9ec7;}
+.plot .layer .plotLine:nth-child(15n+8) {stroke: #ffbf00;}
+.plot .layer .plotLine:nth-child(15n+9) {stroke: #a5609d;}
+.plot .layer .plotLine:nth-child(15n+10) {stroke: #929600;}
+.plot .layer .plotLine:nth-child(15n+11) {stroke: #e95536;}
+.plot .layer .plotLine:nth-child(15n+12) {stroke: #6685d9;}
+.plot .layer .plotLine:nth-child(15n+13) {stroke: #f89f13;}
+.plot .layer .plotLine:nth-child(15n+14) {stroke: #bc5b80;}
+.plot .layer .plotLine:nth-child(15n) {stroke: #47b66d;}
 
-/* Text */
-#plotlabel {
-  width: 6.5em;
-  position: absolute;
-  left: 50vw;
-  bottom: calc(100% + .1rlh + .1em);
-  transform: translate(-50%);
-
-  font-size: 1.5em;
-}
 
 
 

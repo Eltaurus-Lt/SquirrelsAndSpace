@@ -7,12 +7,7 @@
 
   <title>Quadratic transform</title>
   <meta name="author" content="Eltaurus">
-  <script id="PlotSettings" type="application/json">
-    {
-      "PlotRange": 2.64,
-      "CanvasAspect": 1.333
-    }
-  </script>
+
   <link rel="stylesheet" href="styles.css">
 
   <script defer src="../../pLTlib/pLTlib.js"></script>
@@ -25,9 +20,10 @@
 </head>
 <body>
 
-<div id="plotContainer">
-  <svg class="plot"></svg>
-  <svg class="plot axes" TicksX="[[.5, '\frac{1}{2}'], 1 ,2, 3]" TicksY="[[.5, '\frac{1}{2}'], 1 ,2, 3]" MergeOrigin TickDash="5s"><line class="seam" x2="5"></line></svg>
+<div class="plot" PlotRange="2.64" AspectRatio="1.33">
+  <svg class="layer"></svg>
+  <svg class="layer"><line class="seam" x2="5"></line></svg>
+  <div class="layer axes" TicksX="[[.5, '\frac{1}{2}'], 1 ,2, 3]" TicksY="[[.5, '\frac{1}{2}'], 1 ,2, 3]" MergeOrigin></div>
 </div>
 
 <div id="controlPanel">
@@ -39,7 +35,7 @@
 const arcRs = [1/2, 1, 1.5, 2, 2.5, 3, 4];
 
 document.addEventListener("DOMContentLoaded", () => {
-const plotL = document.querySelector(".plot");
+const plotL = document.querySelector(".layer");
 
 /* sectors */
 for (let i = 1; i <= 8; i++) {
