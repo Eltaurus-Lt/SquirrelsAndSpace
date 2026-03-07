@@ -41,16 +41,18 @@ function getPlotSettings(plotL) {
   }
   plotSettings["Left"] = plotL.getAttribute("Left") || plotSettings["Left"];
   plotSettings["Right"] = plotL.getAttribute("Right") || plotSettings["Right"];
-  plotSettings["Top"] = plotL.getAttribute("Top") || (plotSettings["Right"] / plotSettings["AspectRatio"]);
-  plotSettings["Bottom"] = plotL.getAttribute("Bottom") || (plotSettings["Left"] / plotSettings["AspectRatio"]);
-
+  plotSettings["Top"] = plotL.getAttribute("Top") || (plotSettings["Right"] / plotSettings["AspectRatio"] / plotSettings["ScaleRatio"]);
+  plotSettings["Bottom"] = plotL.getAttribute("Bottom") || (plotSettings["Left"] / plotSettings["AspectRatio"] / plotSettings["ScaleRatio"]);
+console.log(plotSettings);
   return plotSettings;
 }
 
 document.querySelectorAll("div.plot").forEach(plotL => {
   const plotSettings = getPlotSettings(plotL);
-
+  
   plotL.querySelectorAll("svg.layer").forEach(layer => {
+    layer.style.aspectRatio = plotSettings["AspectRatio"];
+    layer.setAttribute("preserveAspectRatio", "none");
 
     /* general method for adding elements */
     layer.add = (childType) => {
