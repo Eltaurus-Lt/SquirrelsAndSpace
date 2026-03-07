@@ -44,59 +44,6 @@
 
 <script>
 
-let Precision = 0.0001;
-
-function Subdivide(range, Npoints) {
-  const dx = (range[1] - range[0]) / Npoints;
-  let x = range[0];
-  const pt = [];
-  for (let n = 0; n <= Npoints; n++) {
-    pt.push(x);
-    x += dx;
-  }
-  return pt;
-}
-
-function LinearParametric(f, xs) {
-  let path = "";
-  for (const x of xs) {
-    path += ` L ${f(x).join(" ")}`;
-  }
-  return "M" + path.substring(2);
-}
-
-function BezierParametric(f, df, ts) {
-  let F = f(ts[0]);
-  let dF = df(ts[0]);
-  let dt3 = (ts[1] - ts[0]) / 3;
-  let path = `M ${F.join(" ")} C ${F[0] + dt3 * dF[0]} ${F[1] + dt3 * dF[1]}`;
-  for (let i = 1; i < ts.length - 1; i++) {
-    F = f(ts[i]); dF = df(ts[i]);
-    path += ` ${F[0] - dt3 * dF[0]} ${F[1] - dt3 * dF[1]} ${F[0]} ${F[1]}`;
-    dt3 = (ts[i + 1] - ts[i]) / 3;
-    path += ` C ${F[0] + dt3 * dF[0]} ${F[1] + dt3 * dF[1]}`;
-  }
-  F = f(ts[ts.length - 1]); dF = df(ts[ts.length - 1]);
-  path += ` ${F[0] - dt3 * dF[0]} ${F[1] - dt3 * dF[1]} ${F[0]} ${F[1]}`;
-  return path;
-}
-
-function FindRoot(fdf, x0, iter) {
-  let FdF;
-  for (let i = 0; i < iter; i++) {
-    FdF = fdf(x0);
-    x0 -= FdF[0] / FdF[1];
-  }
-  return([x0, fdf(x0)[0]]);
-}
-
-function NSolve(fdf, x0s, iter) {
-  const sol = x0s.map(x0 => FindRoot(fdf, x0, iter))
-                 .filter(([x, f]) => (Math.abs(f) < Precision))
-                 .map(([x, f]) => x);
-  return(sol);
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   const plotL = document.querySelector(".layer");
   const solL = document.getElementById("solutionLayer");
