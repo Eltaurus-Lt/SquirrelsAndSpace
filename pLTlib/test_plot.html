@@ -20,8 +20,15 @@
   #controlPanel {
     margin-top: 1em;
   }
-  .plotMarker {
+  circle.plotMarker {
     fill: #f68302;
+  }
+  line.plotMarker,
+  path.plotMarker {
+    stroke: #f68302;
+    stroke-width: 12px;
+    stroke-linecap: round;
+    fill: none;
   }
   #cosPlot {
     stroke: #777;
@@ -56,22 +63,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const lineL = plotL.add("line");
   lineL.classList.add('plotLine');
-  lineL.setAttribute("x1", -15);
-  lineL.setAttribute("x2", 15);
+  lineL.setAttribute("x1", -10);
+  lineL.setAttribute("x2", 10);
   dynamic.push(({t, k}) => {
-    lineL.setAttribute("y1", -15/k + t);
-    lineL.setAttribute("y2",  15/k + t);
+    lineL.setAttribute("y1", -10/k + t);
+    lineL.setAttribute("y2",  10/k + t);
   });
 
   dynamic.push(({k, t}) => {
     const sol = NSolve(x=>[x/k + t - Math.cos(x), 1/k + Math.sin(x)], Subdivide([-15, 15], 20), 10);
     solL.innerHTML = "";
     sol.forEach(x => {
-      const markerL = solL.add("circle");
+      const markerL = solL.add("line");
       markerL.classList.add("plotMarker");
-      markerL.setAttribute("r", 0.2);
-      markerL.setAttribute("cx", x);
-      markerL.setAttribute("cy", Math.cos(x));
+      // circle alt
+      //markerL.setAttribute("r", 0.2);
+      //markerL.setAttribute("cx", x);
+      //markerL.setAttribute("cy", Math.cos(x));
+      // path alt
+      //markerL.setAttribute("d", `M ${x} ${Math.cos(x)} Z`);
+      markerL.setAttribute("x1", x);
+      markerL.setAttribute("x2", x + $Precision);
+      markerL.setAttribute("y1", Math.cos(x));
+      markerL.setAttribute("y2", Math.cos(x));
     });
   });
 
