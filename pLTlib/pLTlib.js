@@ -125,7 +125,7 @@ controls.forEach(control => {
 
 /* plotting methods */
 
-let Precision = 0.0001;
+let $Precision = 0.0001;
 
 function Subdivide(range, Npoints) {
   const dx = (range[1] - range[0]) / Npoints;
@@ -173,7 +173,7 @@ function FindRoot(fdf, x0, iter) {
 
 function NSolve(fdf, x0s, iter) {
   const sol = x0s.map(x0 => FindRoot(fdf, x0, iter))
-                 .filter(([x, f]) => (Math.abs(f) < Precision))
+                 .filter(([x, f]) => (Math.abs(f) < $Precision))
                  .map(([x, f]) => x);
   return(sol);
 }
