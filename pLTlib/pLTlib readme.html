@@ -31,18 +31,91 @@
 </div>
 -->
 
-  <h1>pLTlib</h1>
+  <h1 style="text-transform: none;">pLTlib</h1>
+
+  <p>
+    A lightweight toolkit for making interactive mathematical graphics with a focus on performance and ease of low-level customizability.
+  </p>
 
   <br>
 
   <iframe class="centerpiece" src="test_plot.html" onload="window.addEventListener('message', e=>{if(e.source===this.contentWindow && e.data && e.data.type==='embed-height'){this.style.height=e.data.height+'px';}});"></iframe>
   <br>
 
-<!--
+  <h2>Getting started</h2>
+    plot html, 
 
--debug
+   layers are rendered in reverse order (first - bottom, last - top). For example, to render axes on top of the plot lines place the axes layer after the plot layer and vice versa.
 
+  <h3>Embed code</h2>
+
+  <code class="block" highlight="HTML">
+  &lt;iframe src="%%%" width="%%%" onload="window.addEventListener('message', e=>{if(e.source===this.contentWindow && e.data && e.data.type==='embed-height'){this.style.height=e.data.height+'px';}});"&gt;&lt;/iframe&gt;
+  </code>
+  replace %%% with ... and ... the onload function ensures the height of the embedded plot will be automatically adjusted to the natural hight of the source html (and stay correct on page resizing). 
+
+  <h2>Layer types</h2>
+  <h3>Vector graphics</h3>
+  <p>
+    <code>&lt;svg class="layer"&gt;</code>
+  </p>
+  <h3>Text layout</h3>
+    <code>&lt;div class="layer"&gt;</code>
+<!-- todo:
+  <h3>Raster graphics</h3>
+  Canvas
 -->
+  <h3>Shaders (WIP)</h3>
+  <h3>Custom</h3>
+
+  <h2>Dynamic evalutation</h2>
+  <p>
+    On update the functions are executed in the same order they were registered.
+    update() for init.
+  </p>
+  Slider code
+  <code class="block" highlight="JS">  dynamic.push(({k, t}) => {<br>
+    &nbsp;&nbsp;...<br>
+    });</code>
+   Order of the variables provided in <code>{}</code> does not matter. If the arrow function is defined as <code>(var1, var2, ...) => {...}</code> instead, the order shoud match the order of respective slider controls.
+
+  <h2>Styling</h2>
+  <h3>Plot attributes</h3>
+  <h3>Layout</h3>
+  <h3>CSS</h3>
+
+    *Adding <code>debug</code> class to a specific element, element container, or the plot html as a whole will render outlines of the contained layers and sliders to help with layout debugging.
+
+  <h2>Numerical methods</h2>
+
+  optimized for a final result: methods do not perform any checks and rely on all inputs having correct types
+
+  <h3>Plots</h3>
+  <h4><code>plt.LinearPlot(f, xs) (WIP)</code></h4>
+  <h4><code>plt.BezierPlot(f, df, ts) (WIP)</code></h4>
+  <h4><code>plt.LinearParametric(f, xs)</code></h4>
+  <h4><code>plt.BezierParametric(f, df, ts)</code></h4>
+
+  <h3>Solvers</h3>
+  <h4><code>plt.FindRoot(df, x0, iter, damping = 1.)</code></h4>
+    finds a root of an algebraic equation using Newton-Raphson method
+  <h4><code>plt.LocateRoot(fdf, x0, iter)</code> (WIP)</h4>
+    converges slower than FindRoot, but is more stable and ensures the result belongs to the specified interval
+  <h4><code>plt.NSolve(fdf, x0s, iter)</code></h4>
+    returns multiple roots (effectively maps FindRoot over an 
+  <h4><code>plt.NBSolve(fdf, x0s, iter)</code> (WIP)</h4>
+    returns multiple roots found using LocateRoot method
+  <h4><code>plt.NDSolve(fdf, t0, iter)</code> (WIP)</h4>
+    solve a differential equation using Runge-Kutta (rk4) method
+
+  <h3>Utility</h3>
+  <h4><code>.add()</code></h4>
+  <h4><code>Subdivide(range, Npoints)</code></h4>
+  </p>
+    <code>$Precision</code>
+  </p>
+
+  <h2>3D plots (WIP)</h2>
   
 </body>
 </html>
