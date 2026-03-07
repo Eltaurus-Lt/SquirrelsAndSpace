@@ -16,7 +16,11 @@ function attributeParse(value) {
   if (typeof value === "string" && !isNaN(value) && value.trim() !== "") {
     return Number(value);
   }
-  return value;
+  try {
+    return JSON.parse(value);
+  } catch (err) {
+    return value;
+  }
 }
 
 function getPlotSettings(plotL) {
@@ -45,6 +49,7 @@ function getPlotSettings(plotL) {
 
 document.querySelectorAll("div.plot").forEach(plotL => {
   const plotSettings = getPlotSettings(plotL);
+
   plotL.querySelectorAll("svg.layer").forEach(layer => {
 
     /* general method for adding elements */
@@ -62,6 +67,25 @@ document.querySelectorAll("div.plot").forEach(plotL => {
       ${plotSettings["Top"] - plotSettings["Bottom"]}
     `);
   });
+
+  plotL.querySelectorAll("div.axes").forEach(axesL => {
+    const axisX = document.createElement("div");
+    axisX.classList.add("axis", "X");
+    axisX.style.bottom = `${100 * plotSettings["Bottom"] / (plotSettings["Bottom"] - plotSettings["Top"])}%`;
+    axesL.appendChild(axisX);
+    const axisY = document.createElement("div");
+    axisY.classList.add("axis", "Y");
+    axisY.style.right = `${100 * plotSettings["Right"] / (plotSettings["Right"] - plotSettings["Left"])}%`;
+    axesL.appendChild(axisY);
+    if (axesL.hasAttribute("ArrowHeads")) {
+      const arrowheadX = document.createElement("div");
+      arrowheadX.classList.add("arrowhead", "right");
+      axesL.appendChild(arrowheadX);
+      const arrowheadY = document.createElement("div");
+      arrowheadY.classList.add("arrowhead", "top");
+      axesL.appendChild(arrowheadY);
+    }
+  });
 });
 
 
@@ -73,9 +97,6 @@ let arrowheadDef = `
     </marker>
   </defs>
 `;
-
-
-
 
 
 

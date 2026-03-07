@@ -1,3 +1,15 @@
+:root {
+  --line-thickness: 4px;
+  --axes-thickness: 2px;
+  --frame-thickness: 2px;
+  --grid-thickness: 1px;
+  --tick-thickness: 1px;
+  --tick-length: 7px;
+  --subtick-thickness: 1px;
+  --subtick-length: 3px;
+  --arrowheads: 5px;
+}
+
 @media(min-width: 800px) {
   body {
     font-size: 24px;
@@ -11,6 +23,7 @@
 
 body {
   margin: 0;
+  overflow-Y: hidden;
 }
 
 
@@ -38,6 +51,59 @@ div.plot div.axes {
   inset: 0;
 }
 
+:where(div.axes .axis) {
+  position: absolute;
+  background: black;
+}
+:where(div.axes .axis.X) {
+  left: 0;
+  right: 0;
+  height: var(--axes-thickness);
+  translate: 0 50%;
+  bottom: 50%; /* fallback */
+}
+:where(div.axes .axis.Y) {
+  width: var(--axes-thickness);
+  top: 0;
+  bottom: 0;
+  translate: 50% 0;
+  right: 50%; /* fallback */
+}
+
+/* arrowheads */
+:where(div.axes .arrowhead) {
+  position: absolute;
+  background: black;
+  width: calc(7 * var(--axes-thickness));
+  height: calc(5 * var(--axes-thickness));
+  transform-origin: center right;
+  clip-path: polygon(100% 50%, 0 0, 15% 50%, 0 100%);
+}
+:where(div.axes .arrowhead.right) {
+  transform: translateY(50%);
+  right: 0;
+  bottom: 50%; /* fallback */
+}
+:where(div.axes .arrowhead.top) {
+  transform: translateY(-50%) rotate(-90deg);
+  top: 0;
+  right: 50%; /* fallback */
+}
+
+div.axes:has(.arrowhead.right) .axis.X {
+  right: calc(5 * var(--axes-thickness));
+}
+div.axes:has(.arrowhead.left) .axis.X {
+  left: calc(5 * var(--axes-thickness));
+}
+div.axes:has(.arrowhead.top) .axis.Y {
+  top: calc(5 * var(--axes-thickness));
+}
+div.axes:has(.arrowhead.bottom) .axis.Y {
+  bottom: calc(5 * var(--axes-thickness));
+}
+
+
 /* Text labels (todo) */
 #plotlabel {
   width: 6.5em;
@@ -60,30 +126,31 @@ div.plot div.axes {
 }
 
 
-/* Plot Styles (todo) */
-.plotline {
-  stroke-width: 0.07;
+/* Plot Styles */
+.plotLine {
+  stroke-width: var(--line-thickness);
+  fill: none;
 }
 .plotPoint {
   r: 0.05px;
 }
 
 /* WM colors */
-.plot .layer .plotLine:nth-child(15n+1) {stroke: #5e81b5;}
-.plot .layer .plotLine:nth-child(15n+2) {stroke: #e19c24;}
-.plot .layer .plotLine:nth-child(15n+3) {stroke: #8fb032;}
-.plot .layer .plotLine:nth-child(15n+4) {stroke: #eb6235;}
-.plot .layer .plotLine:nth-child(15n+5) {stroke: #8778b3;}
-.plot .layer .plotLine:nth-child(15n+6) {stroke: #c56e1a;}
-.plot .layer .plotLine:nth-child(15n+7) {stroke: #5d9ec7;}
-.plot .layer .plotLine:nth-child(15n+8) {stroke: #ffbf00;}
-.plot .layer .plotLine:nth-child(15n+9) {stroke: #a5609d;}
-.plot .layer .plotLine:nth-child(15n+10) {stroke: #929600;}
-.plot .layer .plotLine:nth-child(15n+11) {stroke: #e95536;}
-.plot .layer .plotLine:nth-child(15n+12) {stroke: #6685d9;}
-.plot .layer .plotLine:nth-child(15n+13) {stroke: #f89f13;}
-.plot .layer .plotLine:nth-child(15n+14) {stroke: #bc5b80;}
-.plot .layer .plotLine:nth-child(15n) {stroke: #47b66d;}
+.plot svg.layer:nth-of-type(15n+1) .plotLine {stroke: #5e81b5;}
+.plot svg.layer:nth-of-type(15n+2) .plotLine {stroke: #e19c24;}
+.plot svg.layer:nth-of-type(15n+3) .plotLine {stroke: #8fb032;}
+.plot svg.layer:nth-of-type(15n+4) .plotLine {stroke: #eb6235;}
+.plot svg.layer:nth-of-type(15n+5) .plotLine {stroke: #8778b3;}
+.plot svg.layer:nth-of-type(15n+6) .plotLine {stroke: #c56e1a;}
+.plot svg.layer:nth-of-type(15n+7) .plotLine {stroke: #5d9ec7;}
+.plot svg.layer:nth-of-type(15n+8) .plotLine {stroke: #ffbf00;}
+.plot svg.layer:nth-of-type(15n+9) .plotLine {stroke: #a5609d;}
+.plot svg.layer:nth-of-type(15n+10) .plotLine {stroke: #929600;}
+.plot svg.layer:nth-of-type(15n+11) .plotLine {stroke: #e95536;}
+.plot svg.layer:nth-of-type(15n+12) .plotLine {stroke: #6685d9;}
+.plot svg.layer:nth-of-type(15n+13) .plotLine {stroke: #f89f13;}
+.plot svg.layer:nth-of-type(15n+14) .plotLine {stroke: #bc5b80;}
+.plot svg.layer:nth-of-type(15n) .plotLine {stroke: #47b66d;}
 
 
 

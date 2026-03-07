@@ -5,7 +5,7 @@ const axesSVG = document.querySelector('svg.axes');
 // arrowheads def
 let arrowheadDef = `
   <defs>
-    <marker id="axisArrowhead" markerWidth="14" markerHeight="5" refX="7" refY="3.5" orient="auto-start-reverse" viewBox="0 0 10 7">
+    <marker id="axisArrowhead" markerWidth="8" markerHeight="5" refX="7" refY="3.5" orient="auto-start-reverse" viewBox="0 0 10 7">
       <polygon points="10 3.5, 0 0, 1.5 3.5, 0 7"/>
     </marker>
   </defs>
