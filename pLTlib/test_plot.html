@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" class="-debug">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>pLTlib test plot</title>
+  <meta name="author" content="Eltaurus">
+
+  <script defer src="pLTlib.js"></script>
+  <link rel="stylesheet" href="pLTlib.css">
+
+<style>
+  .plot {
+    background: white;
+    border-radius: 1em;
+    border: solid white 2em;
+  }
+  #controlPanel {
+    margin-top: 1em;
+  }
+  .plotMarker {
+    fill: #f68302;
+  }
+  #cosPlot {
+    stroke: #777;
+  }
+</style>
+</head>
+<body>
+
+<div class="plot" PlotRange="10.5" ScaleRatio="2.5">
+  <svg class="layer"></svg>
+  <div class="layer axes" TicksX="[[.5, '\(\frac{1}{2}\)'], 1 ,2, 3]" TicksY="[[.5, '\(\frac{i}{2}\)'], 1 ,2, 3]" MergeOrigin Arrowheads></div>
+  <svg class="layer" id="solutionLayer"></svg>
+</div>
+
+<div id="controlPanel">
+  <input var="t" class="plotSlider" autoplay loop="true" type="range" min="-1.2" max="1.2" step="any" value="0">
+</div>
+
+
+<script>
+
+let Precision = 0.0001;
+
+function Subdivide(range, Npoints) {
+  const dx = (range[1] - range[0]) / Npoints;
+  let x = range[0];
+  const pt = [];
+  for (let n = 0; n <= Npoints; n++) {
+    pt.push(x);
+    x += dx;
+  }
+  return pt;
+}
+
+function LinearParametric(f, xs) {
+  let path = "";
+  for (const x of xs) {
+    path += ` L ${f(x).join(" ")}`;
+  }
+  return "M" + path.substring(2);
+}
+
+function FindRoot(fdf, x0, iter) {
+  let FdF;
+  for (let i = 0; i < iter; i++) {
+    FdF = fdf(x0);
+    x0 -= FdF[0] / FdF[1];
+  }
+  return([x0, fdf(x0)[0]]);
+}
+
+function NSolve(fdf, x0s, iter) {
+  const sol = x0s.map(x0 => FindRoot(fdf, x0, iter))
+                 .filter(([x, f]) => (Math.abs(f) < Precision))
+                 .map(([x, f]) => x);
+  return(sol);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const plotL = document.querySelector(".layer");
+  const solL = document.getElementById("solutionLayer");
+
+  const cosL = plotL.add("path");
+  cosL.classList.add("plotLine");
+  cosL.setAttribute("d", LinearParametric(t=>[t, Math.cos(t)], Subdivide([-10, 10], 20)));
+  cosL.id = "cosPlot";
+
+  const lineL = plotL.add("line");
+  lineL.classList.add('plotLine');
+  lineL.setAttribute("x1", -15);
+  lineL.setAttribute("x2", 15);
+  dynamic.push(({t}) => {
+    lineL.setAttribute("y1", -3 + t);
+    lineL.setAttribute("y2",  3 + t);
+  });
+
+  dynamic.push(({t}) => {
+    const sol = NSolve(x=>[x/5 + t - Math.cos(x), 1/5 + Math.sin(x)], Subdivide([-15, 15], 20), 10);
+console.log()
+    solL.innerHTML = "";
+    sol.forEach(x => {
+      const markerL = solL.add("circle");
+      markerL.classList.add("plotMarker");
+      markerL.setAttribute("r", 0.2);
+      markerL.setAttribute("cx", x);
+      markerL.setAttribute("cy", Math.cos(x));
+    });
+  });
+
+  update(); /* init */
+
+});
+</script>
+
+</body>
+</html>
