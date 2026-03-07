@@ -38,6 +38,7 @@
 
 <div id="controlPanel">
   <input var="t" class="plotSlider" autoplay loop="true" type="range" min="-1.2" max="1.2" step="any" value="0">
+  <input var="k" class="plotSlider" autoplay loop="true" type="range" min="1" max="10" step="any" value="5">
 </div>
 
 
@@ -64,6 +65,22 @@ function LinearParametric(f, xs) {
   return "M" + path.substring(2);
 }
 
+function BezierParametric(f, df, ts) {
+  let F = f(ts[0]);
+  let dF = df(ts[0]);
+  let dt3 = (ts[1] - ts[0]) / 3;
+  let path = `M ${F.join(" ")} C ${F[0] + dt3 * dF[0]} ${F[1] + dt3 * dF[1]}`;
+  for (let i = 1; i < ts.length - 1; i++) {
+    F = f(ts[i]); dF = df(ts[i]);
+    path += ` ${F[0] - dt3 * dF[0]} ${F[1] - dt3 * dF[1]} ${F[0]} ${F[1]}`;
+    dt3 = (ts[i + 1] - ts[i]) / 3;
+    path += ` C ${F[0] + dt3 * dF[0]} ${F[1] + dt3 * dF[1]}`;
+  }
+  F = f(ts[ts.length - 1]); dF = df(ts[ts.length - 1]);
+  path += ` ${F[0] - dt3 * dF[0]} ${F[1] - dt3 * dF[1]} ${F[0]} ${F[1]}`;
+  return path;
+}
+
 function FindRoot(fdf, x0, iter) {
   let FdF;
   for (let i = 0; i < iter; i++) {
@@ -86,21 +103,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const cosL = plotL.add("path");
   cosL.classList.add("plotLine");
-  cosL.setAttribute("d", LinearParametric(t=>[t, Math.cos(t)], Subdivide([-10, 10], 20)));
+  //cosL.setAttribute("d", LinearParametric(t=>[t, Math.cos(t)], Subdivide([-10, 10], 30)));
+  cosL.setAttribute("d", BezierParametric(t=>[t, Math.cos(t)],t=>[1, -Math.sin(t)], Subdivide([-10, 10], 30)));
   cosL.id = "cosPlot";
 
   const lineL = plotL.add("line");
   lineL.classList.add('plotLine');
   lineL.setAttribute("x1", -15);
   lineL.setAttribute("x2", 15);
-  dynamic.push(({t}) => {
-    lineL.setAttribute("y1", -3 + t);
-    lineL.setAttribute("y2",  3 + t);
+  dynamic.push(({t, k}) => {
+    lineL.setAttribute("y1", -15/k + t);
+    lineL.setAttribute("y2",  15/k + t);
   });
 
-  dynamic.push(({t}) => {
-    const sol = NSolve(x=>[x/5 + t - Math.cos(x), 1/5 + Math.sin(x)], Subdivide([-15, 15], 20), 10);
-console.log()
+  dynamic.push(({k, t}) => {
+    const sol = NSolve(x=>[x/k + t - Math.cos(x), 1/k + Math.sin(x)], Subdivide([-15, 15], 20), 10);
     solL.innerHTML = "";
     sol.forEach(x => {
       const markerL = solL.add("circle");
