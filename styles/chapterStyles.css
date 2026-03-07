@@ -59,6 +59,10 @@ ul.references {
     margin: auto;
 }
 
+iframe {
+  border: none;
+}
+
 
 /* downloads */
 
