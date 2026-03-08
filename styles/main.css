@@ -140,7 +140,7 @@ body {
     max-width: var(--maxwidth);
     margin: 0 auto;
 
-    padding: 2em;
+    padding: 3.5em;
     padding-bottom: 6em;
 
     background: var(--bg-col);
@@ -176,6 +176,16 @@ h2 {
 p {  
     text-align: justify;
     text-justify: inter-word;
+
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+@media (max-width: 50em) {
+    p {
+        -webkit-hyphens: auto;
+        hyphens: auto;
+    }
 }
 
 .section {
@@ -243,7 +253,7 @@ a:has(h3, h5) {
 
 
 h3 {
-    margin-bottom: 0;
+    margin: 1.5em 0 0;
     color: var(--header-col);
     width: max-content;
     max-width: 100%;
@@ -253,12 +263,16 @@ a h3 {
     text-decoration: underline;
 }
 
+h4 {
+    margin: 0.5em 0;
+}
+
 h5 {
     padding-left: .5em;
+    margin: 0;
 }
 
 h4, h5 {
-    margin: 0;
     width: max-content;
 
     color: var(--subheader-col);
@@ -299,8 +313,13 @@ h4, h5 {
 code.block {
   display: block;
   position: relative;
+
+  text-align: left;
+  white-space: nowrap;
+  overflow-X: auto;
+
   background: var(--hover-col);
-  margin: .5em;
+  margin: .5em 0 .5em 0.5em;
   padding: 1em;
   border-radius: 5px;
   border: 1px solid var(--border-col);

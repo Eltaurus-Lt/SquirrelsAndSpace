@@ -34,7 +34,7 @@
   <h1 style="text-transform: none;">pLTlib</h1>
 
   <p>
-    A lightweight toolkit for making interactive mathematical graphics with a focus on performance and ease of low-level customizability.
+    A lightweight engine for making interactive mathematical graphics with a focus on performance and openness to easy low-level customization. <!-- avoid redundant abstractions and use generic web tools in their rawest form -->
   </p>
 
   <br>
@@ -42,25 +42,79 @@
   <iframe class="centerpiece" src="test_plot.html" onload="window.addEventListener('message', e=>{if(e.source===this.contentWindow && e.data && e.data.type==='embed-height'){this.style.height=e.data.height+'px';}});"></iframe>
   <br>
 
+
+
   <h2>Getting started</h2>
-    plot html, 
 
-   layers are rendered in reverse order (first - bottom, last - top). For example, to render axes on top of the plot lines place the axes layer after the plot layer and vice versa.
 
-  <h3>Embed code</h2>
+  <h3>Plot template</h3>
+  <p>
+    A typical code for a plot would look like the following:
+    <code class="block" highlight="HTML">
+      &lt;div class="plot" PlotRange="[-5, 5]"&gt;<br>
+      &nbsp;&lt;svg class="layer" id="plotCanvas"&gt;&lt;/svg&gt;<br>
+      &nbsp;&lt;div class="layer" Axes Arrowheads Ticks="1"&gt;&lt;/div&gt;<br>
+      &lt;/div&gt;
+    </code>
 
-  <code class="block" highlight="HTML">
-  &lt;iframe src="%%%" width="%%%" onload="window.addEventListener('message', e=>{if(e.source===this.contentWindow && e.data && e.data.type==='embed-height'){this.style.height=e.data.height+'px';}});"&gt;&lt;/iframe&gt;
-  </code>
-  replace %%% with ... and ... the onload function ensures the height of the embedded plot will be automatically adjusted to the natural hight of the source html (and stay correct on page resizing). 
+    A plot can contain any number and <a href="#layers">various types</a> of layers. The layers are rendered in reverse order: the one that comes first is placed at the bottom, the next is placed on top of it, etc. To draw the axes below the plot lines, for example, the <code>&lt;div&gt;</code> with <code>Axes</code> should be moved before the&nbsp;<code>&lt;svg&gt;</code>.
+  </p>
+  <p>
+    Structural <a href="#plot_attributes">plot properties</a> are set up as html attributes of the <code>.plot</code> container and individual <code>.layer</code> elements. The appearance of any component can be customized using standard <a href="#CSS">CSS</a>. 
+  </p>
+  <p>
+    Graphical content can be <a href="#add">added<a> to layers using the provided <a href="#plotting">plotting methods</a> and combined with static elements hardcoded directly inside the respective layers, e.g.:
+    <code class="block" highlight="HTML">
+      &lt;svg class="layer" id="plotCanvas"&gt;<br>
+      &nbsp;&lt;circle r="0.5" cx="2" cy="1" &gt;&lt;/circle&gt;<br>
+      &lt;/svg&gt;
+    </code>
+  </p>
+  <p>
+    For adding plot controls and making the elements interactive see the section on <a href="#dynamic">dynamic evaluation</a>.
+  </p>
 
-  <h2>Layer types</h2>
+  <h3>Boilerplate</h3>
+  
+  <p>
+  Individual illustrations are intended to be coded in separate <code>.html</code> files (each can contain <a href="#layout">multiple</a> <code>.plot</code> objects), which then are embedded into a common article page.
+  </p>
+
+  <p>
+    <h4>Import</h4>
+    The code to be included in the <code>&lt;head&gt;</code> of a plot html file: 
+
+    <code class="block" highlight="HTML">
+      &lt;script defer src="https://cdn.jsdelivr.net/gh/Eltaurus-Lt/SquirrelsAndSpace/pLTlib/pLTlib.js"&gt;&lt;/script&gt;<br>
+      &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Eltaurus-Lt/SquirrelsAndSpace/pLTlib/pLTlib.css"&gt;<br>
+      &lt;script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"&gt;&lt;/script&gt;
+    </code>
+
+    The last line is for importing <a href="https://docs.mathjax.org/en/v4.0/basic/mathjax.html" target="_blank">MathJax</a> and can be ommited if LaTeX fonts and formatting are not used.
+  </p>
+
+  <p>
+    <h4>Embedding</h4>
+    The code for embedding into a parent document:
+    <code class="block" highlight="HTML">
+    &lt;iframe src="plot.html" width="600px" onload="window.addEventListener('message', e=>{if(e.source===this.contentWindow && e.data && e.data.type==='embed-height'){this.style.height=e.data.height+'px';}});"&gt;&lt;/iframe&gt;
+    </code>
+  </p>
+  <p>
+    Replace <code>plot.html</code> with the actual path to the plot file being embedded. The <code>width</code> attribute can be <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units#lengths" target="_blank">modified</a> as needed and additional attributes, like classes and styling, can be inserted as usual. 
+The included onload function ensures the height of the embedded plot is fit to the proper size of the source html and accurately reacts to page resizing. 
+  </p>
+
+
+  <h2 id="layers">Layer types</h2>
   <h3>Vector graphics</h3>
   <p>
     <code>&lt;svg class="layer"&gt;</code>
   </p>
   <h3>Text layout</h3>
+  <p>
     <code>&lt;div class="layer"&gt;</code>
+  </p>
 <!-- todo:
   <h3>Raster graphics</h3>
   Canvas
@@ -68,7 +122,7 @@
   <h3>Shaders (WIP)</h3>
   <h3>Custom</h3>
 
-  <h2>Dynamic evalutation</h2>
+  <h2 id="dynamic">Dynamic evalutation</h2>
   <p>
     On update the functions are executed in the same order they were registered.
     update() for init.
@@ -80,37 +134,42 @@
    Order of the variables provided in <code>{}</code> does not matter. If the arrow function is defined as <code>(var1, var2, ...) => {...}</code> instead, the order shoud match the order of respective slider controls.
 
   <h2>Styling</h2>
-  <h3>Plot attributes</h3>
+  <h3 id="plot_attributes">Plot attributes</h3>
   <h3>Layout</h3>
-  <h3>CSS</h3>
+  <h3 id="CSS">CSS</h3>
 
     *Adding <code>debug</code> class to a specific element, element container, or the plot html as a whole will render outlines of the contained layers and sliders to help with layout debugging.
 
   <h2>Numerical methods</h2>
-
+<!-- no overhead, all methods and settings are selected explicitly -->
   optimized for a final result: methods do not perform any checks and rely on all inputs having correct types
 
-  <h3>Plots</h3>
-  <h4><code>plt.LinearPlot(f, xs) (WIP)</code></h4>
-  <h4><code>plt.BezierPlot(f, df, ts) (WIP)</code></h4>
-  <h4><code>plt.LinearParametric(f, xs)</code></h4>
-  <h4><code>plt.BezierParametric(f, df, ts)</code></h4>
+  <h3 id="plotting">Plots</h3>
+  <h5><code>plt.LinearPlot(f, xs) (WIP)</code></h5>
+  <h5><code>plt.BezierPlot(f, df, ts) (WIP)</code></h5>
+  <h5><code>plt.LinearParametric(f, xs)</code></h5>
+  <h5><code>plt.BezierParametric(f, df, ts)</code></h5>
+  <h5><code>plt.ListPlot(xfs) (WIP)</code></h5>
+  <h5><code>plt.LinearListPlot(xfs) (WIP)</code></h5>
+  <h5><code>plt.BezierListPlot(xfs) (WIP)</code></h5>
+
+
 
   <h3>Solvers</h3>
-  <h4><code>plt.FindRoot(df, x0, iter, damping = 1.)</code></h4>
-    finds a root of an algebraic equation using Newton-Raphson method
-  <h4><code>plt.LocateRoot(fdf, x0, iter)</code> (WIP)</h4>
+  <h5><code>plt.FindRoot(df, x0, iter, damping = 1.)</code></h5>
+    finds a root of an algebraic equation using Newton–Raphson method
+  <h5><code>plt.LocateRoot(fdf, x0, iter)</code> (WIP)</h5>
     converges slower than FindRoot, but is more stable and ensures the result belongs to the specified interval
-  <h4><code>plt.NSolve(fdf, x0s, iter)</code></h4>
+  <h5><code>plt.NSolve(fdf, x0s, iter)</code></h5>
     returns multiple roots (effectively maps FindRoot over an 
-  <h4><code>plt.NBSolve(fdf, x0s, iter)</code> (WIP)</h4>
+  <h5><code>plt.NBSolve(fdf, x0s, iter)</code> (WIP)</h5>
     returns multiple roots found using LocateRoot method
-  <h4><code>plt.NDSolve(fdf, t0, iter)</code> (WIP)</h4>
-    solve a differential equation using Runge-Kutta (rk4) method
+  <h5><code>plt.NDSolve(fdf, t0, iter)</code> (WIP)</h5>
+    solve a differential equation using Runge–Kutta (rk4) method
 
   <h3>Utility</h3>
-  <h4><code>.add()</code></h4>
-  <h4><code>Subdivide(range, Npoints)</code></h4>
+  <h5 id="add"><code>.add()</code></h5>
+  <h5><code>Subdivide(range, Npoints)</code></h5>
   </p>
     <code>$Precision</code>
   </p>
