@@ -107,7 +107,7 @@ The included onload function ensures the height of the embedded plot is fit to t
 
 
   <h2 id="layers">Layer types</h2>
-  <h3>Vector graphics</h3>
+  <h3 id="svg">Vector graphics</h3>
   <p>
     <code>&lt;svg class="layer"&gt;</code>
   </p>
@@ -128,7 +128,7 @@ The included onload function ensures the height of the embedded plot is fit to t
     update() for init.
   </p>
   Slider code
-  <code class="block" highlight="JS">  dynamic.push(({k, t}) => {<br>
+  <code class="block" highlight="JS">  plt.dynamic.push(({k, t}) => {<br>
     &nbsp;&nbsp;...<br>
     });</code>
    Order of the variables provided in <code>{}</code> does not matter. If the arrow function is defined as <code>(var1, var2, ...) => {...}</code> instead, the order shoud match the order of respective slider controls.
@@ -141,38 +141,126 @@ The included onload function ensures the height of the embedded plot is fit to t
     *Adding <code>debug</code> class to a specific element, element container, or the plot html as a whole will render outlines of the contained layers and sliders to help with layout debugging.
 
   <h2>Numerical methods</h2>
+  All numerical mehods are called from the <code>plt</code> object.
 <!-- no overhead, all methods and settings are selected explicitly -->
   optimized for a final result: methods do not perform any checks and rely on all inputs having correct types
 
   <h3 id="plotting">Plots</h3>
-  <h5><code>plt.LinearPlot(f, xs) (WIP)</code></h5>
-  <h5><code>plt.BezierPlot(f, df, ts) (WIP)</code></h5>
-  <h5><code>plt.LinearParametric(f, xs)</code></h5>
-  <h5><code>plt.BezierParametric(f, df, ts)</code></h5>
-  <h5><code>plt.ListPlot(xfs) (WIP)</code></h5>
-  <h5><code>plt.LinearListPlot(xfs) (WIP)</code></h5>
-  <h5><code>plt.BezierListPlot(xfs) (WIP)</code></h5>
+  <p>
+    Plotting methods return line data in the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-string format</a> ready to be applied to a <code>&lt;path&gt;</code> element (inside an <a href="#svg">svg layer</a>): 
+    <code class="block" highlight="JS">
+      const svgLayer = document.querySelector("svg.layer");<br>
+      svgLayer.add("path", "plotLine").setAttribute("d", plot_string);
+    </code>
+    Here <code>.add</code> is a <a href="#add">provided utility method</a> for creating and attaching plot elements, and <code>plot_string</code> is a result returned by one of the methods listed below.
+  </p>
 
+  <p>
+    <h4><code>LinearPlot(f, xs)</code></h4>
+    Plot of an analytical single-valued function <code>f(x)</code> drawn as a polyline over an array of argument values <code>xs</code>:
+    <code class="block" highlight="JS">
+      plot_string = plt.LinearPlot(x =&gt; Math.cos(x), Subdivide([0, 10], 25));
+    </code>
+    Here <code>x =&gt; Math.cos(x)</code> is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">JS arrow function</a> expression for <code>f(x)=cos(x)</code>, and <code>Subdivide(...)</code> is an array of <code>x</code> values, obtained by applying the <a href="#subdivide">respective utility method</a> to the <code>[0, 10]</code> interval.
+  </p>
 
+  <p>
+    <h4><code>BezierPlot(f, df, xs)</code></h4>
+    Method similar to the <code>LinearPlot</code> above, which returns a <a href="https://eltaurus-lt.github.io/ChaosAndCats/en/chapter-03.html" target="_blank">cubic Bezier spline</a> instead of straight-line segments to produce a completely smooth result with fewer points. Requires additionally providing explicit analytical expression for the derivative <code>df(x)</code> of the <code>f(x)</code> function:
+    <code class="block" highlight="JS">
+      plt.BezierPlot(x =&gt; Math.cos(x), x =&gt; -Math.sin(x), xs)
+    </code>
+  </p>
+
+  <h4><code>LinearParametric(f, ts)</code></h4>
+  <p>
+    Equivalent of the <code>LinearPlot</code> for parametric plots of 2D vector functions, such as
+    <code class="block" highlight="JS">
+      t =&gt; [ Math.cos(x - 0.3), Math.sin(2 * x)]
+    </code>
+  </p>
+  <h4><code>BezierParametric(f, df, ts)</code></h4>
+  <p>
+    2D vector equivalent of the <code>BezierPlot</code>. Requires providing the derivative <code>df</code>, which itself should also be a 2D vector function.
+  </p>
+  <h4><code>LinearListPlot(xys)</code></h4>
+  <p>
+    Returns a polyline constructed from an array <code>xys</code> of 2D points <code>[x, y]</code>. Appropriate for plotting table functions. In particular, the ones obtained as numerical solitions of differential equations.
+  </p>
+  <h4><code>BezierListPlot(xys) (WIP)</code></h4>
+  <p>
+    Bezier equivalent of the <code>LinearListPlot</code>.
+  </p>
+  <br>
+  <h4><code>ListPlot(xys) (WIP)</code></h4>
+  <p>
+    A singular method for plotting a table function as a collection of points instead of a continuous line. In contrast to all the previous methods does not return a d-string, but an array of <a href="marker">Markers</a>, which can be attached to an svg layer directly:
+    <code class="block" highlight="JS">
+      svgLayer.add(plt.ListPlot(xys), "plotMarker").
+    </code>
+  </p>
 
   <h3>Solvers</h3>
-  <h5><code>plt.FindRoot(df, x0, iter, damping = 1.)</code></h5>
-    finds a root of an algebraic equation using Newton–Raphson method
-  <h5><code>plt.LocateRoot(fdf, x0, iter)</code> (WIP)</h5>
-    converges slower than FindRoot, but is more stable and ensures the result belongs to the specified interval
-  <h5><code>plt.NSolve(fdf, x0s, iter)</code></h5>
-    returns multiple roots (effectively maps FindRoot over an 
-  <h5><code>plt.NBSolve(fdf, x0s, iter)</code> (WIP)</h5>
-    returns multiple roots found using LocateRoot method
-  <h5><code>plt.NDSolve(fdf, t0, iter)</code> (WIP)</h5>
-    solve a differential equation using Runge–Kutta (rk4) method
+
+  Provided methods for solving algebraic and differential equations.
+ 
+  <h4><code>FindRoot(f, df, x0, iter, damp = 1)</code></h4>
+  <p>
+    Finds a root of an algebraic equation <code>f(x)=0</code> using <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton–Raphson<a> method starting from the point <code>x0</code> and performing <code>iter</code> number of steps. Requires providing analytical derivative <code>df(x)</code> of the function <code>f(x)</code> (both should be single-valued functions).<br>
+    Allows specifying an optional damping factor, which serves as a step multiplier (when the function is called with 4 arguments, <code>damp</code> defaults to <code>1</code>). Values less than <code>1</code> improve stability, but require more steps to converge. Values greater than <code>1</code> can be useful for improving convergence near roots with multiplicity <code>&gt; 1</code>.<br>
+  Example use:
+    <code class="block" highlight="JS">
+      xr = plt.FindRoot(x => (Math.cos(x) - 1), x => -Math.sin(x), 0, 10);
+    </code>
+  </p>
+  <h4><code>LocateRoot(f, [xa, xb], iter)</code></h4>
+  <p>
+    Finds a root of an algebraic equation <code>f(x)=0</code> using the <a href="https://en.wikipedia.org/wiki/Bisection_method" target="_blank">Bisection<a> method starting on an interval <code>[xa, xb]</code> and performing <code>iter</code> number of steps. In general, converges slower than <code>FindRoot</code>, but is always stable and ensures that the result belongs to the specified interval. Relies on <code>f(xa)</code> and <code>f(xb)</code> having opposite signs (returns <code>Null</code> otherwise).
+  </p>
+
+  <h4><code>NSolve(f, df, x0s, iter, damp = 1)</code></h4>
+  <p>
+    Searches for multiple roots of the <code>f(x)=0</code> equation using <code>FindRoot</code> for each of the <code>x0</code> values from the array <code>x0s</code>. Filters out repeated results, based on <a href="#Precision">$Precision</a>.
+  </p>
+
+  <h4><code>NBSolve(f, x0s, iter)</code></h4>
+  <p>
+    Searches for multiple roots of the <code>f(x)=0</code> equation using <code>LocateRoot</code> for each of the pairs of consecutive values from the <code>x0s</code> array. Filters out <code>Null</code> resutls, does not search for more than one root per interval.
+  </p>
+
+  <h4><code>NDSolve(f, x0, ts)</code></h4>
+  <p>
+    Integrates differential equation <code>x'(t)=f(x, t)</code> over the array <code>ts</code> of <code>t</code> values using the <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4) with initial conditions <code>x(ts[0])=x0</code>. The method supports <code>x</code> being both a real number and a vector (array) of arbitrary length. In the vector case, <code>f(x, t)</code> must return an array of the same length and expect its <code>x</code> argument to be an array as well.
+Example use:
+    <code class="block" highlight="JS">
+      function f([x, y, z], t) {<br>
+      &nbsp;&nbsp;return [<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 * (y - x),<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x * (15 - z) - y,<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x * y - 0.2 * z<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;];<br>
+      };<br>
+      sol = plt.NDSolve(f, [1, 1, 10], Subdivide([0, 100], 1000)));
+    </code>
+Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting example:
+    <code class="block" highlight="JS">
+      plot_string = LinearListPlot(sol.map( ([t, [x, y, z]]) => [x, z] ));<br>
+      svgLayer.add("path", "plotLine").setAttribute("d", plot_string);
+    </code>
+  </p>
+
 
   <h3>Utility</h3>
   <h5 id="add"><code>.add()</code></h5>
-  <h5><code>Subdivide(range, Npoints)</code></h5>
-  </p>
-    <code>$Precision</code>
-  </p>
+  class or class list (to control separately thickness and color, for example)
+  <h5 id="subdivide"><code>Subdivide(range, Npoints)</code></h5>
+  <h5><code>Connect</code></h5>
+  <h5><code>$Precision</code></h5>
+
+  <ul class="references todo off">
+    <h4>Additional examples</h4>
+    <li><a href="../en/ConformalMaps.html">Conformal Maps</a></li>
+  </ul>
 
   <h2>3D plots (WIP)</h2>
   
