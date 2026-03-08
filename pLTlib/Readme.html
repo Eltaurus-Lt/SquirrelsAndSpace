@@ -63,7 +63,7 @@
     Structural <a href="#plot_attributes">plot properties</a> are set up as html attributes of the <code>.plot</code> container and individual <code>.layer</code> elements. The appearance of any component can be customized using standard <a href="#CSS">CSS</a>. 
   </p>
   <p>
-    Graphical content can be <a href="#add">added<a> to layers using the provided <a href="#plotting">plotting methods</a> and combined with static elements hardcoded directly inside the respective layers, e.g.:
+    Graphical content can be added to layers using the provided <a href="#plotting">plotting methods</a> and combined with static elements hardcoded directly inside the respective layers, e.g.:
     <code class="block" highlight="HTML">
       &lt;svg class="layer" id="plotCanvas"&gt;<br>
       &nbsp;&lt;circle r="0.5" cx="2" cy="1" &gt;&lt;/circle&gt;<br>
@@ -80,8 +80,8 @@
   Individual illustrations are intended to be coded in separate <code>.html</code> files (each can contain <a href="#layout">multiple</a> <code>.plot</code> objects), which then are embedded into a common article page.
   </p>
 
+  <h4>Import</h4>
   <p>
-    <h4>Import</h4>
     The code to be included in the <code>&lt;head&gt;</code> of a plot html file: 
 
     <code class="block" highlight="HTML">
@@ -93,39 +93,60 @@
     The last line is for importing <a href="https://docs.mathjax.org/en/v4.0/basic/mathjax.html" target="_blank">MathJax</a> and can be ommited if LaTeX fonts and formatting are not used.
   </p>
 
+  <h4>Embedding</h4>
   <p>
-    <h4>Embedding</h4>
     The code for embedding into a parent document:
     <code class="block" highlight="HTML">
     &lt;iframe src="plot.html" width="600px" onload="window.addEventListener('message', e=>{if(e.source===this.contentWindow && e.data && e.data.type==='embed-height'){this.style.height=e.data.height+'px';}});"&gt;&lt;/iframe&gt;
     </code>
   </p>
   <p>
-    Replace <code>plot.html</code> with the actual path to the plot file being embedded. The <code>width</code> attribute can be <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units#lengths" target="_blank">modified</a> as needed and additional attributes, like classes and styling, can be inserted as usual. 
+    Replace <code>plot.html</code> with the actual path to the plot file being embedded. The <code>width</code> attribute can be <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units#lengths" target="_blank">modified</a> as needed and additional attributes, like classes and styling, can be appended as usual. 
 The included onload function ensures the height of the embedded plot is fit to the proper size of the source html and accurately reacts to page resizing. 
   </p>
 
 
   <h2 id="layers">Layer types</h2>
-  <h3 id="svg">Vector graphics</h3>
+  <h3 id="svg">Vector layers</h3>
   <p>
-    <code>&lt;svg class="layer"&gt;</code>
+    <code class="block" highlight="HTML">
+      &lt;svg class="layer"&gt;&lt;/svg&gt;
+    </code>
+    Layers for adding <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch/Basic_shapes" target="_blank">vector graphical elements</a> to a plot. Coordinates and their units are matched with the plot space. In particular, vertical axis is directed upward, as expected from a mathematical plot, instead of going down, as is the default for svg. Note, that if a plot has <a href="#plot_attributes">different scales</a> on horizontal and vertical axes, graphical elements will appear stretched or squished, accordingly. Line <a href="https://developer.mozilla.org/ru/docs/Web/SVG/Reference/Attribute/stroke-width">stroke thickness</a> is set in screen space in pixels and remains fixed, independently of the displaying size of the plot. For adding dots, that appear round inidependently of the plot <code>ScaleRatio</code>, use <a href="#markers">Markers (WiP)</a> instead of <code>&lt;circle&gt;</code>.
   </p>
-  <h3>Text layout</h3>
+  <h3>HTML layers</h3>
   <p>
-    <code>&lt;div class="layer"&gt;</code>
+    <code class="block" highlight="HTML">
+      &lt;div class="layer"&gt;&lt;/div&gt;
+    </code>
+    Layers for adding text and other elements (such as a legend and similar overlays), that should be sized and positioned using screen space <code>px</code> (or <code>%</code>, for fractions of the plot canvas). <a href="#layer_attributes">Axes, Ticks, and Labels</a>, in particular, are placed in HTML layers.
+
   </p>
-<!-- todo:
-  <h3>Raster graphics</h3>
-  Canvas
--->
-  <h3>Shaders (WIP)</h3>
-  <h3>Custom</h3>
+  <h3>Raster layers (WIP)</h3>
+  <p>
+    <code class="block" highlight="HTML">
+      &lt;canvas class="layer"&gt;&lt;/canvas&gt;
+    </code>
+    Layers for drawing with <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Reference/Elements/canvas" target="_blank">canvas methods</a>. Resolution is defined using <a href="#plot_attributes">layer attributes</a> and stays fixed independently of the actual displayed plot size.
+    </p>
+  <h3>Shader layers (WIP)</h3>
+  <p>
+    <code class="block" highlight="HTML">
+      &lt;canvas class="layer glsl"&gt;&lt;/canvas&gt;
+    </code>
+    Layers for producing raster assets rendered at screen resolution, regardless of the plot canvas scaling, using <a href="https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_on_the_web/GLSL_Shaders" target="_blank">GLSL fragment shaders</a>. Plot coordinates are accessible from within a shader as
+    <code class="block todo" highlight="GLSL">
+      vec2 xy = (gl_FragCoord.xy - plotOrigin) / plotResolution;
+    </code>
+  </p>
+  <ul class="references">
+    <h4>References</h4>
+    <li><a href="https://eltaurus-lt.github.io/ChaosAndCats/tools/glsl_renderer.html" target="_blank">GLSL editor</a></li>
+  </ul>
 
   <h2 id="dynamic">Dynamic evalutation</h2>
   <p>
     On update the functions are executed in the same order they were registered.
-    update() for init.
   </p>
   Slider code
   <code class="block" highlight="JS">  plt.dynamic.push(({k, t}) => {<br>
@@ -133,10 +154,41 @@ The included onload function ensures the height of the embedded plot is fit to t
     });</code>
    Order of the variables provided in <code>{}</code> does not matter. If the arrow function is defined as <code>(var1, var2, ...) => {...}</code> instead, the order shoud match the order of respective slider controls.
 
+    update() for init + on custom events (canvas clicks)
+    dynamic vars dict
+
+
   <h2>Styling</h2>
   <h3 id="plot_attributes">Plot attributes</h3>
+PlotRange, aspect ratio, scale ratio
+  <h3 id="layer_attributes">Html layer attributes</h3>
+
+PlotSpace (WIP)
+Standard <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units" target="_blank"><code>em</code> and <code>lh</code></a> CSS units are repurposed inside HTML layers to match plot units for horizontal and vertical axes respectively. In particular, they can be used to align position. The values are reset for all layer children and can be used for typesetting text content inside them normally.
+Note that adding the <code>PlotSpace</code> attribute offests the coordinate system to align with the plot origin. This allows using <code>bottom</code> and <code>left</code> css valus (not <code>top</code> and <code>right</code>!) for setting positions in plot space, but removes the ability to place elements relative to the plot overall canvas.
+
+
+Axes (AxisX AxisY)
+frame
+grid 
+Arrowheads (ArrowheadRight ...)
+Ticks (TicksX TicksY)
+TickLabels
+PlotLabel and AxesLabels = hardcoded div with classes
+
+range cropping
+
+MergeOrigin
+
   <h3>Layout</h3>
   <h3 id="CSS">CSS</h3>
+
+classes for axes, arrowheads, grid and frame: 
+tick halves
+markers
+classes for plots can be added during .add to target specific parts
+
+units (wip)
 
     *Adding <code>debug</code> class to a specific element, element container, or the plot html as a whole will render outlines of the contained layers and sliders to help with layout debugging.
 
@@ -147,7 +199,7 @@ The included onload function ensures the height of the embedded plot is fit to t
 
   <h3 id="plotting">Plots</h3>
   <p>
-    Plotting methods return line data in the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-string format</a> ready to be applied to a <code>&lt;path&gt;</code> element (inside an <a href="#svg">svg layer</a>): 
+    Plotting methods return line data in the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-string format</a> ready to be applied to a <code>&lt;path&gt;</code> element (inside an <a href="#svg">vector layer</a>): 
     <code class="block" highlight="JS">
       const svgLayer = document.querySelector("svg.layer");<br>
       svgLayer.add("path", "plotLine").setAttribute("d", plot_string);
@@ -155,8 +207,8 @@ The included onload function ensures the height of the embedded plot is fit to t
     Here <code>.add</code> is a <a href="#add">provided utility method</a> for creating and attaching plot elements, and <code>plot_string</code> is a result returned by one of the methods listed below.
   </p>
 
+  <h4><code>LinearPlot(f, xs)</code></h4>
   <p>
-    <h4><code>LinearPlot(f, xs)</code></h4>
     Plot of an analytical single-valued function <code>f(x)</code> drawn as a polyline over an array of argument values <code>xs</code>:
     <code class="block" highlight="JS">
       plot_string = plt.LinearPlot(x =&gt; Math.cos(x), Subdivide([0, 10], 25));
@@ -164,8 +216,8 @@ The included onload function ensures the height of the embedded plot is fit to t
     Here <code>x =&gt; Math.cos(x)</code> is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">JS arrow function</a> expression for <code>f(x)=cos(x)</code>, and <code>Subdivide(...)</code> is an array of <code>x</code> values, obtained by applying the <a href="#subdivide">respective utility method</a> to the <code>[0, 10]</code> interval.
   </p>
 
+  <h4><code>BezierPlot(f, df, xs)</code></h4>
   <p>
-    <h4><code>BezierPlot(f, df, xs)</code></h4>
     Method similar to the <code>LinearPlot</code> above, which returns a <a href="https://eltaurus-lt.github.io/ChaosAndCats/en/chapter-03.html" target="_blank">cubic Bezier spline</a> instead of straight-line segments to produce a completely smooth result with fewer points. Requires additionally providing explicit analytical expression for the derivative <code>df(x)</code> of the <code>f(x)</code> function:
     <code class="block" highlight="JS">
       plt.BezierPlot(x =&gt; Math.cos(x), x =&gt; -Math.sin(x), xs)
@@ -194,7 +246,7 @@ The included onload function ensures the height of the embedded plot is fit to t
   <br>
   <h4><code>ListPlot(xys) (WIP)</code></h4>
   <p>
-    A singular method for plotting a table function as a collection of points instead of a continuous line. In contrast to all the previous methods does not return a d-string, but an array of <a href="marker">Markers</a>, which can be attached to an svg layer directly:
+    A singular method for plotting a table function as a collection of points instead of a continuous line. In contrast to all the previous methods does not return a d-string, but an array of <a href="marker">Markers</a>, which can be attached to a vector layer directly:
     <code class="block" highlight="JS">
       svgLayer.add(plt.ListPlot(xys), "plotMarker").
     </code>
