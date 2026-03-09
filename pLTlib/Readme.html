@@ -44,7 +44,7 @@
 
 
 
-  <h2>Getting started</h2>
+  <h2 id="intro">Getting started</h2>
 
 
   <h3>Plot template</h3>
@@ -192,7 +192,7 @@ units (wip)
 
     *Adding <code>debug</code> class to a specific element, element container, or the plot html as a whole will render outlines of the contained layers and sliders to help with layout debugging.
 
-  <h2>Numerical methods</h2>
+  <h2 id="methods">Numerical methods</h2>
   All numerical mehods are called from the <code>plt</code> object.
 <!-- no overhead, all methods and settings are selected explicitly -->
   optimized for a final result: methods do not perform any checks and rely on all inputs having correct types
@@ -211,9 +211,9 @@ units (wip)
   <p>
     Plot of an analytical single-valued function <code>f(x)</code> drawn as a polyline over an array of argument values <code>xs</code>:
     <code class="block" highlight="JS">
-      plot_string = plt.LinearPlot(x =&gt; Math.cos(x), Subdivide([0, 10], 25));
+      plot_string = plt.LinearPlot(x =&gt; Math.cos(x), plt.Subdivide([0, 10], 25));
     </code>
-    Here <code>x =&gt; Math.cos(x)</code> is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">JS arrow function</a> expression for <code>f(x)=cos(x)</code>, and <code>Subdivide(...)</code> is an array of <code>x</code> values, obtained by applying the <a href="#subdivide">respective utility method</a> to the <code>[0, 10]</code> interval.
+    Here <code>x =&gt; Math.cos(x)</code> is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">JS arrow function</a> expression for <code>f(x)=cos(x)</code>, and <code>plt.Subdivide(...)</code> is an array of <code>x</code> values, obtained by applying the <a href="#subdivide">respective utility method</a> to the <code>[0, 10]</code> interval.
   </p>
 
   <h4><code>BezierPlot(f, df, xs)</code></h4>
@@ -292,7 +292,7 @@ Example use:
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x * y - 0.2 * z<br>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;];<br>
       };<br>
-      sol = plt.NDSolve(f, [1, 1, 10], Subdivide([0, 100], 1000)));
+      sol = plt.NDSolve(f, [1, 1, 10], plt.Subdivide([0, 100], 1000)));
     </code>
 Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting example:
     <code class="block" highlight="JS">
@@ -303,15 +303,57 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
 
 
   <h3>Utility</h3>
-  <h5 id="add"><code>.add()</code></h5>
-  class or class list (to control separately thickness and color, for example)
-  <h5 id="subdivide"><code>Subdivide(range, Npoints)</code></h5>
-  <h5><code>Connect</code></h5>
-  <h5><code>$Precision</code></h5>
+  <h4 id="add"><code>.add(elementType, classList = "")</code></h4>
+  <p>
+    Main method for creating <code>svg</code> and <code>html</code> elements and attaching them to <a href="layers">vector and html layers</a> respectivelly. Called from a layer object, returns a reference to the created element. Allows additionally specifying a list of classes (as a single string, separated by spaces) as an optional second argument to mark the element and be used for <a href="#CSS">styling</a>. Example uses:
+    <code class="block" highlight="JS">
+      const svgLayer = document.getElementById("plotCanvas");<br>
+      const lineL = svgLayer.add("line");<br>
+      lineL.setAttribute("x1", 1);<br>
+      lineL.setAttribute("y1", 2);<br>
+    </code>
+    <code class="block" highlight="JS">
+      const divLayer = document.querySelector("div.layer");<br>
+      const textL = divLayer.add("span", "label large");<br>
+      textL.innerText = "Plot Label";
+    </code>
+  </p>
+  <p>
+    Additionally can be called from a <a href="#intro"><code>div.plot</code> container</a> to dynamicaly make <a href="#layers">new layers</a> (WiP). The <code>elementType</code> in such case should be one of the following: <code>"svg"</code>, <code>"html"</code>, <code>"canvas"</code>, <code>"glsl"</code>.
+  </p>
 
-  <ul class="references todo off">
-    <h4>Additional examples</h4>
+  <h4><code>.merge( d_string1, d_string2, ... )</code></h4>
+  <p>
+    Method for merging <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-strings</a> returned by the <a href="#plotting">plotting methods</a>. Can be used consruct piecewise lines from individual segments:
+    <code class="block" highlight="JS">
+      d_string1 = plt.LinearPlot(x => Math.pow(x, 3), plt.Subdivide([0, 1], 3));<br> 
+      d_string2 = plt.BezierParametric(t => [1 + Math.cos(t), 1 + Math.sin(t)], t => [-Math.sin(t), Math.cos(t)], plt.Subdivide([0, 1], 2));<br> 
+      d_string3 = "M 2,0 C 4,0 3,2 3,1";<br>
+      <br>
+      joined_line = plt.merge(d_string1, d_string2, d_string3);
+    </code>
+  </p>
+
+  <h4 id="subdivide"><code>Subdivide([x0, x1], N)</code></h4>
+  <p>
+    Uniformly subdivides a specified interval into N subintervals. Returns a single array of values with the first and the last one coinciding with <code>x0</code> and <code>x1</code>. Called from the <code>plt</code> object:
+    <code class="block" highlight="JS">
+      plt.Subdivide( [0, Math.PI / 2], 50 ) // returns [0, 0.01 π, 0.02 π, ..., 0.5 π]
+    </code>
+  </p>
+  <h4><code>$Precision</code></h4>
+  <p>
+    Some of the <a href="#methods">numerical methods</a> internally use floating-point comparison, which requires specifying an error margin. The utilized value is stored as a global variable <code>$Precision</code>, which can be modified to control the coarseness of the dependent operations: 
+    <code class="block" highlight="JS">
+      $Precision = 1e-9;
+    </code>
+  </p>
+
+  <br>
+  <ul class="references">
+    <h4>Practical examples</h4>
     <li><a href="../en/ConformalMaps.html">Conformal Maps</a></li>
+    <li><a href="../en/NormalForms.html">Normal Forms</a></li>
   </ul>
 
   <h2>3D plots (WIP)</h2>

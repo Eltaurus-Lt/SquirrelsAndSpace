@@ -43,7 +43,7 @@ function getPlotSettings(plotL) {
   plotSettings["Right"] = plotL.getAttribute("Right") || plotSettings["Right"];
   plotSettings["Top"] = plotL.getAttribute("Top") || (plotSettings["Right"] / plotSettings["AspectRatio"] / plotSettings["ScaleRatio"]);
   plotSettings["Bottom"] = plotL.getAttribute("Bottom") || (plotSettings["Left"] / plotSettings["AspectRatio"] / plotSettings["ScaleRatio"]);
-console.log(plotSettings);
+
   return plotSettings;
 }
 
