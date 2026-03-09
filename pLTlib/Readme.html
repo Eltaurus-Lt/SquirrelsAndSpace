@@ -34,7 +34,7 @@
   <h1 style="text-transform: none;">pLTlib</h1>
 
   <p>
-    A lightweight engine for making interactive mathematical graphics with a focus on performance and openness to easy low-level customization. <!-- avoid redundant abstractions and use generic web tools in their rawest form -->
+    A lightweight engine for making interactive mathematical graphics with a focus on performance and openness to easy low-level customization. <!-- avoid redundant abstractions and use generic web tools in their rawest form, rely on existing html, css, and svg standards wherever possible -->
   </p>
 
   <br>
@@ -93,6 +93,16 @@
     The last line is for importing <a href="https://docs.mathjax.org/en/v4.0/basic/mathjax.html" target="_blank">MathJax</a> and can be ommited if LaTeX fonts and formatting are not used.
   </p>
 
+  <h4>Scripting</h4>
+  <p>
+    Scripts relying on pLTlib methods should be wrapped in a <code>DOMContentLoaded</code> callback to make sure the dependencies are loaded before to being used
+    <code class="block" highlight="JS">
+      document.addEventListener("DOMContentLoaded", () => {<br>
+      &nbsp;&nbsp; ... <br>
+      });<br>
+    </code>
+  </p>
+
   <h4>Embedding</h4>
   <p>
     The code for embedding into a parent document:
@@ -104,6 +114,13 @@
     Replace <code>plot.html</code> with the actual path to the plot file being embedded. The <code>width</code> attribute can be <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units#lengths" target="_blank">modified</a> as needed and additional attributes, like classes and styling, can be appended as usual. 
 The included onload function ensures the height of the embedded plot is fit to the proper size of the source html and accurately reacts to page resizing. 
   </p>
+
+  <fieldset class="downloads-block todo">
+    <legend>Downloads</legend>
+    <a class="dwld" href=".html" download title="template">plt_template.html</a>
+    <a class="dwld" href=".html" download title="template">article_template.html</a>
+  </fieldset>
+
 
 
   <h2 id="layers">Layer types</h2>
@@ -144,18 +161,58 @@ The included onload function ensures the height of the embedded plot is fit to t
     <li><a href="https://eltaurus-lt.github.io/ChaosAndCats/tools/glsl_renderer.html" target="_blank">GLSL editor</a></li>
   </ul>
 
-  <h2 id="dynamic">Dynamic evalutation</h2>
-  <p>
-    On update the functions are executed in the same order they were registered.
-  </p>
-  Slider code
-  <code class="block" highlight="JS">  plt.dynamic.push(({k, t}) => {<br>
-    &nbsp;&nbsp;...<br>
-    });</code>
-   Order of the variables provided in <code>{}</code> does not matter. If the arrow function is defined as <code>(var1, var2, ...) => {...}</code> instead, the order shoud match the order of respective slider controls.
 
-    update() for init + on custom events (canvas clicks)
-    dynamic vars dict
+
+  <h2 id="dynamic">Dynamic evalutation</h2>
+
+  <h3>Control elements</h3>
+  <p>
+    Basic controls can be build using native html <code>&lt;input&gt;</code> elements. To make a slider, for example, the following should be put anywhere inside the body of the plot html file (outside of the <code>.plot</code> container itself):
+    <code class="block" highlight="HTML">
+      &lt;input pltvar="k" type="range" min="0" max="1" step="any" value="0.5"&gt;
+    </code>
+    The attributes here are <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/range" target="_blank">standard html slider</a> parameters, which can be used to configure the inputs. The only part essential for the plt engine is the <code>pltvar</code> property that indicate a text name for the JavaScript variable to be controlled by the slider. No other setup for the input element itself, <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input#input_types" target="_blank">regardless of the type</a>, is required to make it fully functional.
+  </p>
+
+  <h3>Update queue</h3>
+  <p>
+    For components of the plot to dynamically respond to changing inputs, their parameters should be updated on each interaction. To automate the associated setup, plt provides the <code>dynamic</code> object, which can be used to push individual update functions into a unified queue:
+
+    <code class="block" highlight="JS">
+      const circleL = plotLayer.add("circle");<br>
+      plt.dynamic.push(({k, t}) => {<br>
+      &nbsp;&nbsp;circleL.setAttribute("r", 1 + k * Math.sin(t) );<br>
+      });
+    </code>
+    In this example, the radius of the circle will get updated in accordance with the provided function each time the value of either <code>k</code> or <code>t</code> is modified. Note that, in general, the arguments referenced in the curly braces can be listed in any order, as long as their names correspond to <code>pltvar</code> values of <code>&lt;input&gt;</code> elements present in the document (a function can use only the necessary subset of <code>pltvar</code> variables, not every <code>&lt;input&gt;</code> has to be referenced in each instance). 
+  </p>
+<!-- todo: deconstructed objects is the required way of specifying dynamic function arguments, as it is pertinent to static analysis and allows avoiding redundant reevaluations
+function source code analysis to only call functions if the changed value is among its arguments. modify .push method for the dynamic to save the queue as a dictionary of arrays with variable names as keys -->
+  <p>
+    The functions from <code>plt.dynamic</code> are automatically connected to the input elements they depend upon and get called back in real time when the associated inputs are being interacted with. The callback execution follows the order in which the functions were originally pushed in. This, in particular, can be leveraged to avoid excessive reevaluations by calculating all reusable values at the head of the queue and saving them as global variables to be accessable from successive functions. Such optimisation is especially important for demanding computations, like <a href="#NDSolve">ODE integration</a>.
+  </p>
+  <p>
+    To manually trigger an update, the <code>.update</code> method can be called, specifying the the <code>pltvar</code> variables to be refreshed as names in string format:
+    <code class="block" highlight="JS">
+      plt.update("t", "ω"); (WiP)
+    </code>
+    Calling <code>update()</code> without arguments performs a global update, refreshing all variables and the whole <code>dynamic</code> queue. In particular, <code>update()</code> is useful for initiating the state of the plot at the end of the script, after all dynamic functions were pushed to the queue.
+  </p>
+
+  <h3>Custom inputs (advanced)</h3>
+  <p>
+    Extra interactivity, such as plot reacting to keyboard events or mouse clicks on its canvas, can be developed by adding a suitable <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener" target="_blank">event listener</a>. The values of auxiliary dynamic variables not represented by any explicit <code>&lt;input&gt;</code> controls are to be stored in dummy html elements, which can be placed anywhere inside the document (by default, they are not being displayed in any way):
+    <code class="block" highlight="HTML">
+      &lt;var pltvar="ω" value="42" &gt;&lt;/var&gt;
+    </code>
+<!-- can be displayed overwriting display: block !important; property and adding ::after with content: attr(value). can even be added to an html layer of the plot -->
+    Code for modifying the value of the respective variable from the event listener:
+    <code class="block" highlight="JS">
+      document.querySelector('var[pltvar="ω"]').value = ...; 
+    </code>
+    Followed by the manual update of the plot state described in the previous section.
+  </p>
+
 
 
   <h2>Styling</h2>
@@ -280,7 +337,7 @@ units (wip)
     Searches for multiple roots of the <code>f(x)=0</code> equation using <code>LocateRoot</code> for each of the pairs of consecutive values from the <code>x0s</code> array. Filters out <code>Null</code> resutls, does not search for more than one root per interval.
   </p>
 
-  <h4><code>NDSolve(f, x0, ts)</code></h4>
+  <h4 id="NDSolve"><code>NDSolve(f, x0, ts)</code></h4>
   <p>
     Integrates differential equation <code>x'(t)=f(x, t)</code> over the array <code>ts</code> of <code>t</code> values using the <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4) with initial conditions <code>x(ts[0])=x0</code>. The method supports <code>x</code> being both a real number and a vector (array) of arbitrary length. In the vector case, <code>f(x, t)</code> must return an array of the same length and expect its <code>x</code> argument to be an array as well.
 Example use:
