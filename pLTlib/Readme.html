@@ -34,7 +34,7 @@
   <h1 style="text-transform: none;">pLTlib</h1>
 
   <p>
-    A lightweight engine for making interactive mathematical graphics with a focus on performance and openness to easy low-level customization. <!-- avoid redundant abstractions and use generic web tools in their rawest form, rely on existing html, css, and svg standards wherever possible -->
+    A lightweight engine for making interactive mathematical graphics with a focus on performance and openness to easy low-level customization. <!-- avoid redundant abstractions and use generic web tools in their rawest form, rely on existing html, css, and svg standards wherever possible, without interfering with their manual coding ... prioritizes final presentation and performance over autoadjusting parameters -->
   </p>
 
   <br>
@@ -51,7 +51,7 @@
   <p>
     A typical code for a plot would look like the following:
     <code class="block" highlight="HTML">
-      &lt;div class="plot" PlotRange="[-5, 5]"&gt;<br>
+      &lt;div class="plot" PlotRange="[0, 7]"&gt;<br>
       &nbsp;&lt;svg class="layer" id="plotCanvas"&gt;&lt;/svg&gt;<br>
       &nbsp;&lt;div class="layer" Axes Arrowheads Ticks="1"&gt;&lt;/div&gt;<br>
       &lt;/div&gt;
@@ -60,7 +60,7 @@
     A plot can contain any number and <a href="#layers">various types</a> of layers. The layers are rendered in reverse order: the one that comes first is placed at the bottom, the next is placed on top of it, etc. To draw the axes below the plot lines, for example, the <code>&lt;div&gt;</code> with <code>Axes</code> should be moved before the&nbsp;<code>&lt;svg&gt;</code>.
   </p>
   <p>
-    Structural <a href="#plot_attributes">plot properties</a> are set up as html attributes of the <code>.plot</code> container and individual <code>.layer</code> elements. The appearance of any component can be customized using standard <a href="#CSS">CSS</a>. 
+    Structural plot properties are set up with <a href="#attributes">html attributes</a>. The appearance of any component can be customized using standard <a href="#CSS">CSS</a>. 
   </p>
   <p>
     Graphical content can be added to layers using the provided <a href="#plotting">plotting methods</a> and combined with static elements hardcoded directly inside the respective layers, e.g.:
@@ -129,14 +129,14 @@ The included onload function ensures the height of the embedded plot is fit to t
     <code class="block" highlight="HTML">
       &lt;svg class="layer"&gt;&lt;/svg&gt;
     </code>
-    Layers for adding <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch/Basic_shapes" target="_blank">vector graphical elements</a> to a plot. Coordinates and their units are matched with the plot space. In particular, vertical axis is directed upward, as expected from a mathematical plot, instead of going down, as is the default for svg. Note, that if a plot has <a href="#plot_attributes">different scales</a> on horizontal and vertical axes, graphical elements will appear stretched or squished, accordingly. Line <a href="https://developer.mozilla.org/ru/docs/Web/SVG/Reference/Attribute/stroke-width">stroke thickness</a> is set in screen space in pixels and remains fixed, independently of the displaying size of the plot. For adding dots, that appear round inidependently of the plot <code>ScaleRatio</code>, use <a href="#markers">Markers (WiP)</a> instead of <code>&lt;circle&gt;</code>.
+    Layers for adding <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch/Basic_shapes" target="_blank">vector graphical elements</a> to a plot. Coordinates and their units are matched with the plot space. In particular, vertical axis is directed upward, as expected from a mathematical plot, instead of going down, as is the default for svg. Note, that if a plot has <a href="#plot_attributes">different scales</a> on horizontal and vertical axes, graphical elements will appear stretched or squished, accordingly. Line <a href="https://developer.mozilla.org/ru/docs/Web/SVG/Reference/Attribute/stroke-width">stroke thickness</a> is set in screen space in pixels and remains fixed, independently of the plot's display size. For adding dots, that appear round inidependently of the plot <code>ScaleRatio</code>, use <a href="#markers">Markers (WiP)</a> instead of <code>&lt;circle&gt;</code>.
   </p>
   <h3>HTML layers</h3>
   <p>
     <code class="block" highlight="HTML">
       &lt;div class="layer"&gt;&lt;/div&gt;
     </code>
-    Layers for adding text and other elements (such as a legend and similar overlays), that should be sized and positioned using screen space <code>px</code> (or <code>%</code>, for fractions of the plot canvas). <a href="#layer_attributes">Axes, Ticks, and Labels</a>, in particular, are placed in HTML layers.
+    Layers for adding text and other elements (such as a legend and similar overlays), that should be sized and positioned using screen space <code>px</code> (or <code>%</code>, for fractions of the plot canvas). <a href="#html_attributes">Axes, Ticks, and Labels</a>, in particular, are placed in HTML layers.
 
   </p>
   <h3>Raster layers (WIP)</h3>
@@ -144,7 +144,7 @@ The included onload function ensures the height of the embedded plot is fit to t
     <code class="block" highlight="HTML">
       &lt;canvas class="layer"&gt;&lt;/canvas&gt;
     </code>
-    Layers for drawing with <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Reference/Elements/canvas" target="_blank">canvas methods</a>. Resolution is defined using <a href="#plot_attributes">layer attributes</a> and stays fixed independently of the actual displayed plot size.
+    Layers for drawing with <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Reference/Elements/canvas" target="_blank">canvas methods</a>. Resolution is defined using <a href="#canvas_attributes">layer attributes</a> and stays fixed independently of the actual displayed plot size.
     </p>
   <h3>Shader layers (WIP)</h3>
   <p>
@@ -167,11 +167,11 @@ The included onload function ensures the height of the embedded plot is fit to t
 
   <h3>Control elements</h3>
   <p>
-    Basic controls can be build using native html <code>&lt;input&gt;</code> elements. To make a slider, for example, the following should be put anywhere inside the body of the plot html file (outside of the <code>.plot</code> container itself):
+    Basic controls can be build using native <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input#input_types" target="_blank">html <code>&lt;input&gt;</code> elements</a>. To make a slider, for example, the following should be put anywhere inside the body of the plot html file (outside of the <code>.plot</code> container itself):
     <code class="block" highlight="HTML">
       &lt;input pltvar="k" type="range" min="0" max="1" step="any" value="0.5"&gt;
     </code>
-    The attributes here are <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/range" target="_blank">standard html slider</a> parameters, which can be used to configure the inputs. The only part essential for the plt engine is the <code>pltvar</code> property that indicate a text name for the JavaScript variable to be controlled by the slider. No other setup for the input element itself, <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input#input_types" target="_blank">regardless of the type</a>, is required to make it fully functional.
+    The attributes here are <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/range" target="_blank">standard html slider</a> parameters, which can be used to configure the inputs. The only part essential for the plt engine is the <code>pltvar</code> property that indicate a text name for the JavaScript variable to be controlled by the slider. No other setup for the input element itself, regardless of the type, is required to make it fully functional.
   </p>
 
   <h3>Update queue</h3>
@@ -210,44 +210,103 @@ function source code analysis to only call functions if the changed value is amo
     <code class="block" highlight="JS">
       document.querySelector('var[pltvar="ω"]').value = ...; 
     </code>
-    Followed by the manual update of the plot state described in the previous section.
+    Followed by the manual plot state update described in the previous section.
   </p>
 
 
 
-  <h2>Styling</h2>
-  <h3 id="plot_attributes">Plot attributes</h3>
-PlotRange, aspect ratio, scale ratio
-  <h3 id="layer_attributes">Html layer attributes</h3>
+  <h2>Appearance</h2>
 
-PlotSpace (WIP)
-Standard <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units" target="_blank"><code>em</code> and <code>lh</code></a> CSS units are repurposed inside HTML layers to match plot units for horizontal and vertical axes respectively. In particular, they can be used to align position. The values are reset for all layer children and can be used for typesetting text content inside them normally.
-Note that adding the <code>PlotSpace</code> attribute offests the coordinate system to align with the plot origin. This allows using <code>bottom</code> and <code>left</code> css valus (not <code>top</code> and <code>right</code>!) for setting positions in plot space, but removes the ability to place elements relative to the plot overall canvas.
+  <h3 id="attributes">Attributes</h3>
+
+  <p>
+    Attributes are used to define structural parameters of the plots and are included inside the opening tag of the respective element:
+    <code class="block" highlight="HTML">
+      &lt;div class="plot" PlotRange="5" AspectRatio="1" ... &gt;
+    </code>
+    Can be listed in arbitrary order. The only mandatory attribute is <code>PlotRange</code> – any other can be ommited, if the respective setting is not needed.
+  </p>
+
+  <h4 id="plot_attributes">Plot</h4>
+  <p>
+    Attributes attached to the <code>div.plot</code> object itself (control overall sizing):
+  </p>
+
+  <ul>
+    <li><code>PlotRange="[Xmin, Xmax]"</code> sets horizontal range of the plot. Providing a number <code>A</code> instead of an interval is interpreted as <code>[-A, A]</code>.</li>
+    <li><code>AspectRatio="X"</code> defines the width-to-height ratio of the plot in screen space. If not explicitly set, defaults to the golden ratio <code>≈1.618</code>.</li>
+    <li><code>ScaleRatio="X"</code> defines the <code>1<sub>Y</sub>:1<sub>X</sub></code> ratio of unit lengths along vertical and horizontal axes. Equals <code>1</code> by default, asserting uniform scaling of the plot space to the screen space mapping.</li> 
+    <!-- todo: vertical origin offset; plot padding and layer clipping -->
+  </ul>
+  <p>
+    Note that vertical range cannot be set directly, because it depends on the properties above, which are more important for final presentation of the illustration than exact <code>Ymin</code> and <code>Ymax</code> values (aspect ratio is typically expected to be standardized across an entire article, while scale ratio is required for plotting data without distortion). 
+  </p>
 
 
-Axes (AxisX AxisY)
-frame
-grid 
-Arrowheads (ArrowheadRight ...)
-Ticks (TicksX TicksY)
-TickLabels
-PlotLabel and AxesLabels = hardcoded div with classes
+  <h4 id="html_attributes">HTML layers</h4>
+  <p>
+    Attributes attached to a <code>div.layer</code> element:
+    <code class="block" highlight="HTML">
+      &lt;div class="layer" Frame Grid Ticks="1" TicksRight="[[.5, '\(\frac{\1}{2}\)'], 1, [1.618, '\varphi']]" ... &gt;
+    </code>
+    Primarily control overlayed details, such as ticks and text labels. The details do not have any default values – plots display what have been explicitly declared. Attributes that appear without values practically serve as toggles, with the result depending only on whether their name is attached to the <code>&lt;div&gt;</code> at all:
+  </p>
+    <ul>
+      <li><code>Axes</code> toggles axes on the HTML layer. Individually, horizontal and vertical axes can be toggled by <code>AxisX</code> and <code>AxisY</code> respectively. </li>
+      <li><code>Arrowheads</code> toggles arrowheads on the ends of axes (have no effect on layers without the any of the <code>Axes</code> attributes). <code>ArrowheadRight</code>, <code>ArrowheadTop</code> (as well as <code>ArrowheadLeft</code> and <code>ArrowheadBottom</code>) control individual ends of each axis. </li>
+      <li><code>Frame</code> toggles frame around the HTML layer. </li>
+      <li><code>Ticks="X"</code> puts equidistant tick marks with interval "X" (in plot units) on <code>Axes</code> or <code>Frame</code> of the layer. When both attributes are present, <code>Ticks</code> applies the same setting to both of them. If that is not the desired effect, a separate HTML layer should be created so that either <code>Axes</code> or <code>Frame</code> could be moved over to it. This way, two independent <code>Ticks</code> setups could be made.
+      <br>Similarly to <code>Arrowheads</code> and <code>Axes</code>, <code>Ticks</code> can be split into two separate attributes – <code>TicksX</code> and <code>TicksY</code> – for horizontal and vertical directions respectively. For the frame ticks, <code>TicksX</code> can be further split into <code>TicksTop</code> and <code>TicksBottom</code> and <code>TicksY</code> can be split into <code>TicksLeft</code> and <code>TicksRight</code>. All variants of the attribute can be used in combination, with the more specialized one always taking priority. </li>
+      <li><code>Ticks="[X1, X2, X3, ...]"</code> is an alternative form for the <code>Tick</code> attribute value to put the ticks at the explicitly set positions <code>X1</code>, <code>X2</code>, etc. Same specialized attributes for each individual side and direction are supported.
+      <br>The <code>Xi</code> themselves can be either numbers, or a pair of a number and a string, like in the example above. The latter labels the respective tick with the text from the provided string, instead of the number itself. The string should be enclosed in single quotes. <code>Xi</code> do not have to all be of the same type, the two formats can be freely mixed. </li>
+      <li><code>Grid</code> toggles a coordinate grid on the back of the HTML layer. Relies on the <code>Tick</code> attribute (<code>TicksX</code> / <code>TicksY</code>) to control the spacing of the grid lines.      </li>
+    </ul>
 
-range cropping
+  <p>
+  Labeling attributes:
+  </p>
+  <ul>
+    <li><code>TickLabels</code> toggles automatic labeling of all the ticks on the layer (manual labels provided in the <code>Tick</code> arrays do not require this attribute to be displayed).</li>
+    <li><code>MergeZero</code> displays a single unified label at the axes' intersection instead of showing two separate zeroes.</li>
+    <li><code>AxesLabels="['labelX', 'labelY']"</code> provides text labels to mark the ends of the axes. Requires <code>Axes</code> (or <code>AxisX</code> / <code>AxisY</code>) attribute. Either of the labels can be an empty string to be omitted. Individual attributes <code>AxisLabelX</code> and <code>AxisLabelY</code> are also supported. </li>
+    <li><code>FrameLabels="['labelBottom', 'labelLeft']"</code> provides text labels to mark the sides of the frame. Can be supplied with an array of four strings instead of two to mark all the sides (starting from the bottom an proceeding in the clockwise direction). Either of the strings can be an empty string to be omitted. All six specialized variants are supported for labeling individual sides or both sides in a certain direction: <code>FrameLabelX</code>, <code>FrameLabelY</code>, <code>FrameLabelBottom</code>, <code>FrameLabelLeft</code>, <code>FrameLabelTop</code>, <code>FrameLabelRight</code>. </li>
+    <li><code>PlotLabel="label"</code> can be used to label the plot as a whole. </li>
+  </ul>
+  <p>
+    All text labels (including manual tick labels) support <a href="https://docs.mathjax.org/en/v4.0/basic/mathematics.html#tex-and-latex-input" target="_blank">MathJax</a> for LaTeX expressions.
+  </p>
+  <br>
+  <ul>
+    <li><code>PlotSpace (WIP)</code> is a special toggle attribute that changes HTML layer coordinate system. It offsets the origin, so that standard <code>bottom</code> and <code>left</code> CSS properties would match respective positions in the plot space. The unit lengths along horizontal and vertical axes equal <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units" target="_blank"><code>em</code> and <code>lh</code></a> respectively. These units are being repurposed from their standard CSS meaning, but the values are reset for all the layer children and can be used for typesetting text content inside them normally. To put an HTML element at the desired position, the following style can be used:
+    <code class="block" highlight="CSS">
+      left: 1em;<br>
+      bottom: 2lh;
+    </code>
+    This aligns the bottom left corner with the point <code>(1, 2)</code> in the plot space. To align top right corner instead, the following transform can be applied:
+    <code class="block" highlight="CSS">
+      transform: translate(-100%, 100%);
+    </code>
+ (using <code>top</code> and <code>right</code> properties wouldn't lead to the desired result). To align the element to the coordinates with its center, transform values <code>(-50%, 50%)</code> can be used. This, in particular, is the method for adding plot <a href=#markers">Markers</a>.
+<!-- todo: axes, grid, etc. on the html layer with PlotSpace -->
+    </li>
+  </ul>
 
-MergeOrigin
 
-  <h3>Layout</h3>
-  <h3 id="CSS">CSS</h3>
+  <h3 id="CSS">Styling</h3>
 
 classes for axes, arrowheads, grid and frame: 
 tick halves
 markers
 classes for plots can be added during .add to target specific parts
 
-units (wip)
-
     *Adding <code>debug</code> class to a specific element, element container, or the plot html as a whole will render outlines of the contained layers and sliders to help with layout debugging.
+
+  <h3>Document Layout</h3>
+  <p>
+    
+  </p>
+
+<a href="https://www.w3schools.com/css/css_grid.asp" target="_blank">Grid</a>
 
   <h2 id="methods">Numerical methods</h2>
   All numerical mehods are called from the <code>plt</code> object.
@@ -308,6 +367,8 @@ units (wip)
       svgLayer.add(plt.ListPlot(xys), "plotMarker").
     </code>
   </p>
+
+<!-- todo: css and svg animations -->
 
   <h3>Solvers</h3>
 
