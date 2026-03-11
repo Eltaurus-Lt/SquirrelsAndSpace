@@ -34,7 +34,8 @@
   <h1 style="text-transform: none;">pLTlib</h1>
 
   <p>
-    A lightweight engine for making interactive mathematical graphics with a focus on performance and openness to easy low-level customization. <!-- avoid redundant abstractions and use generic web tools in their rawest form, rely on existing html, css, and svg standards wherever possible, without interfering with their manual coding ... prioritizes final presentation and performance over autoadjusting parameters -->
+    A lightweight framework for making interactive mathematical graphics with a focus on performance and openness to easy low-level customization. <!-- avoid redundant abstractions and use generic web tools in their rawest form, rely on existing html, css, and svg standards wherever possible, without interfering with their manual coding ... prioritizes final presentation and performance over autoadjusting parameters 
+rather than inventing a narrow domain-specific language; compatible and freely mixed with standard svg and html elements-->
   </p>
 
   <br>
@@ -47,13 +48,13 @@
   <h2 id="intro">Getting started</h2>
 
 
-  <h3>Plot template</h3>
+  <h3 id="plot">Plot element</h3>
   <p>
     A typical code for a plot would look like the following:
     <code class="block" highlight="HTML">
-      &lt;div class="plot" PlotRange="[0, 7]"&gt;<br>
-      &nbsp;&lt;svg class="layer" id="plotCanvas"&gt;&lt;/svg&gt;<br>
-      &nbsp;&lt;div class="layer" Axes Arrowheads Ticks="1"&gt;&lt;/div&gt;<br>
+      &lt;div class="Plot" PlotRange="[0, 7]"&gt;<br>
+      &nbsp;&lt;svg class="Layer" id="plotCanvas"&gt;&lt;/svg&gt;<br>
+      &nbsp;&lt;div class="Layer" Axes Arrowheads Ticks="1"&gt;&lt;/div&gt;<br>
       &lt;/div&gt;
     </code>
 
@@ -65,7 +66,7 @@
   <p>
     Graphical content can be added to layers using the provided <a href="#plotting">plotting methods</a> and combined with static elements hardcoded directly inside the respective layers, e.g.:
     <code class="block" highlight="HTML">
-      &lt;svg class="layer" id="plotCanvas"&gt;<br>
+      &lt;svg class="Layer" id="plotCanvas"&gt;<br>
       &nbsp;&lt;circle r="0.5" cx="2" cy="1" &gt;&lt;/circle&gt;<br>
       &lt;/svg&gt;
     </code>
@@ -77,10 +78,10 @@
   <h3>Boilerplate</h3>
   
   <p>
-  Individual illustrations are intended to be coded in separate <code>.html</code> files (each can contain <a href="#layout">multiple</a> <code>.plot</code> objects), which then are embedded into a common article page.
+  Individual illustrations are intended to be coded in separate <code>.html</code> files (each can contain <a href="#layout">multiple</a> <code>.Plot</code> objects), which then are embedded into a common article page.
   </p>
 
-  <h4>Import</h4>
+  <h4 id="import">Import</h4>
   <p>
     The code to be included in the <code>&lt;head&gt;</code> of a plot html file: 
 
@@ -90,12 +91,12 @@
       &lt;script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"&gt;&lt;/script&gt;
     </code>
 
-    The last line is for importing <a href="https://docs.mathjax.org/en/v4.0/basic/mathjax.html" target="_blank">MathJax</a> and can be ommited if LaTeX fonts and formatting are not used.
+    The last line is for importing <a href="https://docs.mathjax.org/en/v4.0/basic/mathjax.html" target="_blank">MathJax</a> and can be ommited if <a href="#labels">LaTeX fonts and formatting</a> are not used.
   </p>
 
   <h4>Scripting</h4>
   <p>
-    Scripts relying on pLTlib methods should be wrapped in a <code>DOMContentLoaded</code> callback to make sure the dependencies are loaded before to being used
+    Scripts relying on pLTlib methods should be wrapped in a <code>DOMContentLoaded</code> callback to make sure the dependencies are loaded before they are used
     <code class="block" highlight="JS">
       document.addEventListener("DOMContentLoaded", () => {<br>
       &nbsp;&nbsp; ... <br>
@@ -127,14 +128,14 @@ The included onload function ensures the height of the embedded plot is fit to t
   <h3 id="svg">Vector layers</h3>
   <p>
     <code class="block" highlight="HTML">
-      &lt;svg class="layer"&gt;&lt;/svg&gt;
+      &lt;svg class="Layer"&gt;&lt;/svg&gt;
     </code>
     Layers for adding <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch/Basic_shapes" target="_blank">vector graphical elements</a> to a plot. Coordinates and their units are matched with the plot space. In particular, vertical axis is directed upward, as expected from a mathematical plot, instead of going down, as is the default for svg. Note, that if a plot has <a href="#plot_attributes">different scales</a> on horizontal and vertical axes, graphical elements will appear stretched or squished, accordingly. Line <a href="https://developer.mozilla.org/ru/docs/Web/SVG/Reference/Attribute/stroke-width">stroke thickness</a> is set in screen space in pixels and remains fixed, independently of the plot's display size. For adding dots, that appear round inidependently of the plot <code>ScaleRatio</code>, use <a href="#markers">Markers (WiP)</a> instead of <code>&lt;circle&gt;</code>.
   </p>
   <h3>HTML layers</h3>
   <p>
     <code class="block" highlight="HTML">
-      &lt;div class="layer"&gt;&lt;/div&gt;
+      &lt;div class="Layer"&gt;&lt;/div&gt;
     </code>
     Layers for adding text and other elements (such as a legend and similar overlays), that should be sized and positioned using screen space <code>px</code> (or <code>%</code>, for fractions of the plot canvas). <a href="#html_attributes">Axes, Ticks, and Labels</a>, in particular, are placed in HTML layers.
 
@@ -142,14 +143,14 @@ The included onload function ensures the height of the embedded plot is fit to t
   <h3>Raster layers (WIP)</h3>
   <p>
     <code class="block" highlight="HTML">
-      &lt;canvas class="layer"&gt;&lt;/canvas&gt;
+      &lt;canvas class="Layer"&gt;&lt;/canvas&gt;
     </code>
     Layers for drawing with <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Reference/Elements/canvas" target="_blank">canvas methods</a>. Resolution is defined using <a href="#canvas_attributes">layer attributes</a> and stays fixed independently of the actual displayed plot size.
     </p>
   <h3>Shader layers (WIP)</h3>
   <p>
     <code class="block" highlight="HTML">
-      &lt;canvas class="layer glsl"&gt;&lt;/canvas&gt;
+      &lt;canvas class="Layer glsl"&gt;&lt;/canvas&gt;
     </code>
     Layers for producing raster assets rendered at screen resolution, regardless of the plot canvas scaling, using <a href="https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_on_the_web/GLSL_Shaders" target="_blank">GLSL fragment shaders</a>. Plot coordinates are accessible from within a shader as
     <code class="block todo" highlight="GLSL">
@@ -165,13 +166,13 @@ The included onload function ensures the height of the embedded plot is fit to t
 
   <h2 id="dynamic">Dynamic evalutation</h2>
 
-  <h3>Control elements</h3>
+  <h3 id="controls">Control elements</h3>
   <p>
-    Basic controls can be build using native <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input#input_types" target="_blank">html <code>&lt;input&gt;</code> elements</a>. To make a slider, for example, the following should be put anywhere inside the body of the plot html file (outside of the <code>.plot</code> container itself):
+    Basic controls can be build using native <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input#input_types" target="_blank">html <code>&lt;input&gt;</code> elements</a>. To make a slider, for example, the following should be put anywhere inside the body of the plot html file (outside of the <code>.Plot</code> container itself):
     <code class="block" highlight="HTML">
       &lt;input pltvar="k" type="range" min="0" max="1" step="any" value="0.5"&gt;
     </code>
-    The attributes here are <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/range" target="_blank">standard html slider</a> parameters, which can be used to configure the inputs. The only part essential for the plt engine is the <code>pltvar</code> property that indicate a text name for the JavaScript variable to be controlled by the slider. No other setup for the input element itself, regardless of the type, is required to make it fully functional.
+    The attributes here are <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/range" target="_blank">standard html slider</a> parameters, which can be used to configure the inputs. The only part essential for the plt framework is the <code>pltvar</code> property that indicate a text name for the JavaScript variable to be controlled by the slider. No other setup for the input element itself, regardless of the type, is required to make it fully functional.
   </p>
 
   <h3>Update queue</h3>
@@ -199,6 +200,8 @@ function source code analysis to only call functions if the changed value is amo
     Calling <code>update()</code> without arguments performs a global update, refreshing all variables and the whole <code>dynamic</code> queue. In particular, <code>update()</code> is useful for initiating the state of the plot at the end of the script, after all dynamic functions were pushed to the queue.
   </p>
 
+<!-- todo: PlotRange mutation observer -->
+
   <h3>Custom inputs (advanced)</h3>
   <p>
     Extra interactivity, such as plot reacting to keyboard events or mouse clicks on its canvas, can be developed by adding a suitable <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener" target="_blank">event listener</a>. The values of auxiliary dynamic variables not represented by any explicit <code>&lt;input&gt;</code> controls are to be stored in dummy html elements, which can be placed anywhere inside the document (by default, they are not being displayed in any way):
@@ -222,14 +225,14 @@ function source code analysis to only call functions if the changed value is amo
   <p>
     Attributes are used to define structural parameters of the plots and are included inside the opening tag of the respective element:
     <code class="block" highlight="HTML">
-      &lt;div class="plot" PlotRange="5" AspectRatio="1" ... &gt;
+      &lt;div class="Plot" PlotRange="5" AspectRatio="1" ... &gt;
     </code>
     Can be listed in arbitrary order. The only mandatory attribute is <code>PlotRange</code> – any other can be ommited, if the respective setting is not needed.
   </p>
 
   <h4 id="plot_attributes">Plot</h4>
   <p>
-    Attributes attached to the <code>div.plot</code> object itself (control overall sizing):
+    Attributes attached to the <code>div.Plot</code> object itself (control overall sizing):
   </p>
 
   <ul>
@@ -245,9 +248,9 @@ function source code analysis to only call functions if the changed value is amo
 
   <h4 id="html_attributes">HTML layers</h4>
   <p>
-    Attributes attached to a <code>div.layer</code> element:
+    Attributes attached to a <code>div.Layer</code> element:
     <code class="block" highlight="HTML">
-      &lt;div class="layer" Frame Grid Ticks="1" TicksRight="[[.5, '\(\frac{\1}{2}\)'], 1, [1.618, '\varphi']]" ... &gt;
+      &lt;div class="Layer" Frame Grid Ticks="1" TicksRight="[[.5, '\(\frac{\1}{2}\)'], 1, [1.618, '\varphi']]" ... &gt;
     </code>
     Primarily control overlayed details, such as ticks and text labels. The details do not have any default values – plots display what have been explicitly declared. Attributes that appear without values practically serve as toggles, with the result depending only on whether their name is attached to the <code>&lt;div&gt;</code> at all:
   </p>
@@ -259,15 +262,17 @@ function source code analysis to only call functions if the changed value is amo
       <br>Similarly to <code>Arrowheads</code> and <code>Axes</code>, <code>Ticks</code> can be split into two separate attributes – <code>TicksX</code> and <code>TicksY</code> – for horizontal and vertical directions respectively. For the frame ticks, <code>TicksX</code> can be further split into <code>TicksTop</code> and <code>TicksBottom</code> and <code>TicksY</code> can be split into <code>TicksLeft</code> and <code>TicksRight</code>. All variants of the attribute can be used in combination, with the more specialized one always taking priority. </li>
       <li><code>Ticks="[X1, X2, X3, ...]"</code> is an alternative form for the <code>Tick</code> attribute value to put the ticks at the explicitly set positions <code>X1</code>, <code>X2</code>, etc. Same specialized attributes for each individual side and direction are supported.
       <br>The <code>Xi</code> themselves can be either numbers, or a pair of a number and a string, like in the example above. The latter labels the respective tick with the text from the provided string, instead of the number itself. The string should be enclosed in single quotes. <code>Xi</code> do not have to all be of the same type, the two formats can be freely mixed. </li>
+      <li><code>Subticks="n" (WiP)</code> uniformily subdivides interval between consecutive ticks into <code>n</code> parts. Works only with the equidistant format of <code>Ticks</code>.</li>
       <li><code>Grid</code> toggles a coordinate grid on the back of the HTML layer. Relies on the <code>Tick</code> attribute (<code>TicksX</code> / <code>TicksY</code>) to control the spacing of the grid lines.      </li>
     </ul>
 
   <p>
-  Labeling attributes:
+  <span id="labels">Labeling attributes:</span>
   </p>
   <ul>
     <li><code>TickLabels</code> toggles automatic labeling of all the ticks on the layer (manual labels provided in the <code>Tick</code> arrays do not require this attribute to be displayed).</li>
-    <li><code>MergeZero</code> displays a single unified label at the axes' intersection instead of showing two separate zeroes.</li>
+    <li><code>SubtickLabels (WiP)</code> similarly toggles automatic labeling of subticks on the layer.</li>
+    <li><code>MergeZero</code> toggle displaying a single unified label at the axes' intersection instead of showing two separate zeroes.</li>
     <li><code>AxesLabels="['labelX', 'labelY']"</code> provides text labels to mark the ends of the axes. Requires <code>Axes</code> (or <code>AxisX</code> / <code>AxisY</code>) attribute. Either of the labels can be an empty string to be omitted. Individual attributes <code>AxisLabelX</code> and <code>AxisLabelY</code> are also supported. </li>
     <li><code>FrameLabels="['labelBottom', 'labelLeft']"</code> provides text labels to mark the sides of the frame. Can be supplied with an array of four strings instead of two to mark all the sides (starting from the bottom an proceeding in the clockwise direction). Either of the strings can be an empty string to be omitted. All six specialized variants are supported for labeling individual sides or both sides in a certain direction: <code>FrameLabelX</code>, <code>FrameLabelY</code>, <code>FrameLabelBottom</code>, <code>FrameLabelLeft</code>, <code>FrameLabelTop</code>, <code>FrameLabelRight</code>. </li>
     <li><code>PlotLabel="label"</code> can be used to label the plot as a whole. </li>
@@ -275,7 +280,6 @@ function source code analysis to only call functions if the changed value is amo
   <p>
     All text labels (including manual tick labels) support <a href="https://docs.mathjax.org/en/v4.0/basic/mathematics.html#tex-and-latex-input" target="_blank">MathJax</a> for LaTeX expressions.
   </p>
-  <br>
   <ul>
     <li><code>PlotSpace (WIP)</code> is a special toggle attribute that changes HTML layer coordinate system. It offsets the origin, so that standard <code>bottom</code> and <code>left</code> CSS properties would match respective positions in the plot space. The unit lengths along horizontal and vertical axes equal <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units" target="_blank"><code>em</code> and <code>lh</code></a> respectively. These units are being repurposed from their standard CSS meaning, but the values are reset for all the layer children and can be used for typesetting text content inside them normally. To put an HTML element at the desired position, the following style can be used:
     <code class="block" highlight="CSS">
@@ -293,20 +297,98 @@ function source code analysis to only call functions if the changed value is amo
 
 
   <h3 id="CSS">Styling</h3>
-
-classes for axes, arrowheads, grid and frame: 
-tick halves
-markers
-classes for plots can be added during .add to target specific parts
-
-    *Adding <code>debug</code> class to a specific element, element container, or the plot html as a whole will render outlines of the contained layers and sliders to help with layout debugging.
-
-  <h3>Document Layout</h3>
   <p>
-    
+    Appearance of any plot component is controlled directly, using standard CSS. Styling code can be put in a <code>&lt;style&gt;...&lt;/style&gt;</code> tag (or referenced from a separate file) inside the <code>&lt;head&gt;</code> of the document <b>after</b> <a href="#import">pltlib import</a> tags.
+  </p>
+  <h4>Selectors</h4>
+  <p>
+    Classes <code>.Axis</code>, <code>.Arrowhead</code>, <code>.Frame</code>, <code>.Gridline</code>, <code>.Tick</code>, as well as general <code>.Label</code> class, are provided for <a href="https://www.w3schools.com/cssref/css_selectors.php" target="_blank">targeting</a> certain kinds of elements <a href="#html_attributes">generated from attributes</a>. Example uses:
+
+    <code class="block" highlight="CSS">
+      .Frame {<br>
+      &nbsp;&nbsp;border-width: 2px; /* thickness */<br>
+      &nbsp;&nbsp;border-color: green; /* line color */<br>
+      }<br>
+      <br>
+      .Axis, .Gridline {<br>
+      &nbsp;&nbsp;border-color: #bada55; /* line color */<br>
+      &nbsp;&nbsp;border-style: dashed; /* line style */<br>
+      }<br>
+      <br>
+      .Tick {<br>
+      &nbsp;&nbsp;height: 15px; /* tick length */ <br>
+      &nbsp;&nbsp;border-width: 5px; /* tick thickness */<br>
+      }<br>
+      <br>
+      .Axis .Tick {<br>
+      &nbsp;&nbsp;translate: 0 0; /* axis-centered tick */<br>
+      }<br>
+    </code>
+
+    All generated components are <code>&lt;div&gt</code> elements. Axes, frames, and gridlines are direct children of <a href="#layers">HTML layers</a> they are set up for. Frame ticks are attached to edges of a frame, while arrowheads and axes ticks are parented to respective axes. Labels of all kinds are direct descendants of the elements they are labeling.
+Children elements are set up to inherit basic properties from their parents by default. In particular, ticks inherit thickness and color from their axes and frame (which can be overriden by a css rule targeting ticks).
+  </p>
+  <p>
+    For selecting subsets of the components within a certain kind, supplementary classes can be appended to selectors. Classes <code>.X</code> and <code>.Y</code> target any element (axis, arrowhead, gridline, tick, ...) associated with respective direction:
+    <code class="block" highlight="CSS">
+      .Axis.X,<br>
+      .Frame .Tick.Y {<br>
+      &nbsp;&nbsp;border-color: gold;<br>
+      }<br>
+      .Arrowhead.X {<br>
+      &nbsp;&nbsp;background-color: gold;<br>
+      }<br>
+    </code>
+
+    Additionally, classes <code>.Bottom</code>, <code>.Left</code>, <code>.Top</code>, and <code>.Right</code> are available for arrowheads, frame labels, frame edges, and frame ticks. Subticks do not have a dedicated class, instead they are marked with an auxiliary <code>.Sub</code> class on top of the general <code>.Tick</code> and can be targeted with <code>.Sub.Tick</code> selector.
+  </p>
+  <p>
+    Similarly, different kinds of labels do not have distinguishing classes of their own. Instead, they can be selected using the class of its parent element and the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Child_combinator" target="_blank">child combinator</a>:
+    <code class="block" highlight="CSS">
+      .Plot > .Label {<br>
+      &nbsp;&nbsp;font-size: 20px;<br>
+      }<br>
+      <br>
+      .Tick > .Label {<br>
+      &nbsp;&nbsp;font-size: small;<br>
+      }
+    </code>
+  </p>
+  <h4>Positioning ticks and labels</h4>
+  <p>
+    For controlling tick alignment relative to its parent axis (or frame edge), the <a hreaf="https://www.w3schools.com/cssref/css_pr_translate.php" target="_blank"><code>translate</code></a> property can be used:
+    <ul>
+      <li><code>translate: 0 0;</code> centers a tick on the line,</li>
+      <li><code>translate: 0 -50%;</code> (default) moves it entirely inside the plot,</li>
+      <li><code>translate: 0 50%;</code> moves the tick outside.</li>
+    </ul>
   </p>
 
-<a href="https://www.w3schools.com/css/css_grid.asp" target="_blank">Grid</a>
+  <p>
+labels
+
+
+  </p>
+
+  <h4>Extra classes</h4>
+  <p>
+    For styling elements <a href="#methods">created in the plot scripts</a>, custom classes can be assigned in the <a href="#add"><code>.add()</code></a> method. Some extra class names have predefined appearance settings associated with them:
+    <ul>
+      <li><code>.PlotLine</code> for plotted functions automatically assigns them appropriate thickness and different colors depending on the ordinal number of the <a href="#layers">vector layers</a> the lines are added into (in accordance with the default Wolfram Mathematica color scheme).</li>
+      <li id="markers"><code>.PlotMarker (WiP)</code></li>
+    </ul>
+  </p>
+
+  <!-- todo: custom css props for marker clipping paths -->
+   <!--todo: *Adding <code>debug</code> class to a specific element, element container, or the plot html as a whole will render outlines of the contained layers and sliders to help with layout debugging.-->
+
+  <h3>Custom layouts</h3>
+  <p>
+    The framework puts no restrictions on the number and positions of <a href="#plot">plot elements</a> and <a href="#controls">inputs</a>. They can be arranged freely, using any means available in HTML. In particular, <a href="https://www.w3schools.com/css/css_grid.asp" target="_blank">CSS Grid</a> is useful for making multi-panel layouts and complex interfaces.
+    <br>
+    It should be noted, that, by default, height of a <code>.Plot</code> element is connected to its width through the <a href="#plot_attributes"><code>AspectRatio</code></a>. If a different CSS rule is manually set for the height, it might be practical to change <code>AspectRatio</code> to a sufficiently small value and add <code>overflow-y: hidden;</code> to the <code>.Plot</code> styles.
+  </p>
+
 
   <h2 id="methods">Numerical methods</h2>
   All numerical mehods are called from the <code>plt</code> object.
@@ -317,8 +399,8 @@ classes for plots can be added during .add to target specific parts
   <p>
     Plotting methods return line data in the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-string format</a> ready to be applied to a <code>&lt;path&gt;</code> element (inside an <a href="#svg">vector layer</a>): 
     <code class="block" highlight="JS">
-      const svgLayer = document.querySelector("svg.layer");<br>
-      svgLayer.add("path", "plotLine").setAttribute("d", plot_string);
+      const svgLayer = document.querySelector("svg.Layer");<br>
+      svgLayer.add("path", "PlotLine").setAttribute("d", plot_string);
     </code>
     Here <code>.add</code> is a <a href="#add">provided utility method</a> for creating and attaching plot elements, and <code>plot_string</code> is a result returned by one of the methods listed below.
   </p>
@@ -377,7 +459,7 @@ classes for plots can be added during .add to target specific parts
   <h4><code>FindRoot(f, df, x0, iter, damp = 1)</code></h4>
   <p>
     Finds a root of an algebraic equation <code>f(x)=0</code> using <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton–Raphson<a> method starting from the point <code>x0</code> and performing <code>iter</code> number of steps. Requires providing analytical derivative <code>df(x)</code> of the function <code>f(x)</code> (both should be single-valued functions).<br>
-    Allows specifying an optional damping factor, which serves as a step multiplier (when the function is called with 4 arguments, <code>damp</code> defaults to <code>1</code>). Values less than <code>1</code> improve stability, but require more steps to converge. Values greater than <code>1</code> can be useful for improving convergence near roots with multiplicity <code>&gt; 1</code>.<br>
+    Allows specifying an optional damping factor, which serves as a step multiplier (when the function is called with 4 arguments, <code>damp</code> defaults to <code>1</code>). Values less than <code>1</code> improve stability, but require more steps to converge. Values greater than <code>1</code> can be useful for improving convergence near roots with multiplicity&nbsp;<code>&gt;&nbsp;1</code>.<br>
   Example use:
     <code class="block" highlight="JS">
       xr = plt.FindRoot(x => (Math.cos(x) - 1), x => -Math.sin(x), 0, 10);
@@ -415,7 +497,7 @@ Example use:
 Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting example:
     <code class="block" highlight="JS">
       plot_string = LinearListPlot(sol.map( ([t, [x, y, z]]) => [x, z] ));<br>
-      svgLayer.add("path", "plotLine").setAttribute("d", plot_string);
+      svgLayer.add("path", "PlotLine").setAttribute("d", plot_string);
     </code>
   </p>
 
@@ -431,13 +513,13 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
       lineL.setAttribute("y1", 2);<br>
     </code>
     <code class="block" highlight="JS">
-      const divLayer = document.querySelector("div.layer");<br>
+      const divLayer = document.querySelector("div.Layer");<br>
       const textL = divLayer.add("span", "label large");<br>
       textL.innerText = "Plot Label";
     </code>
   </p>
   <p>
-    Additionally can be called from a <a href="#intro"><code>div.plot</code> container</a> to dynamicaly make <a href="#layers">new layers</a> (WiP). The <code>elementType</code> in such case should be one of the following: <code>"svg"</code>, <code>"html"</code>, <code>"canvas"</code>, <code>"glsl"</code>.
+    Additionally can be called from a <a href="#intro"><code>div.Plot</code> container</a> to dynamicaly make <a href="#layers">new layers</a> (WiP). The <code>elementType</code> in such case should be one of the following: <code>"svg"</code>, <code>"html"</code>, <code>"canvas"</code>, <code>"glsl"</code>.
   </p>
 
   <h4><code>.merge( d_string1, d_string2, ... )</code></h4>
