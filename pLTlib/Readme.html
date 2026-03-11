@@ -34,9 +34,16 @@
   <h1 style="text-transform: none;">pLTlib</h1>
 
   <p>
-    A lightweight framework for making interactive mathematical graphics with a focus on performance and openness to easy low-level customization. <!-- avoid redundant abstractions and use generic web tools in their rawest form, rely on existing html, css, and svg standards wherever possible, without interfering with their manual coding ... prioritizes final presentation and performance over autoadjusting parameters 
-rather than inventing a narrow domain-specific language; compatible and freely mixed with standard svg and html elements-->
+    A lightweight framework for making interactive mathematical graphics with a focus on refinement, stability, and performance of finalized presentation. 
   </p>
+  <ul>
+    <li>Designed with accessability of low-level customization in mind, it works directly in webpage's DOM, instead of keeping a complex internal state and relying on elaborate API calls</li>
+    <li>Does not involve unnecessary rasterization</li>
+    <li>Components allow edits with standard <a href="#layers">HTML</a> and <a href="#CSS">CSS means</a>, which makes the framework extremely open to being combined with other tools and friendly to manual adjustments</li>
+    <li>Packs essential <a href="#methods">numerical methods</a></li>
+    <li>Interactivity <a href="#controls">requires minimal setup</a> without limiting the full potential</li>
+<!-- todo: export to svg -->
+  </ul>
 
   <br>
 
@@ -50,21 +57,20 @@ rather than inventing a narrow domain-specific language; compatible and freely m
 
   <h3 id="plot">Plot element</h3>
   <p>
-    A typical code for a plot would look like the following:
+    Plots are constructed as container elements holding multiple layers of <a href="#layers">various types</a>. Example structure:
+
     <code class="block" highlight="HTML">
       &lt;div class="Plot" PlotRange="[0, 7]"&gt;<br>
       &nbsp;&lt;svg class="Layer" id="plotCanvas"&gt;&lt;/svg&gt;<br>
       &nbsp;&lt;div class="Layer" Axes Arrowheads Ticks="1"&gt;&lt;/div&gt;<br>
+      &nbsp;&lt;svg class="Layer" id="epilog"&gt;&lt;/svg&gt;<br>
       &lt;/div&gt;
     </code>
 
-    A plot can contain any number and <a href="#layers">various types</a> of layers. The layers are rendered in reverse order: the one that comes first is placed at the bottom, the next is placed on top of it, etc. To draw the axes below the plot lines, for example, the <code>&lt;div&gt;</code> with <code>Axes</code> should be moved before the&nbsp;<code>&lt;svg&gt;</code>.
+    The layers are rendered in reverse order: the first is put at the bottom with each next being placed on top of the previous one. To draw the axes underneath everything else in the example above, the first two layers should be swapped.
   </p>
   <p>
-    Structural plot properties are set up with <a href="#attributes">html attributes</a>. The appearance of any component can be customized using standard <a href="#CSS">CSS</a>. 
-  </p>
-  <p>
-    Graphical content can be added to layers using the provided <a href="#plotting">plotting methods</a> and combined with static elements hardcoded directly inside the respective layers, e.g.:
+    Graphical content can be added using the provided <a href="#plotting">plotting methods</a> and combined with static elements hardcoded directly inside the respective layers, e.g.:
     <code class="block" highlight="HTML">
       &lt;svg class="Layer" id="plotCanvas"&gt;<br>
       &nbsp;&lt;circle r="0.5" cx="2" cy="1" &gt;&lt;/circle&gt;<br>
@@ -72,13 +78,13 @@ rather than inventing a narrow domain-specific language; compatible and freely m
     </code>
   </p>
   <p>
-    For adding plot controls and making the elements interactive see the section on <a href="#dynamic">dynamic evaluation</a>.
+        Primary plot properties are set up via <a href="#attributes">html attributes</a>, while the appearance of any component is customized with CSS rules written for the <a href="#CSS">provided classes</a>. Interactive plot controls can be made from standard HTML inputs and connected to responsive graphical components using simple update queue (see the section on <a href="#dynamic">dynamic evaluation</a>).
   </p>
 
   <h3>Boilerplate</h3>
   
   <p>
-  Individual illustrations are intended to be coded in separate <code>.html</code> files (each can contain <a href="#layout">multiple</a> <code>.Plot</code> objects), which then are embedded into a common article page.
+  Individual illustrations are intended to be coded in separate <code>.html</code> files (each can contain <a href="#layout">multiple</a> <code>.Plot</code> objects), which then could be embedded into a common article page.
   </p>
 
   <h4 id="import">Import</h4>
@@ -125,6 +131,9 @@ The included onload function ensures the height of the embedded plot is fit to t
 
 
   <h2 id="layers">Layer types</h2>
+  <p>
+    A plot can contain any number of layers of any kind.
+  </p>
   <h3 id="svg">Vector layers</h3>
   <p>
     <code class="block" highlight="HTML">
@@ -390,10 +399,12 @@ labels
   </p>
 
 
+
   <h2 id="methods">Numerical methods</h2>
-  All numerical mehods are called from the <code>plt</code> object.
-<!-- no overhead, all methods and settings are selected explicitly -->
-  optimized for a final result: methods do not perform any checks and rely on all inputs having correct types
+
+  <p>
+    Provided implementations of common numerical methods covering basic needs of plotting functions and solving algebraic and differential equations. Because finalized illustrations imply predefined well-posed conditions, the provided routines perform no data checks and rely on the incoming arguments always having appropriate formats. To further cut on potential overhead and avoid jittering typically associated with real-time auto-tuning, all parameters are taken in explicitly. Note, that the listed methods are called from the <code>plt</code> object.
+  </p>
 
   <h3 id="plotting">Plots</h3>
   <p>
