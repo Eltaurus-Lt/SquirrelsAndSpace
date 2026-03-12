@@ -1,18 +1,15 @@
-const plotDefaults = { // default PlotSettings
+const plt = {"private": {}};
+
+
+plt.plotDefaults = { // default PlotSettings
   PlotRange: [0, 10], // (number = symmetric interval; [x1, x2] = explicit interval; ex: [0, x2] = one-sided plot)
   AspectRatio: 1.618,
   ScaleRatio: 1, // ratio of pixel values for axes units
 
   PlotOffset: 0 // todo
 };
-const layerDefaults = {
-};
-const axesDefaults = {
-};
-const gridDefaults = {
-};
 
-function attributeParse(value) {
+attributeParse = function (value) {
   if (typeof value === "string" && !isNaN(value) && value.trim() !== "") {
     return Number(value);
   }
@@ -23,11 +20,11 @@ function attributeParse(value) {
   }
 }
 
-function getPlotSettings(plotL) {
+plt.getPlotSettings = function (plotL) {
   const plotSettings = {};
 
-  for (const setting of Object.keys(plotDefaults)) {
-    plotSettings[setting] = attributeParse(plotL.getAttribute(setting)) || plotDefaults[setting];
+  for (const setting of Object.keys(plt.plotDefaults)) {
+    plotSettings[setting] = attributeParse(plotL.getAttribute(setting)) || plt.plotDefaults[setting];
   }
 
   if (Array.isArray(plotSettings["PlotRange"]) && plotSettings["PlotRange"].length > 1) {
@@ -47,16 +44,31 @@ function getPlotSettings(plotL) {
   return plotSettings;
 }
 
-document.querySelectorAll("div.plot").forEach(plotL => {
-  const plotSettings = getPlotSettings(plotL);
+plt.private.addadddivmethod = function(parentL) {
+  return function(classList = "") {
+    const childL = document.createElement("div");
+    if (classList) {
+      childL.classList.add(...classList.split(" "));
+    }
+    parentL.appendChild(childL);
+    return childL;
+  }
+}  
+
+document.querySelectorAll("div.Plot").forEach(plotL => {
+  const plotSettings = plt.getPlotSettings(plotL);
   
-  plotL.querySelectorAll("svg.layer").forEach(layer => {
+  /* Vector Layers */
+  plotL.querySelectorAll("svg.Layer").forEach(layer => {
     layer.style.aspectRatio = plotSettings["AspectRatio"];
     layer.setAttribute("preserveAspectRatio", "none");
 
     /* general method for adding elements */
-    layer.add = (childType) => {
+    layer.add = (childType, classList = "") => {
       const childL = document.createElementNS("http://www.w3.org/2000/svg", childType);
+      if (classList) {
+        childL.classList.add(...classList.split(" "));
+      }
       layer.appendChild(childL);
       return childL;
     }
@@ -70,29 +82,35 @@ document.querySelectorAll("div.plot").forEach(plotL => {
     `);
   });
 
-  plotL.querySelectorAll("div.axes").forEach(axesL => {
-    const axisX = document.createElement("div");
-    axisX.classList.add("axis", "X");
+  /* Web Layers */
+  plotL.querySelectorAll("div.Layer").forEach(layer => {
+
+    /* general method for adding elements */
+    layer.add = plt.private.addadddivmethod(layer);
+  });
+
+  /* Axes */
+  plotL.querySelectorAll("div.Layer[Axes]").forEach(axesL => {
+    const axisX = axesL.add("Axis X");
     axisX.style.bottom = `${100 * plotSettings["Bottom"] / (plotSettings["Bottom"] - plotSettings["Top"])}%`;
-    axesL.appendChild(axisX);
-    const axisY = document.createElement("div");
-    axisY.classList.add("axis", "Y");
-    axisY.style.right = `${100 * plotSettings["Right"] / (plotSettings["Right"] - plotSettings["Left"])}%`;
-    axesL.appendChild(axisY);
-    if (axesL.hasAttribute("ArrowHeads")) {
-      const arrowheadX = document.createElement("div");
-      arrowheadX.classList.add("arrowhead", "right");
-      axesL.appendChild(arrowheadX);
-      const arrowheadY = document.createElement("div");
-      arrowheadY.classList.add("arrowhead", "top");
-      axesL.appendChild(arrowheadY);
+    axisX.add = plt.private.addadddivmethod(axisX);
+    if (axesL.hasAttribute("Arrowheads")) {
+      axisX.add("Arrowhead X Right");
     }
+
+    const axisY = axesL.add("Axis Y");
+    axisY.style.right = `${100 * plotSettings["Right"] / (plotSettings["Right"] - plotSettings["Left"])}%`;
+    axisY.add = plt.private.addadddivmethod(axisY);
+    if (axesL.hasAttribute("Arrowheads")) {
+      axisY.add("Arrowhead Y Top");
+    }
+
   });
 });
 
 
 
-let arrowheadDef = `
+plt.arrowheadDef = `
   <defs>
     <marker id="axisArrowhead" markerWidth="14" markerHeight="5" refX="7" refY="3.5" orient="auto-start-reverse" viewBox="0 0 10 7">
       <polygon points="10 3.5, 0 0, 1.5 3.5, 0 7"/>
@@ -102,34 +120,37 @@ let arrowheadDef = `
 
 
 
-/* Manipulate */
-const controls = document.getElementById("controlPanel")?.querySelectorAll("input");
-const vars = {};
-function updateVars() {
-  controls.forEach(control => {
-    vars[control.getAttribute("var")] = attributeParse(control.value);
+/* DYNAMIC EVALUATION */
+
+plt.controls = document.querySelectorAll("input[pltvar]");
+plt.vars = {};
+plt.dynamic = [];
+plt.updateVars = function() {
+  plt.controls.forEach(control => {
+    plt.vars[control.getAttribute("pltvar")] = attributeParse(control.value);
   });
 }
-const dynamic = [];
-function update() {
-  updateVars();
-  for (const updF of dynamic) {
-    updF(vars); // todo: updF.toString() ... if contains changed value || switch to maninpulation observers
+
+plt.update = function() {
+  plt.updateVars();
+  for (const updF of plt.dynamic) {
+    updF(plt.vars); // todo: updF.toString() ... if contains changed value || switch to maninpulation observers
   }
 }
-controls.forEach(control => {
-  control.oninput = update;
+plt.controls.forEach(control => {
+  control.oninput = plt.update;
 });
 
 
 
 // -------------------------------------------------------
 
-/* plotting methods */
+/* NUMERICAL METHODS */
+/* Utility */
 
 let $Precision = 0.0001;
 
-function Subdivide(range, Npoints) {
+plt.Subdivide = function(range, Npoints) {
   const dx = (range[1] - range[0]) / Npoints;
   let x = range[0];
   const pt = [];
@@ -140,7 +161,9 @@ function Subdivide(range, Npoints) {
   return pt;
 }
 
-function LinearParametric(f, xs) {
+/* Plotting */
+
+plt.LinearParametric = function(f, xs) {
   let path = "";
   for (const x of xs) {
     path += ` L ${f(x).join(" ")}`;
@@ -148,7 +171,7 @@ function LinearParametric(f, xs) {
   return "M" + path.substring(2);
 }
 
-function BezierParametric(f, df, ts) {
+plt.BezierParametric = function(f, df, ts) {
   let F = f(ts[0]);
   let dF = df(ts[0]);
   let dt3 = (ts[1] - ts[0]) / 3;
@@ -164,7 +187,9 @@ function BezierParametric(f, df, ts) {
   return path;
 }
 
-function FindRoot(fdf, x0, iter) {
+/* Solvers */
+
+plt.FindRoot = function(fdf, x0, iter) {
   let FdF;
   for (let i = 0; i < iter; i++) {
     FdF = fdf(x0);
@@ -173,24 +198,24 @@ function FindRoot(fdf, x0, iter) {
   return([x0, fdf(x0)[0]]);
 }
 
-function NSolve(fdf, x0s, iter) {
-  const sol = x0s.map(x0 => FindRoot(fdf, x0, iter))
+plt.NSolve = function(fdf, x0s, iter) {
+  const sol = x0s.map(x0 => plt.FindRoot(fdf, x0, iter))
                  .filter(([x, f]) => (Math.abs(f) < $Precision))
                  .map(([x, f]) => x);
   return(sol);
 }
 
-
+Object.freeze(plt);
 
 // -------------------------------------------------------
 
-/* embedded messaging */
+/* Embedding */
 
-function embedHeight(){
+plt.private.embedHeight = function () {
   parent.postMessage({
     type: 'embed-height',
     height: document.body.scrollHeight
   }, '*');
 }
-window.addEventListener('load', embedHeight);
-window.addEventListener('resize', embedHeight);
+window.addEventListener('load', plt.private.embedHeight);
+window.addEventListener('resize', plt.private.embedHeight);

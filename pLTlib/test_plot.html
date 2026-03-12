@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="pLTlib.css">
 
 <style>
-  .plot {
+  .Plot {
     background: white;
     border-radius: 1em;
     border: solid white 2em;
@@ -20,11 +20,11 @@
   #controlPanel {
     margin-top: 1em;
   }
-  circle.plotMarker {
+  circle.PlotMarker {
     fill: #f68302;
   }
-  line.plotMarker,
-  path.plotMarker {
+  line.PlotMarker,
+  path.PlotMarker {
     stroke: #f68302;
     stroke-width: 12px;
     stroke-linecap: round;
@@ -37,45 +37,42 @@
 </head>
 <body>
 
-<div class="plot" PlotRange="10.5" ScaleRatio="2.9">
-  <svg class="layer"></svg>
-  <div class="layer axes" TicksX="[[.5, '\(\frac{1}{2}\)'], 1 ,2, 3]" TicksY="[[.5, '\(\frac{i}{2}\)'], 1 ,2, 3]" MergeOrigin Arrowheads></div>
-  <svg class="layer" id="solutionLayer"></svg>
+<div class="Plot" PlotRange="10.5" ScaleRatio="2.9">
+  <svg class="Layer"></svg>
+  <div class="Layer" Axes Arrowheads TicksX="[[.5, '\(\frac{1}{2}\)'], 1 ,2, 3]" TicksY="[[.5, '\(\frac{i}{2}\)'], 1 ,2, 3]" MergeOrigin></div>
+  <svg class="Layer" id="solutionLayer"></svg>
 </div>
 
 <div id="controlPanel">
-  <input var="t" class="plotSlider" autoplay loop="true" type="range" min="-1.2" max="1.2" step="any" value="0">
-  <input var="k" class="plotSlider" autoplay loop="true" type="range" min="1" max="10" step="any" value="5">
+  <input pltvar="t" autoplay loop="true" type="range" min="-1.2" max="1.2" step="any" value="0">
+  <input pltvar="k" autoplay loop="true" type="range" min="1" max="10" step="any" value="5">
 </div>
 
 
 <script>
 
 document.addEventListener("DOMContentLoaded", () => {
-  const plotL = document.querySelector(".layer");
+  const plotL = document.querySelector(".Layer");
   const solL = document.getElementById("solutionLayer");
 
-  const cosL = plotL.add("path");
-  cosL.classList.add("plotLine");
-  //cosL.setAttribute("d", LinearParametric(t=>[t, Math.cos(t)], Subdivide([-10, 10], 30)));
-  cosL.setAttribute("d", BezierParametric(t=>[t, Math.cos(t)],t=>[1, -Math.sin(t)], Subdivide([-10, 10], 30)));
+  const cosL = plotL.add("path", "PlotLine");
+  //cosL.setAttribute("d", plt.LinearParametric(t=>[t, Math.cos(t)], plt.Subdivide([-10, 10], 30)));
+  cosL.setAttribute("d", plt.BezierParametric(t=>[t, Math.cos(t)],t=>[1, -Math.sin(t)], plt.Subdivide([-10, 10], 30)));
   cosL.id = "cosPlot";
 
-  const lineL = plotL.add("line");
-  lineL.classList.add('plotLine');
+  const lineL = plotL.add("line", "PlotLine");
   lineL.setAttribute("x1", -10);
   lineL.setAttribute("x2", 10);
-  dynamic.push(({t, k}) => {
+  plt.dynamic.push(({t, k}) => {
     lineL.setAttribute("y1", -10/k + t);
     lineL.setAttribute("y2",  10/k + t);
   });
 
-  dynamic.push(({k, t}) => {
-    const sol = NSolve(x=>[x/k + t - Math.cos(x), 1/k + Math.sin(x)], Subdivide([-15, 15], 20), 10);
+  plt.dynamic.push(({k, t}) => {
+    const sol = plt.NSolve(x=>[x/k + t - Math.cos(x), 1/k + Math.sin(x)], plt.Subdivide([-15, 15], 20), 10);
     solL.innerHTML = "";
     sol.forEach(x => {
-      const markerL = solL.add("line");
-      markerL.classList.add("plotMarker");
+      const markerL = solL.add("line", "PlotMarker");
       // circle alt
       //markerL.setAttribute("r", 0.2);
       //markerL.setAttribute("cx", x);
@@ -89,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  update(); /* init */
+  plt.update(); /* init */
 
 });
 </script>

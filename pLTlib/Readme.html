@@ -41,6 +41,7 @@
     <li>Does not involve unnecessary rasterization</li>
     <li>Components allow edits with standard <a href="#layers">HTML</a> and <a href="#CSS">CSS means</a>, which makes the framework extremely open to being combined with other tools and friendly to manual adjustments</li>
     <li>Packs essential <a href="#methods">numerical methods</a></li>
+    <li>Allows drawing smooth plots with very few points</li>
     <li>Interactivity <a href="#controls">requires minimal setup</a> without limiting the full potential</li>
 <!-- todo: export to svg -->
   </ul>
@@ -80,6 +81,12 @@
   <p>
         Primary plot properties are set up via <a href="#attributes">html attributes</a>, while the appearance of any component is customized with CSS rules written for the <a href="#CSS">provided classes</a>. Interactive plot controls can be made from standard HTML inputs and connected to responsive graphical components using simple update queue (see the section on <a href="#dynamic">dynamic evaluation</a>).
   </p>
+
+  <fieldset class="downloads-block todo">
+    <legend>Downloads</legend>
+    <a class="dwld" href=".html" download title="template">plt_template.html</a>
+    <a class="dwld" href=".html" download title="template">article_template.html</a>
+  </fieldset>
 
   <h3>Boilerplate</h3>
   
@@ -122,11 +129,7 @@
 The included onload function ensures the height of the embedded plot is fit to the proper size of the source html and accurately reacts to page resizing. 
   </p>
 
-  <fieldset class="downloads-block todo">
-    <legend>Downloads</legend>
-    <a class="dwld" href=".html" download title="template">plt_template.html</a>
-    <a class="dwld" href=".html" download title="template">article_template.html</a>
-  </fieldset>
+
 
 
 
@@ -141,7 +144,7 @@ The included onload function ensures the height of the embedded plot is fit to t
     </code>
     Layers for adding <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch/Basic_shapes" target="_blank">vector graphical elements</a> to a plot. Coordinates and their units are matched with the plot space. In particular, vertical axis is directed upward, as expected from a mathematical plot, instead of going down, as is the default for svg. Note, that if a plot has <a href="#plot_attributes">different scales</a> on horizontal and vertical axes, graphical elements will appear stretched or squished, accordingly. Line <a href="https://developer.mozilla.org/ru/docs/Web/SVG/Reference/Attribute/stroke-width">stroke thickness</a> is set in screen space in pixels and remains fixed, independently of the plot's display size. For adding dots, that appear round inidependently of the plot <code>ScaleRatio</code>, use <a href="#markers">Markers (WiP)</a> instead of <code>&lt;circle&gt;</code>.
   </p>
-  <h3>HTML layers</h3>
+  <h3>Web layers</h3>
   <p>
     <code class="block" highlight="HTML">
       &lt;div class="Layer"&gt;&lt;/div&gt;
@@ -374,7 +377,7 @@ Children elements are set up to inherit basic properties from their parents by d
   </p>
 
   <p>
-labels
+labels (WiP)
 
 
   </p>

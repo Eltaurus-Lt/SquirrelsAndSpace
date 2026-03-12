@@ -1,13 +1,9 @@
 :root {
   --line-thickness: 3px;
   --axes-thickness: 2px;
+  --axes-color: black;
   --frame-thickness: 2px;
   --grid-thickness: 1px;
-  --tick-thickness: 1px;
-  --tick-length: 7px;
-  --subtick-thickness: 1px;
-  --subtick-length: 3px;
-  --arrowheads: 5px;
 }
 
 @media(min-width: 800px) {
@@ -27,86 +23,100 @@ body {
 }
 
 
-/* Plot Layers */
-div.plot {
+/* Plot */
+
+div.Plot {
   position: relative;
   width: 100%;
   box-sizing: border-box;
 }
-div.plot > * {
+
+
+/* Layers */
+
+div.Plot > * {
   display: block;
   position: absolute;
 }
-div.plot svg.layer { 
+div.Plot .Layer { 
   width: 100%;
   height: 100%;
   inset: 0;
+}
+svg.Layer {
   scale: 1 -1;
 }
-div.plot svg.layer:first-of-type {
+div.Plot svg.Layer:first-of-type {
   position: relative;
 }
-div.plot svg.layer * { 
+:where(svg.Layer) * { 
   vector-effect: non-scaling-stroke;
 }
 
-/* axes */
-div.plot div.axes {
-  position: absolute;
-  inset: 0;
-}
 
-:where(div.axes .axis) {
+/* Axes */
+
+.Axis {
   position: absolute;
-  background: black;
+  border-color: var(--axes-color);
+  border-style: solid;
 }
-:where(div.axes .axis.X) {
+.Axis.X {
   left: 0;
   right: 0;
-  height: var(--axes-thickness);
+  height: 0;
+
+  border-right-width: 0 !important;
+  border-left-width: 0 !important;
+  border-width: var(--axes-thickness);
+
   translate: 0 50%;
-  bottom: 50%; /* fallback */
+  scale: 1 0.5;
+  bottom: 5%; /* fallback */
 }
-:where(div.axes .axis.Y) {
-  width: var(--axes-thickness);
+.Axis.X > * {
+  scale: 1 2;
+}
+.Axis.Y {
   top: 0;
   bottom: 0;
+  width: 0;
+
+  border-top-width: 0 !important;
+  border-bottom-width: 0 !important;
+  border-width: var(--axes-thickness);
+
   translate: 50% 0;
-  right: 50%; /* fallback */
+  scale: 0.5 1;
+  right: 5%; /* fallback */
+}
+.Axis.Y > * {
+  scale: 2 1;
 }
 
-/* arrowheads */
-:where(div.axes .arrowhead) {
+
+/* Arrowheads */
+
+.Arrowhead {
   position: absolute;
-  background: black;
-  width: calc(7 * var(--axes-thickness));
-  height: calc(5 * var(--axes-thickness));
+  background: var(--axes-color);
+
+  height: calc(5 * var(--axes-thickness)); 
+  aspect-ratio: 7/5;
   transform-origin: center right;
   clip-path: polygon(100% 50%, 0 0, 15% 50%, 0 100%);
 }
-:where(div.axes .arrowhead.right) {
-  transform: translateY(50%);
+.Arrowhead.Right {
+  translate: 25% -50%;
   right: 0;
-  bottom: 50%; /* fallback */
 }
-:where(div.axes .arrowhead.top) {
-  transform: translateY(-50%) rotate(-90deg);
+.Arrowhead.Top {
+  translate: -100% calc( -50% - 25% * 7 / 5 );
+  rotate: -90deg;
+  scale: 1 2;
   top: 0;
-  right: 50%; /* fallback */
 }
 
-div.axes:has(.arrowhead.right) .axis.X {
-  right: calc(5 * var(--axes-thickness));
-}
-div.axes:has(.arrowhead.left) .axis.X {
-  left: calc(5 * var(--axes-thickness));
-}
-div.axes:has(.arrowhead.top) .axis.Y {
-  top: calc(5 * var(--axes-thickness));
-}
-div.axes:has(.arrowhead.bottom) .axis.Y {
-  bottom: calc(5 * var(--axes-thickness));
-}
 
 
 /* Text labels (todo) */
@@ -125,37 +135,37 @@ div.axes:has(.arrowhead.bottom) .axis.Y {
 #controlPanel {
   margin-top: .5em;
 }
-.plotSlider {
+input[pltvar][type="range"] {
   width: calc(100% - 10px);
   margin-left: 5px;
 }
 
 
 /* Plot Styles */
-.plotLine {
+.PlotLine {
   stroke-width: var(--line-thickness);
   fill: none;
 }
-.plotPoint {
+.PlotPoint {
   r: 0.05px;
 }
 
 /* WM colors */
-.plot svg.layer:nth-of-type(15n+1) .plotLine {stroke: #5e81b5;}
-.plot svg.layer:nth-of-type(15n+2) .plotLine {stroke: #e19c24;}
-.plot svg.layer:nth-of-type(15n+3) .plotLine {stroke: #8fb032;}
-.plot svg.layer:nth-of-type(15n+4) .plotLine {stroke: #eb6235;}
-.plot svg.layer:nth-of-type(15n+5) .plotLine {stroke: #8778b3;}
-.plot svg.layer:nth-of-type(15n+6) .plotLine {stroke: #c56e1a;}
-.plot svg.layer:nth-of-type(15n+7) .plotLine {stroke: #5d9ec7;}
-.plot svg.layer:nth-of-type(15n+8) .plotLine {stroke: #ffbf00;}
-.plot svg.layer:nth-of-type(15n+9) .plotLine {stroke: #a5609d;}
-.plot svg.layer:nth-of-type(15n+10) .plotLine {stroke: #929600;}
-.plot svg.layer:nth-of-type(15n+11) .plotLine {stroke: #e95536;}
-.plot svg.layer:nth-of-type(15n+12) .plotLine {stroke: #6685d9;}
-.plot svg.layer:nth-of-type(15n+13) .plotLine {stroke: #f89f13;}
-.plot svg.layer:nth-of-type(15n+14) .plotLine {stroke: #bc5b80;}
-.plot svg.layer:nth-of-type(15n) .plotLine {stroke: #47b66d;}
+.Plot svg.Layer:nth-of-type(15n+1) .PlotLine {stroke: #5e81b5;}
+.Plot svg.Layer:nth-of-type(15n+2) .PlotLine {stroke: #e19c24;}
+.Plot svg.Layer:nth-of-type(15n+3) .PlotLine {stroke: #8fb032;}
+.Plot svg.Layer:nth-of-type(15n+4) .PlotLine {stroke: #eb6235;}
+.Plot svg.Layer:nth-of-type(15n+5) .PlotLine {stroke: #8778b3;}
+.Plot svg.Layer:nth-of-type(15n+6) .PlotLine {stroke: #c56e1a;}
+.Plot svg.Layer:nth-of-type(15n+7) .PlotLine {stroke: #5d9ec7;}
+.Plot svg.Layer:nth-of-type(15n+8) .PlotLine {stroke: #ffbf00;}
+.Plot svg.Layer:nth-of-type(15n+9) .PlotLine {stroke: #a5609d;}
+.Plot svg.Layer:nth-of-type(15n+10) .PlotLine {stroke: #929600;}
+.Plot svg.Layer:nth-of-type(15n+11) .PlotLine {stroke: #e95536;}
+.Plot svg.Layer:nth-of-type(15n+12) .PlotLine {stroke: #6685d9;}
+.Plot svg.Layer:nth-of-type(15n+13) .PlotLine {stroke: #f89f13;}
+.Plot svg.Layer:nth-of-type(15n+14) .PlotLine {stroke: #bc5b80;}
+.Plot svg.Layer:nth-of-type(15n) .PlotLine {stroke: #47b66d;}
 
 
 
