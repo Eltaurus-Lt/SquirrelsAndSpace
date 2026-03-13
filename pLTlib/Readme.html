@@ -37,12 +37,14 @@
     A lightweight framework for making interactive mathematical graphics with a focus on refinement, stability, and performance of finalized presentation. 
   </p>
   <ul>
-    <li>Designed with accessability of low-level customization in mind, it works directly in webpage's DOM, instead of keeping a complex internal state and relying on elaborate API calls</li>
+    <li>Designed with low-level accessability in mind, it works directly in webpage's DOM, instead of keeping a complex internal state and relying on elaborate API calls</li>
+    <li>Provides means for high-level customization</li>
     <li>Does not involve unnecessary rasterization</li>
     <li>Components allow edits with standard <a href="#layers">HTML</a> and <a href="#CSS">CSS means</a>, which makes the framework extremely open to being combined with other tools and friendly to manual adjustments</li>
     <li>Packs essential <a href="#methods">numerical methods</a></li>
     <li>Allows drawing smooth plots with very few points</li>
     <li>Interactivity <a href="#controls">requires minimal setup</a> without limiting the full potential</li>
+<!-- todo:  tick-dashing sync (+ origin merging)-->
 <!-- todo: export to svg -->
   </ul>
 
@@ -61,7 +63,7 @@
     Plots are constructed as container elements holding multiple layers of <a href="#layers">various types</a>. Example structure:
 
     <code class="block" highlight="HTML">
-      &lt;div class="Plot" PlotRange="[0, 7]"&gt;<br>
+      &lt;div class="Plot" PlotRange="[0, 7]" PlotLabel="Example"&gt;<br>
       &nbsp;&lt;svg class="Layer" id="plotCanvas"&gt;&lt;/svg&gt;<br>
       &nbsp;&lt;div class="Layer" Axes Arrowheads Ticks="1"&gt;&lt;/div&gt;<br>
       &nbsp;&lt;svg class="Layer" id="epilog"&gt;&lt;/svg&gt;<br>
@@ -187,6 +189,15 @@ The included onload function ensures the height of the embedded plot is fit to t
     The attributes here are <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/range" target="_blank">standard html slider</a> parameters, which can be used to configure the inputs. The only part essential for the plt framework is the <code>pltvar</code> property that indicate a text name for the JavaScript variable to be controlled by the slider. No other setup for the input element itself, regardless of the type, is required to make it fully functional.
   </p>
 
+  <h3>Mouse controls (WIP)</h3>
+  <ul>
+<!-- todo: limits -->
+    <li>Panning</li>
+    <li>Scale</li>
+    <li>3D camera</li>
+    <li>Draggable elements</li>
+  </ul>
+
   <h3>Update queue</h3>
   <p>
     For components of the plot to dynamically respond to changing inputs, their parameters should be updated on each interaction. To automate the associated setup, plt provides the <code>dynamic</code> object, which can be used to push individual update functions into a unified queue:
@@ -212,7 +223,7 @@ function source code analysis to only call functions if the changed value is amo
     Calling <code>update()</code> without arguments performs a global update, refreshing all variables and the whole <code>dynamic</code> queue. In particular, <code>update()</code> is useful for initiating the state of the plot at the end of the script, after all dynamic functions were pushed to the queue.
   </p>
 
-<!-- todo: PlotRange mutation observer -->
+  <h3>Dynamic PlotRange (WIP)</h3>
 
   <h3>Custom inputs (advanced)</h3>
   <p>
@@ -250,19 +261,21 @@ function source code analysis to only call functions if the changed value is amo
   <ul>
     <li><code>PlotRange="[Xmin, Xmax]"</code> sets horizontal range of the plot. Providing a number <code>A</code> instead of an interval is interpreted as <code>[-A, A]</code>.</li>
     <li><code>AspectRatio="X"</code> defines the width-to-height ratio of the plot in screen space. If not explicitly set, defaults to the golden ratio <code>≈1.618</code>.</li>
-    <li><code>ScaleRatio="X"</code> defines the <code>1<sub>Y</sub>:1<sub>X</sub></code> ratio of unit lengths along vertical and horizontal axes. Equals <code>1</code> by default, asserting uniform scaling of the plot space to the screen space mapping.</li> 
-    <!-- todo: vertical origin offset; plot padding and layer clipping -->
+    <li><code>ScaleRatio="X"</code> defines the <code>1<sub>Y</sub>:1<sub>X</sub></code> ratio of unit lengths along vertical and horizontal axes. Equals <code>1</code> by default, asserting uniform scaling of the plot space to the screen space mapping.</li>
+    <li><code>RangePivot="[X0, Y0]" (WiP)</code> . </li>
+    <li><code>PlotLabel="label"</code> can be used to label the plot as a whole. </li>
+    <!-- todo: plot padding and layer clipping -->
   </ul>
   <p>
     Note that vertical range cannot be set directly, because it depends on the properties above, which are more important for final presentation of the illustration than exact <code>Ymin</code> and <code>Ymax</code> values (aspect ratio is typically expected to be standardized across an entire article, while scale ratio is required for plotting data without distortion). 
   </p>
 
 
-  <h4 id="html_attributes">HTML layers</h4>
+  <h4 id="html_attributes">Web layers</h4>
   <p>
     Attributes attached to a <code>div.Layer</code> element:
     <code class="block" highlight="HTML">
-      &lt;div class="Layer" Frame Grid Ticks="1" TicksRight="[[.5, '\(\frac{\1}{2}\)'], 1, [1.618, '\varphi']]" ... &gt;
+      &lt;div class="Layer" Frame Grid Ticks="1" TicksRight="[[.5, '$\frac{\1}{2}$'], 1, [1.618, '$\varphi$']]" ... &gt;
     </code>
     Primarily control overlayed details, such as ticks and text labels. The details do not have any default values – plots display what have been explicitly declared. Attributes that appear without values practically serve as toggles, with the result depending only on whether their name is attached to the <code>&lt;div&gt;</code> at all:
   </p>
@@ -287,7 +300,6 @@ function source code analysis to only call functions if the changed value is amo
     <li><code>MergeZero</code> toggle displaying a single unified label at the axes' intersection instead of showing two separate zeroes.</li>
     <li><code>AxesLabels="['labelX', 'labelY']"</code> provides text labels to mark the ends of the axes. Requires <code>Axes</code> (or <code>AxisX</code> / <code>AxisY</code>) attribute. Either of the labels can be an empty string to be omitted. Individual attributes <code>AxisLabelX</code> and <code>AxisLabelY</code> are also supported. </li>
     <li><code>FrameLabels="['labelBottom', 'labelLeft']"</code> provides text labels to mark the sides of the frame. Can be supplied with an array of four strings instead of two to mark all the sides (starting from the bottom an proceeding in the clockwise direction). Either of the strings can be an empty string to be omitted. All six specialized variants are supported for labeling individual sides or both sides in a certain direction: <code>FrameLabelX</code>, <code>FrameLabelY</code>, <code>FrameLabelBottom</code>, <code>FrameLabelLeft</code>, <code>FrameLabelTop</code>, <code>FrameLabelRight</code>. </li>
-    <li><code>PlotLabel="label"</code> can be used to label the plot as a whole. </li>
   </ul>
   <p>
     All text labels (including manual tick labels) support <a href="https://docs.mathjax.org/en/v4.0/basic/mathematics.html#tex-and-latex-input" target="_blank">MathJax</a> for LaTeX expressions.
@@ -312,28 +324,40 @@ function source code analysis to only call functions if the changed value is amo
   <p>
     Appearance of any plot component is controlled directly, using standard CSS. Styling code can be put in a <code>&lt;style&gt;...&lt;/style&gt;</code> tag (or referenced from a separate file) inside the <code>&lt;head&gt;</code> of the document <b>after</b> <a href="#import">pltlib import</a> tags.
   </p>
-  <h4>Selectors</h4>
+
+  <h4>CSS properties (WiP)</h4>
+  <p>
+    Inherited. <code>--Thickness</code>, <code>--TickLength</code>, <code>--Dashing</code>,<code>--DashingPeriod</code>, <code>--Color</code>
+
+    To reset bounding to plot origin for a specific object (e.g., plot legend):
+<!--todo: check-->
+    <code class="block" highlight="CSS">
+      translate: 0;
+    </code>
+  </p>
+
+  <h4>Selectors (low-level)</h4>
   <p>
     Classes <code>.Axis</code>, <code>.Arrowhead</code>, <code>.Frame</code>, <code>.Gridline</code>, <code>.Tick</code>, as well as general <code>.Label</code> class, are provided for <a href="https://www.w3schools.com/cssref/css_selectors.php" target="_blank">targeting</a> certain kinds of elements <a href="#html_attributes">generated from attributes</a>. Example uses:
 
     <code class="block" highlight="CSS">
       .Frame {<br>
-      &nbsp;&nbsp;border-width: 2px; /* thickness */<br>
-      &nbsp;&nbsp;border-color: green; /* line color */<br>
+      &nbsp;&nbsp;--Thickness: 5px; /* inherited by the frame ticks */<br>
       }<br>
       <br>
       .Axis, .Gridline {<br>
-      &nbsp;&nbsp;border-color: #bada55; /* line color */<br>
-      &nbsp;&nbsp;border-style: dashed; /* line style */<br>
+      &nbsp;&nbsp;--Color: green; /* inherited by the axes' ticks and arrowheads */<br>
+      &nbsp;&nbsp;--Dashing: 0.5; <br>
+      &nbsp;&nbsp;--DashingPeriod: calc(4 * var(--Thickness)); <br>
       }<br>
       <br>
       .Tick {<br>
-      &nbsp;&nbsp;height: 15px; /* tick length */ <br>
-      &nbsp;&nbsp;border-width: 5px; /* tick thickness */<br>
+      &nbsp;&nbsp;--TickLength: 15px;<br>
+      &nbsp;&nbsp;--Thickness: 2px; /* overrides inherited value */<br>
       }<br>
       <br>
-      .Axis .Tick {<br>
-      &nbsp;&nbsp;translate: 0 0; /* axis-centered tick */<br>
+      .Axis {<br>
+      &nbsp;&nbsp;justify-content: 0; /* tick alignment */<br>
       }<br>
     </code>
 
@@ -345,7 +369,7 @@ Children elements are set up to inherit basic properties from their parents by d
     <code class="block" highlight="CSS">
       .Axis.X,<br>
       .Frame .Tick.Y {<br>
-      &nbsp;&nbsp;border-color: gold;<br>
+      &nbsp;&nbsp;border-color: #bada55;<br>
       }<br>
       .Arrowhead.X {<br>
       &nbsp;&nbsp;background-color: gold;<br>
@@ -375,7 +399,7 @@ Children elements are set up to inherit basic properties from their parents by d
       <li><code>translate: 0 50%;</code> moves the tick outside.</li>
     </ul>
   </p>
-
+<!-- todo: space transform: origin/ lh em -->
   <p>
 labels (WiP)
 
@@ -403,98 +427,113 @@ labels (WiP)
 
 
 
-  <h2 id="methods">Numerical methods</h2>
+<h2 id="methods">Numerical methods</h2>
 
-  <p>
-    Provided implementations of common numerical methods covering basic needs of plotting functions and solving algebraic and differential equations. Because finalized illustrations imply predefined well-posed conditions, the provided routines perform no data checks and rely on the incoming arguments always having appropriate formats. To further cut on potential overhead and avoid jittering typically associated with real-time auto-tuning, all parameters are taken in explicitly. Note, that the listed methods are called from the <code>plt</code> object.
-  </p>
+<p>
+  Provided implementations of common numerical methods covering basic needs of plotting functions and solving algebraic and differential equations. Because finalized illustrations imply predefined well-posed conditions, the provided routines perform no data checks and rely on the incoming arguments always having appropriate formats. To further cut on overhead and avoid jittering typically associated with real-time auto-tuning, all parameter values are taken in explicitly.
+</p>
 
-  <h3 id="plotting">Plots</h3>
-  <p>
+<h3 id="plotting">Plots</h3>
+<p>
     Plotting methods return line data in the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-string format</a> ready to be applied to a <code>&lt;path&gt;</code> element (inside an <a href="#svg">vector layer</a>): 
     <code class="block" highlight="JS">
       const svgLayer = document.querySelector("svg.Layer");<br>
       svgLayer.add("path", "PlotLine").setAttribute("d", plot_string);
     </code>
-    Here <code>.add</code> is a <a href="#add">provided utility method</a> for creating and attaching plot elements, and <code>plot_string</code> is a result returned by one of the methods listed below.
+    Here <code>.add</code> is a <a href="#add">provided utility method</a> for creating and attaching plot elements, white the <code>plot_string</code> is a result returned by either of the methods listed below. All plotting methods are called from the <code>plt</code> object.
   </p>
 
-  <h4><code>LinearPlot(f, xs)</code></h4>
-  <p>
-    Plot of an analytical single-valued function <code>f(x)</code> drawn as a polyline over an array of argument values <code>xs</code>:
-    <code class="block" highlight="JS">
-      plot_string = plt.LinearPlot(x =&gt; Math.cos(x), plt.Subdivide([0, 10], 25));
-    </code>
-    Here <code>x =&gt; Math.cos(x)</code> is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">JS arrow function</a> expression for <code>f(x)=cos(x)</code>, and <code>plt.Subdivide(...)</code> is an array of <code>x</code> values, obtained by applying the <a href="#subdivide">respective utility method</a> to the <code>[0, 10]</code> interval.
-  </p>
+<ul>
+  <li><h4><code>LinearPlot(f, xs)</code></h4>
+      <p>
+        Plot of an analytical single-valued function <code>f(x)</code> drawn as a polyline over an array of argument values <code>xs</code>:
+        <code class="block" highlight="JS">
+          plot_string = plt.LinearPlot(x =&gt; Math.cos(x), plt.Subdivide([0, 10], 25));
+        </code>
+        Here <code>x =&gt; Math.cos(x)</code> is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">JS arrow function</a> expression for <code>f(x)=cos(x)</code>, and <code>plt.Subdivide(...)</code> is an array of <code>x</code> values, obtained by applying the <a href="#subdivide">respective utility method</a> to the <code>[0, 10]</code> interval.
+      </p>
+    </li>
 
-  <h4><code>BezierPlot(f, df, xs)</code></h4>
-  <p>
-    Method similar to the <code>LinearPlot</code> above, which returns a <a href="https://eltaurus-lt.github.io/ChaosAndCats/en/chapter-03.html" target="_blank">cubic Bezier spline</a> instead of straight-line segments to produce a completely smooth result with fewer points. Requires additionally providing explicit analytical expression for the derivative <code>df(x)</code> of the <code>f(x)</code> function:
-    <code class="block" highlight="JS">
-      plt.BezierPlot(x =&gt; Math.cos(x), x =&gt; -Math.sin(x), xs)
-    </code>
-  </p>
+    <li><h4><code>BezierPlot(f, df, xs)</code></h4>
+      <p>
+        Method similar to the <code>LinearPlot</code> above, which returns a <a href="https://eltaurus-lt.github.io/ChaosAndCats/en/chapter-03.html" target="_blank">cubic Bezier spline</a> instead of straight-line segments to produce a completely smooth result with fewer points. Requires additionally providing explicit analytical expression for the derivative <code>df(x)</code> of the <code>f(x)</code> function:
+        <code class="block" highlight="JS">
+          plt.BezierPlot(x =&gt; Math.cos(x), x =&gt; -Math.sin(x), xs)
+        </code>
+      </p>
+    </li>
 
-  <h4><code>LinearParametric(f, ts)</code></h4>
-  <p>
-    Equivalent of the <code>LinearPlot</code> for parametric plots of 2D vector functions, such as
-    <code class="block" highlight="JS">
-      t =&gt; [ Math.cos(x - 0.3), Math.sin(2 * x)]
-    </code>
-  </p>
-  <h4><code>BezierParametric(f, df, ts)</code></h4>
-  <p>
-    2D vector equivalent of the <code>BezierPlot</code>. Requires providing the derivative <code>df</code>, which itself should also be a 2D vector function.
-  </p>
-  <h4><code>LinearListPlot(xys)</code></h4>
-  <p>
-    Returns a polyline constructed from an array <code>xys</code> of 2D points <code>[x, y]</code>. Appropriate for plotting table functions. In particular, the ones obtained as numerical solitions of differential equations.
-  </p>
-  <h4><code>BezierListPlot(xys) (WIP)</code></h4>
-  <p>
-    Bezier equivalent of the <code>LinearListPlot</code>.
-  </p>
+    <li><h4><code>LinearParametric(f, ts)</code></h4>
+    <p>
+      Equivalent of the <code>LinearPlot</code> for parametric plots of 2D vector functions, such as
+      <code class="block" highlight="JS">
+        t =&gt; [ Math.cos(x - 0.3), Math.sin(2 * x)]
+      </code>
+    </p></li>
+
+    <li><h4><code>BezierParametric(f, df, ts)</code></h4>
+    <p>
+      2D vector equivalent of the <code>BezierPlot</code>. Requires providing the derivative <code>df</code>, which itself should also be a 2D vector function.
+    </p></li>
+
+
+    <li><h4><code>LinearListPlot(xys)</code></h4>
+    <p>
+      Returns a polyline constructed from an array <code>xys</code> of 2D points <code>[x, y]</code>. Appropriate for plotting table functions. In particular, the ones obtained as numerical solitions of differential equations.
+    </p></li>
+
+    <li><h4><code>BezierListPlot(xys) (WIP)</code></h4>
+    <p>
+      Bezier equivalent of the <code>LinearListPlot</code>.
+    </p></li>
+  </ul>
   <br>
-  <h4><code>ListPlot(xys) (WIP)</code></h4>
+
+  <ul>
+  <li><h4><code>ListPlot(xys) (WIP)</code></h4>
   <p>
-    A singular method for plotting a table function as a collection of points instead of a continuous line. In contrast to all the previous methods does not return a d-string, but an array of <a href="marker">Markers</a>, which can be attached to a vector layer directly:
+    A singular method for plotting a table function as a collection of points instead of a continuous line. In contrast to all the previous methods does not return a d-string, but an array of <a href="#markers">Markers</a>, which can be attached to a vector layer directly:
     <code class="block" highlight="JS">
       svgLayer.add(plt.ListPlot(xys), "plotMarker").
     </code>
   </p>
+  </ul>
 
 <!-- todo: css and svg animations -->
 
   <h3>Solvers</h3>
 
-  Provided methods for solving algebraic and differential equations.
- 
-  <h4><code>FindRoot(f, df, x0, iter, damp = 1)</code></h4>
   <p>
-    Finds a root of an algebraic equation <code>f(x)=0</code> using <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton–Raphson<a> method starting from the point <code>x0</code> and performing <code>iter</code> number of steps. Requires providing analytical derivative <code>df(x)</code> of the function <code>f(x)</code> (both should be single-valued functions).<br>
+    Provided methods for solving algebraic and differential equations. Called from the <code>plt</code> object.
+  </p>
+ 
+  <ul>
+    <li><h4><code>FindRoot(f, df, x0, iter, damp = 1)</code></h4>
+  <p>
+    Finds a root of an algebraic equation <code>f(x)=0</code> using <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton–Raphson</a> method starting from the point <code>x0</code> and performing <code>iter</code> number of steps. Requires providing analytical derivative <code>df(x)</code> of the function <code>f(x)</code> (both should be single-valued functions).<br>
     Allows specifying an optional damping factor, which serves as a step multiplier (when the function is called with 4 arguments, <code>damp</code> defaults to <code>1</code>). Values less than <code>1</code> improve stability, but require more steps to converge. Values greater than <code>1</code> can be useful for improving convergence near roots with multiplicity&nbsp;<code>&gt;&nbsp;1</code>.<br>
   Example use:
     <code class="block" highlight="JS">
       xr = plt.FindRoot(x => (Math.cos(x) - 1), x => -Math.sin(x), 0, 10);
     </code>
-  </p>
-  <h4><code>LocateRoot(f, [xa, xb], iter)</code></h4>
-  <p>
-    Finds a root of an algebraic equation <code>f(x)=0</code> using the <a href="https://en.wikipedia.org/wiki/Bisection_method" target="_blank">Bisection<a> method starting on an interval <code>[xa, xb]</code> and performing <code>iter</code> number of steps. In general, converges slower than <code>FindRoot</code>, but is always stable and ensures that the result belongs to the specified interval. Relies on <code>f(xa)</code> and <code>f(xb)</code> having opposite signs (returns <code>Null</code> otherwise).
-  </p>
+  </p></li>
 
-  <h4><code>NSolve(f, df, x0s, iter, damp = 1)</code></h4>
+  <li><h4><code>LocateRoot(f, [xa, xb], iter)</code></h4>
+  <p>
+    Finds a root of an algebraic equation <code>f(x)=0</code> using the <a href="https://en.wikipedia.org/wiki/Bisection_method" target="_blank">Bisection</a> method starting on an interval <code>[xa, xb]</code> and performing <code>iter</code> number of steps. In general, converges slower than <code>FindRoot</code>, but is always stable and ensures that the result belongs to the specified interval. Relies on <code>f(xa)</code> and <code>f(xb)</code> having opposite signs (returns <code>Null</code> otherwise).
+  </p></li>
+
+  <li><h4><code>NSolve(f, df, x0s, iter, damp = 1)</code></h4>
   <p>
     Searches for multiple roots of the <code>f(x)=0</code> equation using <code>FindRoot</code> for each of the <code>x0</code> values from the array <code>x0s</code>. Filters out repeated results, based on <a href="#Precision">$Precision</a>.
-  </p>
+  </p></li>
 
-  <h4><code>NBSolve(f, x0s, iter)</code></h4>
+  <li><h4><code>NBSolve(f, x0s, iter)</code></h4>
   <p>
     Searches for multiple roots of the <code>f(x)=0</code> equation using <code>LocateRoot</code> for each of the pairs of consecutive values from the <code>x0s</code> array. Filters out <code>Null</code> resutls, does not search for more than one root per interval.
-  </p>
+  </p></li>
 
-  <h4 id="NDSolve"><code>NDSolve(f, x0, ts)</code></h4>
+  <li><h4 id="NDSolve"><code>NDSolve(f, x0, ts)</code></h4>
   <p>
     Integrates differential equation <code>x'(t)=f(x, t)</code> over the array <code>ts</code> of <code>t</code> values using the <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4) with initial conditions <code>x(ts[0])=x0</code>. The method supports <code>x</code> being both a real number and a vector (array) of arbitrary length. In the vector case, <code>f(x, t)</code> must return an array of the same length and expect its <code>x</code> argument to be an array as well.
 Example use:
@@ -513,11 +552,22 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
       plot_string = LinearListPlot(sol.map( ([t, [x, y, z]]) => [x, z] ));<br>
       svgLayer.add("path", "PlotLine").setAttribute("d", plot_string);
     </code>
-  </p>
+  </p></li>
+  </ul>
 
 
   <h3>Utility</h3>
-  <h4 id="add"><code>.add(elementType, classList = "")</code></h4>
+  <ul>
+
+  <li><h4 id="subdivide"><code>Subdivide([x0, x1], N)</code></h4>
+  <p>
+    Uniformly subdivides a specified interval into N subintervals. Returns a single array of values with the first and the last one coinciding with <code>x0</code> and <code>x1</code>. Called from the <code>plt</code> object:
+    <code class="block" highlight="JS">
+      plt.Subdivide( [0, Math.PI / 2], 50 ) // returns [0, 0.01 π, 0.02 π, ..., 0.5 π]
+    </code>
+  </p></li>
+
+    <li><h4 id="add"><code>.add(elementType, classList = "")</code></h4>
   <p>
     Main method for creating <code>svg</code> and <code>html</code> elements and attaching them to <a href="layers">vector and html layers</a> respectivelly. Called from a layer object, returns a reference to the created element. Allows additionally specifying a list of classes (as a single string, separated by spaces) as an optional second argument to mark the element and be used for <a href="#CSS">styling</a>. Example uses:
     <code class="block" highlight="JS">
@@ -534,9 +584,9 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
   </p>
   <p>
     Additionally can be called from a <a href="#intro"><code>div.Plot</code> container</a> to dynamicaly make <a href="#layers">new layers</a> (WiP). The <code>elementType</code> in such case should be one of the following: <code>"svg"</code>, <code>"html"</code>, <code>"canvas"</code>, <code>"glsl"</code>.
-  </p>
+  </p></li>
 
-  <h4><code>.merge( d_string1, d_string2, ... )</code></h4>
+  <li><h4><code>.merge( d_string1, d_string2, ... )</code></h4>
   <p>
     Method for merging <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-strings</a> returned by the <a href="#plotting">plotting methods</a>. Can be used consruct piecewise lines from individual segments:
     <code class="block" highlight="JS">
@@ -546,22 +596,22 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
       <br>
       joined_line = plt.merge(d_string1, d_string2, d_string3);
     </code>
-  </p>
+  </p></li>
 
-  <h4 id="subdivide"><code>Subdivide([x0, x1], N)</code></h4>
-  <p>
-    Uniformly subdivides a specified interval into N subintervals. Returns a single array of values with the first and the last one coinciding with <code>x0</code> and <code>x1</code>. Called from the <code>plt</code> object:
-    <code class="block" highlight="JS">
-      plt.Subdivide( [0, Math.PI / 2], 50 ) // returns [0, 0.01 π, 0.02 π, ..., 0.5 π]
-    </code>
-  </p>
-  <h4><code>$Precision</code></h4>
+  <li><h4><code>.unwrap(obj)</code></h4>
+    <p>
+      Unwraps methods contained in an object into the global scope. Useful for <code>Math</code> to simplify writing long math expressions. Can also be used on the <code>plt</code> itself.
+    </p>
+  </li>
+ 
+  <li><h4><code>$Precision</code></h4>
   <p>
     Some of the <a href="#methods">numerical methods</a> internally use floating-point comparison, which requires specifying an error margin. The utilized value is stored as a global variable <code>$Precision</code>, which can be modified to control the coarseness of the dependent operations: 
     <code class="block" highlight="JS">
       $Precision = 1e-9;
     </code>
-  </p>
+  </p></li>
+  </ul>
 
   <br>
   <ul class="references">
