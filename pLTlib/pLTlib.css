@@ -1,10 +1,49 @@
+/* defaults */
 :root {
-  --line-thickness: 3px;
-  --axes-thickness: 2px;
-  --axes-color: black;
-  --frame-thickness: 2px;
-  --grid-thickness: 1px;
+  --Thickness: 2px;
+  --PointSize: 5px;
+  --Color: black;
+
+  --TickLength: 5px;
+  --ArrowheadsWidth: 5;
+  --ArrowheadsLength: 7;
+
+/* todo */  --Dashing: ; 
 }
+
+.PlotLine {
+  --Color: var(--wm-color);
+  stroke-width: var(--Thickness);
+  stroke: var(--Color);
+  fill: none;
+}
+div.PlotMarker {
+  --Color: var(--wm-color);
+  position: absolute;
+  width: var(--PointSize);
+  aspect-ratio: 1;
+  background: limegreen;
+  border-radius: 100%;
+}
+
+/* WM colors */
+.Plot .Layer:nth-of-type(15n+1) {--wm-color: #5e81b5;}
+.Plot .Layer:nth-of-type(15n+2) {--wm-color: #e19c24;}
+.Plot .Layer:nth-of-type(15n+3) {--wm-color: #8fb032;}
+.Plot .Layer:nth-of-type(15n+4) {--wm-color: #eb6235;}
+.Plot .Layer:nth-of-type(15n+5) {--wm-color: #8778b3;}
+.Plot .Layer:nth-of-type(15n+6) {--wm-color: #c56e1a;}
+.Plot .Layer:nth-of-type(15n+7) {--wm-color: #5d9ec7;}
+.Plot .Layer:nth-of-type(15n+8) {--wm-color: #ffbf00;}
+.Plot .Layer:nth-of-type(15n+9) {--wm-color: #a5609d;}
+.Plot .Layer:nth-of-type(15n+10) {--wm-color: #929600;}
+.Plot .Layer:nth-of-type(15n+11) {--wm-color: #e95536;}
+.Plot .Layer:nth-of-type(15n+12) {--wm-color: #6685d9;}
+.Plot .Layer:nth-of-type(15n+13) {--wm-color: #f89f13;}
+.Plot .Layer:nth-of-type(15n+14) {--wm-color: #bc5b80;}
+.Plot .Layer:nth-of-type(15n) {--wm-color: #47b66d;}
+
+
 
 @media(min-width: 800px) {
   body {
@@ -19,7 +58,7 @@
 
 body {
   margin: 0;
-  overflow-Y: hidden;
+  overflow: hidden;
 }
 
 
@@ -38,86 +77,122 @@ div.Plot > * {
   display: block;
   position: absolute;
 }
-div.Plot .Layer { 
+/* Vector */
+div.Plot svg.Layer {
   width: 100%;
   height: 100%;
   inset: 0;
-}
-svg.Layer {
+
   scale: 1 -1;
 }
 div.Plot svg.Layer:first-of-type {
-  position: relative;
+  position: relative; /* todo: change to flex/grid */
 }
 :where(svg.Layer) * { 
   vector-effect: non-scaling-stroke;
+}
+/* Markup */
+div.Plot div.Layer > * { 
+  display: block;
+  position: absolute;
+  translate: -50% 50%;
 }
 
 
 /* Axes */
 
-.Axis {
+div.Plot div.Layer .Axis {
+  background-color: var(--Color);
+  display: flex;
+  justify-content: center;
+}
+div.Plot div.Layer .Axis > * {
   position: absolute;
-  border-color: var(--axes-color);
-  border-style: solid;
 }
-.Axis.X {
-  left: 0;
-  right: 0;
+div.Plot div.Layer .Axis.X {
   height: 0;
-
-  border-right-width: 0 !important;
-  border-left-width: 0 !important;
-  border-width: var(--axes-thickness);
-
+  padding: calc(var(--Thickness) / 2) 0;
   translate: 0 50%;
-  scale: 1 0.5;
-  bottom: 5%; /* fallback */
+  bottom: 0; /* fallback */
+  scale: 1 -1;
 }
-.Axis.X > * {
-  scale: 1 2;
+div.Plot div.Layer .Axis.X > * {
+  scale: 1 -1;
 }
-.Axis.Y {
-  top: 0;
-  bottom: 0;
+div.Plot div.Layer .Axis.Y {
   width: 0;
+  padding: 0 calc(var(--Thickness) / 2);
+  translate: -50% 0;
+  left: 0; /* fallback */
 
-  border-top-width: 0 !important;
-  border-bottom-width: 0 !important;
-  border-width: var(--axes-thickness);
-
-  translate: 50% 0;
-  scale: 0.5 1;
-  right: 5%; /* fallback */
-}
-.Axis.Y > * {
-  scale: 2 1;
+  flex-direction: column;
 }
 
 
 /* Arrowheads */
 
 .Arrowhead {
-  position: absolute;
-  background: var(--axes-color);
+  background: var(--Color);
 
-  height: calc(5 * var(--axes-thickness)); 
-  aspect-ratio: 7/5;
-  transform-origin: center right;
+  aspect-ratio: 1;
+  scale: calc( var(--ArrowheadsLength) / var(--ArrowheadsWidth) ) 1;
   clip-path: polygon(100% 50%, 0 0, 15% 50%, 0 100%);
+  align-self: center;
+}
+div.Plot div.Layer .Axis.X > .Arrowhead.X {
+  scale: calc( var(--ArrowheadsLength) / var(--ArrowheadsWidth) ) 1;
+}
+.Arrowhead.X {
+  height: calc( 100% * var(--ArrowheadsWidth) );
 }
 .Arrowhead.Right {
-  translate: 25% -50%;
+  translate: 50% 0;
   right: 0;
 }
+.Arrowhead.Left {
+  translate: -50% 0;
+  rotate: 180deg;
+  left: 0;
+}
+.Arrowhead.Y {
+  width: calc( 100% * var(--ArrowheadsWidth) );
+}
 .Arrowhead.Top {
-  translate: -100% calc( -50% - 25% * 7 / 5 );
+  translate: 0 -50%;
   rotate: -90deg;
-  scale: 1 2;
   top: 0;
 }
+.Arrowhead.Bottom {
+  translate: 0 50%;
+  rotate: 90deg;
+  bottom: 0;
+}
 
+/* Ticks */
+.Tick.X {
+  width: var(--Thickness);
+  height: var(--TickLength);
+  background: var(--Color);
+  translate: -50% 0;
+}
+.Sub.Tick.X {
+  height: calc(.5 * var(--TickLength));
+}
 
+.Tick.Y {
+  height: var(--Thickness);
+  width: var(--TickLength);
+  background: var(--Color);
+  translate: 0 50%;
+}
+.Sub.Tick.Y {
+  width: calc(.5 * var(--TickLength));
+}
+.Tick.zero {
+  visibility: hidden;
+  /* --Color: red;
+  --Thickness: calc(.5 * var(--TickLength)); */
+}
 
 /* Text labels (todo) */
 #plotlabel {
@@ -141,43 +216,31 @@ input[pltvar][type="range"] {
 }
 
 
-/* Plot Styles */
-.PlotLine {
-  stroke-width: var(--line-thickness);
-  fill: none;
-}
-.PlotPoint {
-  r: 0.05px;
-}
-
-/* WM colors */
-.Plot svg.Layer:nth-of-type(15n+1) .PlotLine {stroke: #5e81b5;}
-.Plot svg.Layer:nth-of-type(15n+2) .PlotLine {stroke: #e19c24;}
-.Plot svg.Layer:nth-of-type(15n+3) .PlotLine {stroke: #8fb032;}
-.Plot svg.Layer:nth-of-type(15n+4) .PlotLine {stroke: #eb6235;}
-.Plot svg.Layer:nth-of-type(15n+5) .PlotLine {stroke: #8778b3;}
-.Plot svg.Layer:nth-of-type(15n+6) .PlotLine {stroke: #c56e1a;}
-.Plot svg.Layer:nth-of-type(15n+7) .PlotLine {stroke: #5d9ec7;}
-.Plot svg.Layer:nth-of-type(15n+8) .PlotLine {stroke: #ffbf00;}
-.Plot svg.Layer:nth-of-type(15n+9) .PlotLine {stroke: #a5609d;}
-.Plot svg.Layer:nth-of-type(15n+10) .PlotLine {stroke: #929600;}
-.Plot svg.Layer:nth-of-type(15n+11) .PlotLine {stroke: #e95536;}
-.Plot svg.Layer:nth-of-type(15n+12) .PlotLine {stroke: #6685d9;}
-.Plot svg.Layer:nth-of-type(15n+13) .PlotLine {stroke: #f89f13;}
-.Plot svg.Layer:nth-of-type(15n+14) .PlotLine {stroke: #bc5b80;}
-.Plot svg.Layer:nth-of-type(15n) .PlotLine {stroke: #47b66d;}
-
-
 
 
 /* debug */
 
-.debug.plot,
-.debug .plot {
-    outline: solid 2px yellow;
-    outline-offset: -1px;
+.debug.Plot,
+.debug .Plot {
+  outline: solid 2px yellow;
+  outline-offset: -1px;
 }
-svg.layer.debug,
-.debug svg.layer {
-    outline: solid 1px red;
+svg.Layer.debug,
+.debug svg.Layer {
+  outline: solid 1px red;
+}
+div.Layer.debug,
+.debug div.Layer {
+  outline: solid 1px blue;
+}
+div.Layer.debug::after,
+.debug div.Layer::after {
+  content: '';
+  display: block;
+  position: absolute;
+  width: 1%;
+  height: 1%;
+  outline: limegreen 1px solid;
+  left: 0;
+  bottom: 0;
 }

@@ -42,9 +42,10 @@
     <li>Does not involve unnecessary rasterization</li>
     <li>Components allow edits with standard <a href="#layers">HTML</a> and <a href="#CSS">CSS means</a>, which makes the framework extremely open to being combined with other tools and friendly to manual adjustments</li>
     <li>Packs essential <a href="#methods">numerical methods</a></li>
-    <li>Allows drawing smooth plots with very few points</li>
-    <li>Interactivity <a href="#controls">requires minimal setup</a> without limiting the full potential</li>
-<!-- todo:  tick-dashing sync (+ origin merging)-->
+    <li>Capable of drawing smooth plots with very few points</li>
+    <li>Interactivity <a href="#controls">requires minimal setup</a> without limiting the full potential</li><!-- todo:  can be easily set up to only perform the necessary calculation on each dynamic update -->
+
+<!-- todo:  refinement options tick-dashing sync (+ origin merging)-->
 <!-- todo: export to svg -->
   </ul>
 
@@ -146,7 +147,7 @@ The included onload function ensures the height of the embedded plot is fit to t
     </code>
     Layers for adding <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch/Basic_shapes" target="_blank">vector graphical elements</a> to a plot. Coordinates and their units are matched with the plot space. In particular, vertical axis is directed upward, as expected from a mathematical plot, instead of going down, as is the default for svg. Note, that if a plot has <a href="#plot_attributes">different scales</a> on horizontal and vertical axes, graphical elements will appear stretched or squished, accordingly. Line <a href="https://developer.mozilla.org/ru/docs/Web/SVG/Reference/Attribute/stroke-width">stroke thickness</a> is set in screen space in pixels and remains fixed, independently of the plot's display size. For adding dots, that appear round inidependently of the plot <code>ScaleRatio</code>, use <a href="#markers">Markers (WiP)</a> instead of <code>&lt;circle&gt;</code>.
   </p>
-  <h3>Web layers</h3>
+  <h3>Markup layers</h3>
   <p>
     <code class="block" highlight="HTML">
       &lt;div class="Layer"&gt;&lt;/div&gt;
@@ -271,23 +272,23 @@ function source code analysis to only call functions if the changed value is amo
   </p>
 
 
-  <h4 id="html_attributes">Web layers</h4>
+  <h4 id="html_attributes">Markup layers</h4>
   <p>
     Attributes attached to a <code>div.Layer</code> element:
     <code class="block" highlight="HTML">
-      &lt;div class="Layer" Frame Grid Ticks="1" TicksRight="[[.5, '$\frac{\1}{2}$'], 1, [1.618, '$\varphi$']]" ... &gt;
+      &lt;div class="Layer" Frame Grid Ticks="1" TicksRight="[[.5, '$\\frac{1}{2}$'], 1, [1.618, '$\\varphi$']]" ... &gt;
     </code>
     Primarily control overlayed details, such as ticks and text labels. The details do not have any default values – plots display what have been explicitly declared. Attributes that appear without values practically serve as toggles, with the result depending only on whether their name is attached to the <code>&lt;div&gt;</code> at all:
   </p>
     <ul>
       <li><code>Axes</code> toggles axes on the HTML layer. Individually, horizontal and vertical axes can be toggled by <code>AxisX</code> and <code>AxisY</code> respectively. </li>
-      <li><code>Arrowheads</code> toggles arrowheads on the ends of axes (have no effect on layers without the any of the <code>Axes</code> attributes). <code>ArrowheadRight</code>, <code>ArrowheadTop</code> (as well as <code>ArrowheadLeft</code> and <code>ArrowheadBottom</code>) control individual ends of each axis. </li>
+      <li><code>Arrowheads</code> toggles arrowheads on the ends of axes (have no effect on layers without any of the <code>Axes</code> attributes). <code>ArrowheadRight</code>, <code>ArrowheadTop</code> (as well as <code>ArrowheadLeft</code> and <code>ArrowheadBottom</code>) control individual ends of each axis. </li>
       <li><code>Frame</code> toggles frame around the HTML layer. </li>
       <li><code>Ticks="X"</code> puts equidistant tick marks with interval "X" (in plot units) on <code>Axes</code> or <code>Frame</code> of the layer. When both attributes are present, <code>Ticks</code> applies the same setting to both of them. If that is not the desired effect, a separate HTML layer should be created so that either <code>Axes</code> or <code>Frame</code> could be moved over to it. This way, two independent <code>Ticks</code> setups could be made.
-      <br>Similarly to <code>Arrowheads</code> and <code>Axes</code>, <code>Ticks</code> can be split into two separate attributes – <code>TicksX</code> and <code>TicksY</code> – for horizontal and vertical directions respectively. For the frame ticks, <code>TicksX</code> can be further split into <code>TicksTop</code> and <code>TicksBottom</code> and <code>TicksY</code> can be split into <code>TicksLeft</code> and <code>TicksRight</code>. All variants of the attribute can be used in combination, with the more specialized one always taking priority. </li>
+      <br>Similarly to <code>Arrowheads</code> and <code>Axes</code>, <code>Ticks</code> can be split into two separate attributes – <code>TicksX</code> and <code>TicksY</code> – for horizontal and vertical directions respectively. For the frame ticks, <code>TicksX</code> can be further split into <code>TicksTop</code> and <code>TicksBottom</code> and <code>TicksY</code> can be split into <code>TicksLeft</code> and <code>TicksRight</code>. All variants of the attribute can be used in combination, with the more specialized one always taking priority. Note that empty specialized setting, like <code>TicksRight=""</code>, overwrites more general ones, effectively removing any ticks from the provided side or direction.</li>
       <li><code>Ticks="[X1, X2, X3, ...]"</code> is an alternative form for the <code>Tick</code> attribute value to put the ticks at the explicitly set positions <code>X1</code>, <code>X2</code>, etc. Same specialized attributes for each individual side and direction are supported.
       <br>The <code>Xi</code> themselves can be either numbers, or a pair of a number and a string, like in the example above. The latter labels the respective tick with the text from the provided string, instead of the number itself. The string should be enclosed in single quotes. <code>Xi</code> do not have to all be of the same type, the two formats can be freely mixed. </li>
-      <li><code>Subticks="n" (WiP)</code> uniformily subdivides interval between consecutive ticks into <code>n</code> parts. Works only with the equidistant format of <code>Ticks</code>.</li>
+      <li><code>Subticks="n" (WiP)</code> uniformily subdivides interval between consecutive ticks into <code>n</code> parts. Works only with the equidistant format of <code>Ticks</code>. Similar to the <code>Ticks</code> attribute itself, <code>SubticksX</code>, <code>…Y</code>, <code>…Bottom</code>, <code>…Left</code>, <code>…Top</code>, <code>…Bottom</code> are available for axes and the frame. </li>
       <li><code>Grid</code> toggles a coordinate grid on the back of the HTML layer. Relies on the <code>Tick</code> attribute (<code>TicksX</code> / <code>TicksY</code>) to control the spacing of the grid lines.      </li>
     </ul>
 
@@ -377,6 +378,7 @@ Children elements are set up to inherit basic properties from their parents by d
     </code>
 
     Additionally, classes <code>.Bottom</code>, <code>.Left</code>, <code>.Top</code>, and <code>.Right</code> are available for arrowheads, frame labels, frame edges, and frame ticks. Subticks do not have a dedicated class, instead they are marked with an auxiliary <code>.Sub</code> class on top of the general <code>.Tick</code> and can be targeted with <code>.Sub.Tick</code> selector.
+<!-- todo: .Sub.Gridline -->
   </p>
   <p>
     Similarly, different kinds of labels do not have distinguishing classes of their own. Instead, they can be selected using the class of its parent element and the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Selectors/Child_combinator" target="_blank">child combinator</a>:
@@ -391,6 +393,7 @@ Children elements are set up to inherit basic properties from their parents by d
     </code>
   </p>
   <h4>Positioning ticks and labels</h4>
+<!--   align-items: center; flex-start (default/inner ticks); flex-end (outer ticks); for individual ticks: align-self: --//-- ; -->
   <p>
     For controlling tick alignment relative to its parent axis (or frame edge), the <a hreaf="https://www.w3schools.com/cssref/css_pr_translate.php" target="_blank"><code>translate</code></a> property can be used:
     <ul>
@@ -467,7 +470,7 @@ labels (WiP)
     <p>
       Equivalent of the <code>LinearPlot</code> for parametric plots of 2D vector functions, such as
       <code class="block" highlight="JS">
-        t =&gt; [ Math.cos(x - 0.3), Math.sin(2 * x)]
+        t =&gt; [Math.cos(x - 0.3), Math.sin(2 * x)]
       </code>
     </p></li>
 

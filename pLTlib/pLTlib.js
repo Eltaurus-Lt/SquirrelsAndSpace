@@ -1,30 +1,57 @@
-const plt = {"private": {}};
-
+const plt = {};
+let $Precision = 0.0001;
 
 plt.plotDefaults = { // default PlotSettings
   PlotRange: [0, 10], // (number = symmetric interval; [x1, x2] = explicit interval; ex: [0, x2] = one-sided plot)
   AspectRatio: 1.618,
   ScaleRatio: 1, // ratio of pixel values for axes units
 
-  PlotOffset: 0 // todo
+  PlotOrigin: 0, // todo
+  RangePivot: 0 // todo
 };
 
-attributeParse = function (value) {
-  if (typeof value === "string" && !isNaN(value) && value.trim() !== "") {
-    return Number(value);
+plt._parseAttribute = function(value) {
+  function attr2json(attrstr) {
+    return attrstr.replaceAll("'",'"');
+    // todo? : unescape \f etc.
   }
-  try {
-    return JSON.parse(value);
-  } catch (err) {
+  function lead0fix(attrstr) {
+    return attrstr.replace(/(?<!\d)\.(\d+)/g, '0.$1');
+  }
+
+  if (typeof value !== "string") { // null, in particular
     return value;
   }
+  if (!isNaN(value) && value.trim() !== "") {
+    return Number(value);
+  }
+  if (value.includes("[")) {
+    try {
+        return JSON.parse(value);
+    } catch {}
+    try {
+        return JSON.parse(lead0fix(value));
+    } catch {}
+    const norm = attr2json(value);
+    try {
+        return JSON.parse(norm);
+    } catch {}
+    try {
+        return JSON.parse(lead0fix(norm));
+    } catch {}
+  };
+  return attr2json(value);
 }
 
-plt.getPlotSettings = function (plotL) {
+plt._parsedAttribute = function(L, attr) {
+  return this._parseAttribute(L.getAttribute(attr));
+}
+
+plt.getPlotSettings = function(plotL) {
   const plotSettings = {};
 
   for (const setting of Object.keys(plt.plotDefaults)) {
-    plotSettings[setting] = attributeParse(plotL.getAttribute(setting)) || plt.plotDefaults[setting];
+    plotSettings[setting] = plt._parseAttribute(plotL.getAttribute(setting)) || plt.plotDefaults[setting];
   }
 
   if (Array.isArray(plotSettings["PlotRange"]) && plotSettings["PlotRange"].length > 1) {
@@ -44,7 +71,49 @@ plt.getPlotSettings = function (plotL) {
   return plotSettings;
 }
 
-plt.private.addadddivmethod = function(parentL) {
+plt._getMarkupAttributes = function(layer) {
+  const attributes = {};
+
+  attributes["Grid"] = layer.hasAttribute("Grid");
+
+  attributes["AxisX"] = layer.hasAttribute("AxisX") || layer.hasAttribute("Axes");
+  attributes["AxisY"] = layer.hasAttribute("AxisY") || layer.hasAttribute("Axes");
+
+  attributes["ArrowheadBottom"] = layer.hasAttribute("ArrowheadBottom");
+  attributes["ArrowheadLeft"] = layer.hasAttribute("ArrowheadLeft");
+  attributes["ArrowheadTop"] = layer.hasAttribute("ArrowheadTop") || layer.hasAttribute("Arrowheads");
+  attributes["ArrowheadRight"] = layer.hasAttribute("ArrowheadRight") || layer.hasAttribute("Arrowheads");
+  
+  attributes["Frame"] = layer.hasAttribute("Frame");
+
+  function moreSpecial(attr, general) {
+    const special = plt._parsedAttribute(layer, attr);
+    if (special !== null) { // "" must be preserved
+      return special;
+    }
+    return general;
+  }
+
+  attributes["Ticks"] = this._parsedAttribute(layer, "Ticks");
+  attributes["TicksX"] = moreSpecial("TicksX", attributes["Ticks"]);
+  attributes["TicksY"] = moreSpecial("TicksY", attributes["Ticks"]);
+  attributes["TicksBottom"] = moreSpecial("TicksBottom", attributes["TicksX"]);
+  attributes["TicksLeft"] = moreSpecial("TicksLeft", attributes["TicksY"]);
+  attributes["TicksTop"] = moreSpecial("TicksTop", attributes["TicksX"]);
+  attributes["TicksRight"] = moreSpecial("TicksRight", attributes["TicksY"]);
+
+  attributes["Subticks"] = this._parsedAttribute(layer, "Subticks");
+  attributes["SubticksX"] = moreSpecial("SubticksX", attributes["Subticks"]);
+  attributes["SubticksY"] = moreSpecial("SubticksY", attributes["Subticks"]);
+  attributes["SubticksBottom"] = moreSpecial("SubticksBottom", attributes["SubticksX"]);
+  attributes["SubticksLeft"] = moreSpecial("SubticksLeft", attributes["SubticksY"]);
+  attributes["SubticksTop"] = moreSpecial("SubticksTop", attributes["SubticksX"]);
+  attributes["SubticksRight"] = moreSpecial("SubticksRight", attributes["SubticksY"]);
+
+  return attributes;
+}
+
+plt._addadddivmethod = function(parentL) {
   return function(classList = "") {
     const childL = document.createElement("div");
     if (classList) {
@@ -57,6 +126,11 @@ plt.private.addadddivmethod = function(parentL) {
 
 document.querySelectorAll("div.Plot").forEach(plotL => {
   const plotSettings = plt.getPlotSettings(plotL);
+
+  const RangeX = plotSettings["Right"] - plotSettings["Left"];
+  const RangeY = plotSettings["Top"] - plotSettings["Bottom"];
+  const Px = 100 / RangeX;;
+  const Py = 100 / RangeY;
   
   /* Vector Layers */
   plotL.querySelectorAll("svg.Layer").forEach(layer => {
@@ -74,38 +148,89 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
     }
 
     // set viewboxes
-    layer.setAttribute('viewBox', `
-      ${plotSettings["Left"]}
-      ${plotSettings["Bottom"]}
-      ${plotSettings["Right"] - plotSettings["Left"]}
-      ${plotSettings["Top"] - plotSettings["Bottom"]}
-    `);
+    layer.setAttribute('viewBox', `${plotSettings["Left"]} ${plotSettings["Bottom"]} ${RangeX} ${RangeY}`);
   });
 
   /* Web Layers */
+  function addTicks([axisL, tag, P], [start, end], [ticks, subticks]) {
+    const subs = Math.round(subticks) || 1;
+    const iStart = Math.floor((plotSettings[start] - 0) / ticks) * subs;
+    const iEnd = Math.ceil((plotSettings[end] - 0) / ticks) * subs;
+    for (let i = iStart; i <= iEnd; i++) {
+      const pos = ticks * i / subs + 0;
+      if (pos <= plotSettings[start] || pos >= plotSettings[end]) continue;
+      const tickL = axisL.add(`Tick ${tag}`);
+      if (i % subs !== 0 ) {
+        tickL.classList.add("Sub");
+      }
+      if ( Math.abs(pos - 0) < $Precision ) {
+        tickL.classList.add("zero");
+      }
+      tickL.style[start.toLowerCase()] = `${(pos - plotSettings[start]) * P}%`;
+    }
+  }
+
   plotL.querySelectorAll("div.Layer").forEach(layer => {
 
     /* general method for adding elements */
-    layer.add = plt.private.addadddivmethod(layer);
-  });
+    layer.add = plt._addadddivmethod(layer);
 
-  /* Axes */
-  plotL.querySelectorAll("div.Layer[Axes]").forEach(axesL => {
-    const axisX = axesL.add("Axis X");
-    axisX.style.bottom = `${100 * plotSettings["Bottom"] / (plotSettings["Bottom"] - plotSettings["Top"])}%`;
-    axisX.add = plt.private.addadddivmethod(axisX);
-    if (axesL.hasAttribute("Arrowheads")) {
-      axisX.add("Arrowhead X Right");
+    /* layer attributes  */
+    const attrs = plt._getMarkupAttributes(layer);
+
+    /* setting scale */
+    layer.style.left = `${(0 - plotSettings["Left"]) * Px}%`;
+    layer.style.bottom = `${(0 - plotSettings["Bottom"]) * Py}%`;
+    layer.style.width = `${100 * Px}%`;
+    layer.style.height = `${100 * Py}%`;
+
+    /* Axes */
+    if (attrs["AxisY"]) {
+      const axisY = layer.add("Axis Y");
+      axisY.add = plt._addadddivmethod(axisY);
+      
+      axisY.style.bottom = `${plotSettings["Bottom"]}%`;
+      axisY.style.height = `${RangeY}%`;
+      axisY.style.left = `${0}%`;
+
+      /* Ticks */
+      if (typeof attrs["TicksY"] === "number") {
+        addTicks([axisY, "Y", Py], ["Bottom", "Top"], [attrs["TicksY"], attrs["SubticksY"]] );
+      }
+
+      /* Arrowheads */
+      if (attrs["ArrowheadTop"]) {
+        axisY.add("Arrowhead Y Top");
+      }
+      if (attrs["ArrowheadBottom"]) {
+        axisY.add("Arrowhead Y Bottom");
+      }
     }
 
-    const axisY = axesL.add("Axis Y");
-    axisY.style.right = `${100 * plotSettings["Right"] / (plotSettings["Right"] - plotSettings["Left"])}%`;
-    axisY.add = plt.private.addadddivmethod(axisY);
-    if (axesL.hasAttribute("Arrowheads")) {
-      axisY.add("Arrowhead Y Top");
+    if (attrs["AxisY"]) {
+      const axisX = layer.add("Axis X");
+      axisX.add = plt._addadddivmethod(axisX);
+
+      axisX.style.left = `${plotSettings["Left"]}%`;
+      axisX.style.width = `${RangeX}%`;
+      axisX.style.bottom = `${0}%`;
+
+      /* Ticks */
+      if (typeof attrs["TicksX"] === "number") {
+        addTicks([axisX, "X", Px], ["Left", "Right"], [attrs["TicksX"], attrs["SubticksX"]] );
+      }
+
+      /* Arrowheads */
+      if (attrs["ArrowheadRight"]) {
+        axisX.add("Arrowhead X Right");
+      }
+      if (attrs["ArrowheadLeft"]) {
+        axisX.add("Arrowhead X Left");
+      }
     }
 
   });
+  
 });
 
 
@@ -127,7 +252,7 @@ plt.vars = {};
 plt.dynamic = [];
 plt.updateVars = function() {
   plt.controls.forEach(control => {
-    plt.vars[control.getAttribute("pltvar")] = attributeParse(control.value);
+    plt.vars[control.getAttribute("pltvar")] = plt._parseAttribute(control.value);
   });
 }
 
@@ -148,7 +273,13 @@ plt.controls.forEach(control => {
 /* NUMERICAL METHODS */
 /* Utility */
 
-let $Precision = 0.0001;
+plt.unwrap = function(obj) { /* todo? -> unwrap into local scope */
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === "function") {
+      window[key] = value;
+    }
+  }
+}
 
 plt.Subdivide = function(range, Npoints) {
   const dx = (range[1] - range[0]) / Npoints;
@@ -200,22 +331,23 @@ plt.FindRoot = function(fdf, x0, iter) {
 
 plt.NSolve = function(fdf, x0s, iter) {
   const sol = x0s.map(x0 => plt.FindRoot(fdf, x0, iter))
-                 .filter(([x, f]) => (Math.abs(f) < $Precision))
+                 .filter(([x, f]) => (Math.abs(f) < 10*$Precision))
                  .map(([x, f]) => x);
   return(sol);
 }
-
-Object.freeze(plt);
 
 // -------------------------------------------------------
 
 /* Embedding */
 
-plt.private.embedHeight = function () {
+plt._embedHeight = function () {
   parent.postMessage({
     type: 'embed-height',
     height: document.body.scrollHeight
   }, '*');
 }
-window.addEventListener('load', plt.private.embedHeight);
-window.addEventListener('resize', plt.private.embedHeight);
+window.addEventListener('load', plt._embedHeight);
+window.addEventListener('resize', plt._embedHeight);
+
+
+Object.freeze(plt);

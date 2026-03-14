@@ -30,22 +30,31 @@
     stroke-linecap: round;
     fill: none;
   }
+  div.PlotMarker {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: limegreen;
+    border-radius: 100%;
+  }
   #cosPlot {
     stroke: #777;
   }
+
 </style>
 </head>
 <body>
 
-<div class="Plot" PlotRange="10.5" ScaleRatio="2.9">
+<div class="Plot" PlotRange="[-10.5, 10.5]" ScaleRatio="2.9">
   <svg class="Layer"></svg>
-  <div class="Layer" Axes Arrowheads TicksX="[[.5, '$\frac{1}{2}$'], 1 ,2, 3]" TicksY="[[.5, '$\frac{i}{2}$'], 1 ,2, 3]" MergeOrigin></div>
+  <div class="Layer" Axes Arrowheads Ticks="1" SubticksY="5"	 MergeOrigin></div>
   <svg class="Layer" id="solutionLayer"></svg>
 </div>
 
 <div id="controlPanel">
   <input pltvar="t" autoplay loop="true" type="range" min="-1.2" max="1.2" step="any" value="0">
   <input pltvar="k" autoplay loop="true" type="range" min="1" max="10" step="any" value="5">
+  <input pltvar="ω" autoplay loop="true" type="range" min="0.2" max="1.5" step="any" value="5">
 </div>
 
 
@@ -56,8 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const solL = document.getElementById("solutionLayer");
 
   const cosL = plotL.add("path", "PlotLine");
-  //cosL.setAttribute("d", plt.LinearParametric(t=>[t, Math.cos(t)], plt.Subdivide([-10, 10], 30)));
-  cosL.setAttribute("d", plt.BezierParametric(t=>[t, Math.cos(t)],t=>[1, -Math.sin(t)], plt.Subdivide([-10, 10], 30)));
   cosL.id = "cosPlot";
 
   const lineL = plotL.add("line", "PlotLine");
@@ -68,8 +75,10 @@ document.addEventListener("DOMContentLoaded", () => {
     lineL.setAttribute("y2",  10/k + t);
   });
 
-  plt.dynamic.push(({k, t}) => {
-    const sol = plt.NSolve(x=>[x/k + t - Math.cos(x), 1/k + Math.sin(x)], plt.Subdivide([-15, 15], 20), 10);
+  plt.dynamic.push(({k, t, ω}) => {
+    cosL.setAttribute("d", plt.BezierParametric(t=>[t, Math.cos(ω*t)],t=>[1, -ω*Math.sin(ω*t)], plt.Subdivide([-10, 10], 30)));
+
+    const sol = plt.NSolve(x=>[x/k + t - Math.cos(ω*x), 1/k + ω*Math.sin(ω*x)], plt.Subdivide([-15, 15], 20), 100);
     solL.innerHTML = "";
     sol.forEach(x => {
       const markerL = solL.add("line", "PlotMarker");
@@ -81,8 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
       //markerL.setAttribute("d", `M ${x} ${Math.cos(x)} Z`);
       markerL.setAttribute("x1", x);
       markerL.setAttribute("x2", x + $Precision);
-      markerL.setAttribute("y1", Math.cos(x));
-      markerL.setAttribute("y2", Math.cos(x));
+      markerL.setAttribute("y1", Math.cos(ω*x));
+      markerL.setAttribute("y2", Math.cos(ω*x));
     });
   });
 
