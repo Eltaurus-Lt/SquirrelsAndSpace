@@ -294,10 +294,34 @@ plt.Subdivide = function(range, Npoints) {
 
 /* Plotting */
 
-plt.LinearParametric = function(f, xs) {
+plt.LinearPlot = function(f, xs) {
   let path = "";
   for (const x of xs) {
-    path += ` L ${f(x).join(" ")}`;
+    path += ` L ${x} ${f(x)}`;
+  }
+  return "M" + path.substring(2);
+}
+
+plt.BezierPlot = function(f, df, xs) {
+  let F = f(xs[0]);
+  let dF = df(xs[0]);
+  let dx3 = (xs[1] - xs[0]) / 3;
+  let path = `M ${xs[0]} ${F} C ${xs[0] + dx3} ${F + dx3 * dF}`;
+  for (let i = 1; i < xs.length - 1; i++) {
+    F = f(xs[i]); dF = df(xs[i]);
+    path += ` ${xs[i] - dx3} ${F - dx3 * dF} ${xs[i]} ${F}`;
+    dx3 = (xs[i + 1] - xs[i]) / 3;
+    path += ` C ${xs[i] + dx3} ${F + dx3 * dF}`;
+  }
+  F = f(xs[xs.length - 1]); dF = df(xs[xs.length - 1]);
+  path += ` ${xs[xs.length - 1] - dx3} ${F - dx3 * dF} ${xs[xs.length - 1]} ${F}`;
+  return path;
+}
+
+plt.LinearParametric = function(f, ts) {
+  let path = "";
+  for (const t of ts) {
+    path += ` L ${f(t).join(" ")}`;
   }
   return "M" + path.substring(2);
 }

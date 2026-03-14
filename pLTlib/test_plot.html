@@ -76,7 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   plt.dynamic.push(({k, t, ω}) => {
-    cosL.setAttribute("d", plt.BezierParametric(t=>[t, Math.cos(ω*t)],t=>[1, -ω*Math.sin(ω*t)], plt.Subdivide([-10, 10], 30)));
+    cosL.setAttribute("d", plt.BezierPlot(t=>Math.cos(ω*t),t=>-ω*Math.sin(ω*t), plt.Subdivide([-10, 10], 30)));
+
 
     const sol = plt.NSolve(x=>[x/k + t - Math.cos(ω*x), 1/k + ω*Math.sin(ω*x)], plt.Subdivide([-15, 15], 20), 100);
     solL.innerHTML = "";
