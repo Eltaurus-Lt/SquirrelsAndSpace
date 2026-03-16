@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <script defer src="pLTlib.js"></script>
+    <link rel="stylesheet" href="pLTlib.css">
+
+    <style>
+
+
+.Plot {
+  border: 2px solid black;
+}
+
+.Axis {
+  align-items: center;
+}
+
+
+    </style>
+  </head>
+  <body>
+
+
+
+
+
+<div class="Plot" PlotRange="25" AspectRatio="1">
+ <svg class="Layer" id="canvasLeft"></svg>
+ <svg class="Layer" id="canvasLeft2"></svg>
+ <div class="Layer" Axes Ticks="1"></div>
+</div> 
+
+<input pltvar="ρ" type="range" min="0" max="28" step="any" value="15"> 
+<input pltvar="σ" type="range" min="0" max="10" step="any" value="2"> 
+<input pltvar="β" type="range" min="0" max="2.66667" step="any" value="0.2"> 
+
+
+
+
+
+
+
+
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+
+leftPlot = document.getElementById("canvasLeft");
+leftPlot2 = document.getElementById("canvasLeft2");
+anal = leftPlot.add("path", "PlotLine");
+num = leftPlot2.add("path", "PlotLine");
+
+plt.dynamic.push(({σ, β}) => {
+  /* analytic solution */
+/*  const D = β*β-4*σ;
+  if (D > 0) {
+    sqrtD = Math.sqrt(D);
+    f = t=> ((Math.exp(t*sqrtD)-1)*β + (Math.exp(t*sqrtD)+1)*sqrtD)*5*Math.exp(-.5*(β+sqrtD)*t)/sqrtD;
+  } else if (D < 0) {
+    sqrtD = Math.sqrt(-D);
+    f = t=> (Math.cos(.5*t*sqrtD) + β*Math.sin(.5*t*sqrtD)/sqrtD)*10*Math.exp(-.5*β*t);    
+  }*/
+
+  f = t=>10*Math.exp(-.5*t*t*β-Math.sin(t*σ)/σ);
+  anal.setAttribute("d", plt.LinearPlot(f, plt.Subdivide([0,25],50)));
+
+  sol = plt.NDSolve((x,t)=>-x*(β*t+Math.cos(σ*t)), 10, plt.Subdivide([0,25],150));
+  num.setAttribute("d", plt.LinearListPlot(sol));
+
+}); 
+
+
+
+
+lorenzRHS = function f([x, y, z], t) {
+  return [
+           σ * (y - x),
+           x * (ρ - z) - y,
+           x * y - β * z
+         ];
+};
+//sol = plt.NDSolve(f, [1, 1, 10], plt.Subdivide([0, 100], 1000))); 
+
+
+
+plt.update();
+});
+
+
+   </script>
+  </body>
+</html>

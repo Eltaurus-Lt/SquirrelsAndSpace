@@ -37,7 +37,7 @@
     A lightweight framework for making interactive mathematical graphics with a focus on refinement, stability, and performance of finalized presentation. 
   </p>
   <ul>
-    <li>Designed with low-level accessability in mind, it works directly in webpage's DOM, instead of keeping a complex internal state and relying on elaborate API calls</li>
+    <li>Designed with low-level accessability in mind, it minimizes abstraction and works directly in webpage DOM, instead of keeping a complex internal state and relying on elaborate API calls</li>
     <li>Provides means for high-level customization</li>
     <li>Does not involve unnecessary rasterization</li>
     <li>Components allow edits with standard <a href="#layers">HTML</a> and <a href="#CSS">CSS means</a>, which makes the framework extremely open to being combined with other tools and friendly to manual adjustments</li>
@@ -46,7 +46,7 @@
     <li>Interactivity <a href="#controls">requires minimal setup</a> without limiting the full potential</li><!-- todo:  can be easily set up to only perform the necessary calculation on each dynamic update -->
 
 <!-- todo:  refinement options tick-dashing sync (+ origin merging)-->
-<!-- todo: export to svg -->
+<!-- todo: Supports export into a clean structured svg -->
   </ul>
 
   <br>
@@ -92,6 +92,7 @@
   </fieldset>
 
   <h3>Boilerplate</h3>
+<!-- &lt;!DOCTYPE html&gt; is important ! -->
   
   <p>
   Individual illustrations are intended to be coded in separate <code>.html</code> files (each can contain <a href="#layout">multiple</a> <code>.Plot</code> objects), which then could be embedded into a common article page.
@@ -118,6 +119,7 @@
       &nbsp;&nbsp; ... <br>
       });<br>
     </code>
+    (scripts outside of the <code>DOMContentLoaded</code> can be used to modify framework's input parameters programmatically).
   </p>
 
   <h4>Embedding</h4>
@@ -160,7 +162,7 @@ The included onload function ensures the height of the embedded plot is fit to t
     <code class="block" highlight="HTML">
       &lt;canvas class="Layer"&gt;&lt;/canvas&gt;
     </code>
-    Layers for drawing with <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Reference/Elements/canvas" target="_blank">canvas methods</a>. Resolution is defined using <a href="#canvas_attributes">layer attributes</a> and stays fixed independently of the actual displayed plot size.
+    Layers for drawing with <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Reference/Elements/canvas" target="_blank">canvas methods</a>. Resolution is defined using <a href="#canvas_attributes">layer attributes</a> and stays fixed independently of the actual displayed plot size. Useful for ArrayPlot's, in particular.
     </p>
   <h3>Shader layers (WIP)</h3>
   <p>
@@ -204,7 +206,7 @@ The included onload function ensures the height of the embedded plot is fit to t
     For components of the plot to dynamically respond to changing inputs, their parameters should be updated on each interaction. To automate the associated setup, plt provides the <code>dynamic</code> object, which can be used to push individual update functions into a unified queue:
 
     <code class="block" highlight="JS">
-      const circleL = plotLayer.add("circle");<br>
+<!--      const circleL = plotLayer.add("circle");<br> -->
       plt.dynamic.push(({k, t}) => {<br>
       &nbsp;&nbsp;circleL.setAttribute("r", 1 + k * Math.sin(t) );<br>
       });
@@ -329,6 +331,7 @@ function source code analysis to only call functions if the changed value is amo
   <h4>CSS properties (WiP)</h4>
   <p>
     Inherited. <code>--Thickness</code>, <code>--TickLength</code>, <code>--Dashing</code>,<code>--DashingPeriod</code>, <code>--Color</code>
+<!--todo: --AbsoluteThickness = calc Thickness * vw * ??? + non-scaling-stroke: off; -->
 
     To reset bounding to plot origin for a specific object (e.g., plot legend):
 <!--todo: check-->
@@ -530,7 +533,7 @@ labels (WiP)
   <p>
     Searches for multiple roots of the <code>f(x)=0</code> equation using <code>FindRoot</code> for each of the <code>x0</code> values from the array <code>x0s</code>. Filters out repeated results, based on <a href="#Precision">$Precision</a>.
   </p></li>
-
+<!-- => NRSolve, NSolve = Brent’s method -->
   <li><h4><code>NBSolve(f, x0s, iter)</code></h4>
   <p>
     Searches for multiple roots of the <code>f(x)=0</code> equation using <code>LocateRoot</code> for each of the pairs of consecutive values from the <code>x0s</code> array. Filters out <code>Null</code> resutls, does not search for more than one root per interval.
@@ -538,7 +541,7 @@ labels (WiP)
 
   <li><h4 id="NDSolve"><code>NDSolve(f, x0, ts)</code></h4>
   <p>
-    Integrates differential equation <code>x'(t)=f(x, t)</code> over the array <code>ts</code> of <code>t</code> values using the <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4) with initial conditions <code>x(ts[0])=x0</code>. The method supports <code>x</code> being both a real number and a vector (array) of arbitrary length. In the vector case, <code>f(x, t)</code> must return an array of the same length and expect its <code>x</code> argument to be an array as well.
+    Integrates differential equation <code>x'(t)=f(x, t)</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4) with initial conditions <code>x(ts[0])=x0</code>. The method supports <code>x</code> being both a real number and a vector (array) of arbitrary length. In the vector case, <code>f(x, t)</code> must return an array of the same length and expect its <code>x</code> argument to be an array as well.
 Example use:
     <code class="block" highlight="JS">
       function f([x, y, z], t) {<br>

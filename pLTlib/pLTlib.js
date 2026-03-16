@@ -58,6 +58,7 @@ plt.getPlotSettings = function(plotL) {
     plotSettings["Left"] = plotSettings["PlotRange"][0];  
     plotSettings["Right"] = plotSettings["PlotRange"][1];
   } else if (typeof plotSettings["PlotRange"] === "number" && !isNaN(plotSettings["PlotRange"])) {
+    plotSettings["PlotRange"] = Math.abs(plotSettings["PlotRange"]);
     plotSettings["Left"] = -plotSettings["PlotRange"];
     plotSettings["Right"] = plotSettings["PlotRange"];
   } else {
@@ -294,6 +295,14 @@ plt.Subdivide = function(range, Npoints) {
 
 /* Plotting */
 
+plt.LinearListPlot = function(xys) {
+  let path = "";
+  for (const xy of xys) {
+    path += ` L ${xy.join(" ")}`;
+  }
+  return "M" + path.substring(2);
+}
+
 plt.LinearPlot = function(f, xs) {
   let path = "";
   for (const x of xs) {
@@ -358,6 +367,25 @@ plt.NSolve = function(fdf, x0s, iter) {
                  .filter(([x, f]) => (Math.abs(f) < 10*$Precision))
                  .map(([x, f]) => x);
   return(sol);
+}
+
+plt.NDSolve = function(f, x0, ts, method = "rk4") {
+  if (typeof x0 === "number") { /* 1D */
+    var x = x0; 
+    const sol = [[ts[0], x]];
+    for (let i = 1; i < ts.length; i++) {
+      const dt = ts[i] - ts[i-1];
+      const k1dt = f(x, ts[i-1])*dt;
+      const k2dt = f(x + k1dt/2, ts[i] - dt/2)*dt;
+      const k3dt = f(x + k2dt/2, ts[i] - dt/2)*dt;
+      const k4dt = f(x + k3dt, ts[i])*dt;
+      x += (k1dt + 2*k2dt + 2*k3dt + k4dt)/6;
+      sol.push([ts[i], x]);
+    }
+    return(sol);    
+  } else { /* ND */
+    
+  }
 }
 
 // -------------------------------------------------------

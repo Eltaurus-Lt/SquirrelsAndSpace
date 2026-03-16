@@ -4,7 +4,7 @@
   --PointSize: 5px;
   --Color: black;
 
-  --TickLength: 5px;
+  --TickLength: 6px;
   --ArrowheadsWidth: 5;
   --ArrowheadsLength: 7;
 
@@ -64,10 +64,12 @@ body {
 
 /* Plot */
 
-div.Plot {
+.Plot {
   position: relative;
   width: 100%;
   box-sizing: border-box;
+  clip-path: inset(0 0 0 0);
+  border: transparent 1em solid;
 }
 
 
