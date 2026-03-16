@@ -42,7 +42,7 @@
     <li>Does not involve unnecessary rasterization</li>
     <li>Components allow edits with standard <a href="#layers">HTML</a> and <a href="#CSS">CSS means</a>, which makes the framework extremely open to being combined with other tools and friendly to manual adjustments</li>
     <li>Packs essential <a href="#methods">numerical methods</a></li>
-    <li>Capable of drawing smooth plots with very few points</li>
+    <li>Capable of drawing <a href="#BezierList">smooth plots with very few points</a></li>
     <li>Interactivity <a href="#controls">requires minimal setup</a> without limiting the full potential</li><!-- todo:  can be easily set up to only perform the necessary calculation on each dynamic update -->
 
 <!-- todo:  refinement options tick-dashing sync (+ origin merging)-->
@@ -488,9 +488,9 @@ labels (WiP)
       Returns a polyline constructed from an array <code>xys</code> of 2D points <code>[x, y]</code>. Appropriate for plotting table functions. In particular, the ones obtained as numerical solitions of differential equations.
     </p></li>
 
-    <li><h4><code>BezierListPlot(xys) (WIP)</code></h4>
+    <li id="BezierList"><h4><code>BezierListPlot(xys)</code></h4>
     <p>
-      Bezier equivalent of the <code>LinearListPlot</code>.
+      Bezier equivalent of the <code>LinearListPlot</code>. Works similarly to Adobe Illuatrator <i>Curvature</i> tool.
     </p></li>
   </ul>
   <br>

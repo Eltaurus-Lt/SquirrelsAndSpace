@@ -351,6 +351,52 @@ plt.BezierParametric = function(f, df, ts) {
   return path;
 }
 
+plt.BezierListPlot = function(xys) {
+    const n = xys.length - 1; // number of bezier segments
+    var c = new Array(n); // temp second diag
+    var dx = new Array(n), dy = new Array(n); // rhs
+
+    /* LAE Matrices (tridiagonal) */
+    // First rows
+    dx[0] = xys[0][0] + 2 * xys[1][0];
+    dy[0] = xys[0][1] + 2 * xys[1][1];
+    // Internal rows
+    for (i = 1; i < n - 1; i++) {
+        dx[i] = 4 * xys[i][0] + 2 * xys[i+1][0];
+        dy[i] = 4 * xys[i][1] + 2 * xys[i+1][1];
+    }
+    // Last rows
+    dx[n-1] = 4 * xys[n-1][0] + .5 * xys[n][0];
+    dy[n-1] = 4 * xys[n-1][1] + .5 * xys[n][1];
+
+    /* Solve using Thomas algorithm */
+    var b;
+    dx[0] = .5 * dx[0];
+    dy[0] = .5 * dy[0];
+    c[0] = 0.5;
+
+    // Forward pass
+    for (let i = 1; i < n; i++) {
+        c[i] = 1 / ((i < n - 1 ? 4.0 : 3.5) - c[i-1]);
+        dx[i] = (dx[i] - dx[i-1]) * c[i];
+        dy[i] = (dy[i] - dy[i-1]) * c[i];
+    }
+
+    // Back substitution
+    for (let i = n - 2; i >= 0; i--) {
+        dx[i] -= c[i] * dx[i+1];
+        dy[i] -= c[i] * dy[i+1];
+    }
+
+    /* path */
+    let path = `M ${xys[0].join(" ")}`;
+    for (i = 0; i < n - 1; i++) {
+        path += ` C ${dx[i]} ${dy[i]} ${2*xys[i+1][0]-dx[i+1]} ${2*xys[i+1][1]-dy[i+1]} ${xys[i+1].join(" ")}`;
+    }
+    path += ` C ${dx[n-1]} ${dy[n-1]} ${.5*(xys[n][0]+dx[n-1])} ${.5*(xys[n][1]+dy[n-1])} ${xys[n].join(" ")}`;  // (0 acceleration condition)
+    return path;
+}
+
 /* Solvers */
 
 plt.FindRoot = function(f, df, x0, iter, damp = 1) {

@@ -47,7 +47,7 @@
 
 <div class="Plot" PlotRange="[-10.5, 10.5]" ScaleRatio="2.9">
   <svg class="Layer"></svg>
-  <div class="Layer" Axes Arrowheads Ticks="1" SubticksY="5"	 MergeOrigin></div>
+  <div class="Layer" Axes Arrowheads Ticks="1" TicksX="5" Subticks="5" MergeOrigin></div>
   <svg class="Layer" id="solutionLayer"></svg>
 </div>
 
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cosL.setAttribute("d", plt.BezierPlot(t=>Math.cos(ω*t),t=>-ω*Math.sin(ω*t), plt.Subdivide([-10, 10], 30)));
 
 
-    const sol = plt.NSolve(x=>(x/k + t - Math.cos(ω*x)),x=>(1/k + ω*Math.sin(ω*x)), plt.Subdivide([-15, 15], 20), 100);
+    const sol = plt.NSolve(x=>(x/k + t - Math.cos(ω*x)),x=>(1/k + ω*Math.sin(ω*x)), plt.Subdivide([-15, 15], 20), 10);
     solL.innerHTML = "";
     sol.forEach(x => {
       const markerL = solL.add("line", "PlotMarker");
@@ -91,8 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
       //markerL.setAttribute("d", `M ${x} ${Math.cos(x)} Z`);
       markerL.setAttribute("x1", x);
       markerL.setAttribute("x2", x + $Precision);
-      markerL.setAttribute("y1", Math.cos(ω*x));
-      markerL.setAttribute("y2", Math.cos(ω*x));
+      markerL.setAttribute("y1", x/k + t);
+      markerL.setAttribute("y2", x/k + t);
     });
   });
 

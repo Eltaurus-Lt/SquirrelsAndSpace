@@ -28,6 +28,10 @@
 <div class="Plot" PlotRange="25" AspectRatio="1">
  <svg class="Layer" id="canvasLeft"></svg>
  <svg class="Layer" id="canvasLeft2"></svg>
+ <svg class="Layer" id="canvas"></svg>
+
+ <svg class="Layer" id="canvas3"></svg>
+
  <div class="Layer" Axes Ticks="1"></div>
 </div> 
 
@@ -47,8 +51,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 leftPlot = document.getElementById("canvasLeft");
 leftPlot2 = document.getElementById("canvasLeft2");
+leftPlot3 = document.getElementById("canvas3");
 anal = leftPlot.add("path", "PlotLine");
 num = leftPlot2.add("path", "PlotLine");
+
+leftPlot3.add("path", "PlotLine").setAttribute("d", plt.LinearListPlot([[0,0],[-10,10],[-10,0],[-20,0]]));
+leftPlot3.add("path", "PlotLine").setAttribute("d", plt.BezierListPlot([[0,0],[-10,10],[-10,0],[-20,0]]));
 
 plt.dynamic.push(({σ, β}) => {
   /* analytic solution */
@@ -61,10 +69,10 @@ plt.dynamic.push(({σ, β}) => {
     f = t=> (Math.cos(.5*t*sqrtD) + β*Math.sin(.5*t*sqrtD)/sqrtD)*10*Math.exp(-.5*β*t);    
   }
 
-  anal.setAttribute("d", plt.LinearPlot(f, plt.Subdivide([0,25],50)));
+  anal.setAttribute("d", plt.LinearPlot(f, plt.Subdivide([0,25],100)));
 
   sol = plt.NDSolve((t, [x, dx])=>[dx, - σ*x - β*dx ], [10, 0], plt.Subdivide([0,25],100)).map(([t,[x,dx]])=>[t,x]);
-  num.setAttribute("d", plt.LinearListPlot(sol));
+  num.setAttribute("d", plt.BezierListPlot(sol));
 
 }); 
 
