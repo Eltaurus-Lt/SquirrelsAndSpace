@@ -518,9 +518,9 @@ labels (WiP)
   <p>
     Finds a root of an algebraic equation <code>f(x)=0</code> using <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton–Raphson</a> method starting from the point <code>x0</code> and performing <code>iter</code> number of steps. Requires providing analytical derivative <code>df(x)</code> of the function <code>f(x)</code> (both should be single-valued functions).<br>
     Allows specifying an optional damping factor, which serves as a step multiplier (when the function is called with 4 arguments, <code>damp</code> defaults to <code>1</code>). Values less than <code>1</code> improve stability, but require more steps to converge. Values greater than <code>1</code> can be useful for improving convergence near roots with multiplicity&nbsp;<code>&gt;&nbsp;1</code>.<br>
-  Example use:
+  Returns the root and the error. Example use:
     <code class="block" highlight="JS">
-      xr = plt.FindRoot(x => (Math.cos(x) - 1), x => -Math.sin(x), 0, 10);
+      xr = plt.FindRoot(x => (Math.cos(x) - 1), x => -Math.sin(x), 0, 10)[0];
     </code>
   </p></li>
 
@@ -541,10 +541,10 @@ labels (WiP)
 
   <li><h4 id="NDSolve"><code>NDSolve(f, x0, ts)</code></h4>
   <p>
-    Integrates differential equation <code>x'(t)=f(x, t)</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4) with initial conditions <code>x(ts[0])=x0</code>. The method supports <code>x</code> being both a real number and a vector (array) of arbitrary length. In the vector case, <code>f(x, t)</code> must return an array of the same length and expect its <code>x</code> argument to be an array as well.
+    Integrates differential equation <code>x'(t)=f(t, x)</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4) with initial conditions <code>x(ts[0])=x0</code>. The method supports <code>x</code> being both a real number and a vector (array) of arbitrary length. In the vector case, <code>f(t, x)</code> must return an array of the same length and expect its <code>x</code> argument to be an array as well.
 Example use:
     <code class="block" highlight="JS">
-      function f([x, y, z], t) {<br>
+      function f(t, [x, y, z]) {<br>
       &nbsp;&nbsp;return [<br>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 * (y - x),<br>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x * (15 - z) - y,<br>
@@ -610,7 +610,7 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
     </p>
   </li>
  
-  <li><h4><code>$Precision</code></h4>
+  <li id="Precision"><h4><code>$Precision</code></h4>
   <p>
     Some of the <a href="#methods">numerical methods</a> internally use floating-point comparison, which requires specifying an error margin. The utilized value is stored as a global variable <code>$Precision</code>, which can be modified to control the coarseness of the dependent operations: 
     <code class="block" highlight="JS">

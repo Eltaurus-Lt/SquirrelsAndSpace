@@ -52,19 +52,18 @@ num = leftPlot2.add("path", "PlotLine");
 
 plt.dynamic.push(({σ, β}) => {
   /* analytic solution */
-/*  const D = β*β-4*σ;
+  const D = β*β-4*σ;
   if (D > 0) {
     sqrtD = Math.sqrt(D);
     f = t=> ((Math.exp(t*sqrtD)-1)*β + (Math.exp(t*sqrtD)+1)*sqrtD)*5*Math.exp(-.5*(β+sqrtD)*t)/sqrtD;
   } else if (D < 0) {
     sqrtD = Math.sqrt(-D);
     f = t=> (Math.cos(.5*t*sqrtD) + β*Math.sin(.5*t*sqrtD)/sqrtD)*10*Math.exp(-.5*β*t);    
-  }*/
+  }
 
-  f = t=>10*Math.exp(-.5*t*t*β-Math.sin(t*σ)/σ);
   anal.setAttribute("d", plt.LinearPlot(f, plt.Subdivide([0,25],50)));
 
-  sol = plt.NDSolve((x,t)=>-x*(β*t+Math.cos(σ*t)), 10, plt.Subdivide([0,25],150));
+  sol = plt.NDSolve((t, [x, dx])=>[dx, - σ*x - β*dx ], [10, 0], plt.Subdivide([0,25],100)).map(([t,[x,dx]])=>[t,x]);
   num.setAttribute("d", plt.LinearListPlot(sol));
 
 }); 

@@ -353,39 +353,67 @@ plt.BezierParametric = function(f, df, ts) {
 
 /* Solvers */
 
-plt.FindRoot = function(fdf, x0, iter) {
-  let FdF;
+plt.FindRoot = function(f, df, x0, iter, damp = 1) {
   for (let i = 0; i < iter; i++) {
-    FdF = fdf(x0);
-    x0 -= FdF[0] / FdF[1];
+    x0 -= damp * f(x0) / df(x0);
   }
-  return([x0, fdf(x0)[0]]);
+  return([x0, f(x0)]);
 }
 
-plt.NSolve = function(fdf, x0s, iter) {
-  const sol = x0s.map(x0 => plt.FindRoot(fdf, x0, iter))
+plt.NSolve = function(f, df, x0s, iter, damp = 1) {
+  const sol = x0s.map(x0 => plt.FindRoot(f, df, x0, iter, damp))
                  .filter(([x, f]) => (Math.abs(f) < 10*$Precision))
                  .map(([x, f]) => x);
   return(sol);
 }
 
-plt.NDSolve = function(f, x0, ts, method = "rk4") {
+plt._NVectorAdd = function(N) {
+  return function vadd(v1, v2) {
+    const res = [];
+    for (i = 0; i < N; i++) {
+      res.push(v1[i]+v2[i]);
+    }
+    return res;
+  }
+}
+plt._NVectorMult = function(N) {
+  return function vmult(k, v) {
+    const res = [];
+    for (i = 0; i < N; i++) {
+      res.push(k*v[i]);
+    }
+    return res;
+  }
+}
+
+plt.NDSolve = function(rhs, x0, ts, method = "rk4") {
+  var x = x0; 
+  const sol = [[ts[0], x]];
   if (typeof x0 === "number") { /* 1D */
-    var x = x0; 
-    const sol = [[ts[0], x]];
     for (let i = 1; i < ts.length; i++) {
       const dt = ts[i] - ts[i-1];
-      const k1dt = f(x, ts[i-1])*dt;
-      const k2dt = f(x + k1dt/2, ts[i] - dt/2)*dt;
-      const k3dt = f(x + k2dt/2, ts[i] - dt/2)*dt;
-      const k4dt = f(x + k3dt, ts[i])*dt;
+      const k1dt = rhs(ts[i-1]   , x) *dt;
+      const k2dt = rhs(ts[i]-dt/2, x + .5*k1dt) *dt;
+      const k3dt = rhs(ts[i]-dt/2, x + .5*k2dt) *dt;
+      const k4dt = rhs(ts[i]     , x + k3dt) *dt;
       x += (k1dt + 2*k2dt + 2*k3dt + k4dt)/6;
       sol.push([ts[i], x]);
     }
-    return(sol);    
   } else { /* ND */
-    
+    const N = x0.length;
+    const vadd = plt._NVectorAdd(N);
+    const vmult = plt._NVectorMult(N);
+    for (let i = 1; i < ts.length; i++) {
+      const dt = ts[i] - ts[i-1];
+      const k1dt = vmult(dt, rhs(ts[i-1]   , x));
+      const k2dt = vmult(dt, rhs(ts[i]-dt/2, vadd(x, vmult(.5, k1dt))));
+      const k3dt = vmult(dt, rhs(ts[i]-dt/2, vadd(x, vmult(.5, k2dt))));
+      const k4dt = vmult(dt, rhs(ts[i]     , vadd(x, k3dt)));
+      x = vadd(x, vmult(1/6, vadd(vadd(k1dt, vmult(2, k2dt)), vadd(vmult(2, k3dt), k4dt))));
+      sol.push([ts[i], x]);
+    }    
   }
+  return(sol);    
 }
 
 // -------------------------------------------------------

@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cosL.setAttribute("d", plt.BezierPlot(t=>Math.cos(ω*t),t=>-ω*Math.sin(ω*t), plt.Subdivide([-10, 10], 30)));
 
 
-    const sol = plt.NSolve(x=>[x/k + t - Math.cos(ω*x), 1/k + ω*Math.sin(ω*x)], plt.Subdivide([-15, 15], 20), 100);
+    const sol = plt.NSolve(x=>(x/k + t - Math.cos(ω*x)),x=>(1/k + ω*Math.sin(ω*x)), plt.Subdivide([-15, 15], 20), 100);
     solL.innerHTML = "";
     sol.forEach(x => {
       const markerL = solL.add("line", "PlotMarker");
