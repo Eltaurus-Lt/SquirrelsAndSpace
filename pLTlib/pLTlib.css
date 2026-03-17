@@ -24,13 +24,16 @@
   width: var(--PointSize);
   aspect-ratio: 1;
   background: var(--Color);
-  border-radius: 100%;
+  clip-path: circle();
 
   /* svg markers */
   stroke: var(--Color);
   stroke-width: var(--PointSize);
   stroke-linecap: round;
   fill: none;
+}
+svg .PlotMarker {
+  clip-path: none;
 }
 
 /* WM colors */

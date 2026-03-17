@@ -40,11 +40,12 @@
     <li>Designed with low-level accessability in mind, it minimizes abstraction and works directly in webpage DOM, instead of keeping a complex internal state and relying on elaborate API calls</li>
     <li>Provides means for high-level customization</li>
     <li>Does not involve unnecessary rasterization</li>
-    <li>Components allow edits with standard <a href="#layers">HTML</a> and <a href="#CSS">CSS means</a>, which makes the framework extremely open to being combined with other tools and friendly to manual adjustments</li>
+    <li>Components allow edits with standard <a href="#layers">HTML</a> and <a href="#styling_classes">CSS means</a>, which makes the framework extremely open to being combined with other tools and friendly to manual adjustments</li>
     <li>Packs essential <a href="#methods">numerical methods</a></li>
     <li>Capable of drawing <a href="#BezierList">smooth plots with very few points</a></li>
     <li>Interactivity <a href="#controls">requires minimal setup</a> without limiting the full potential</li><!-- todo:  can be easily set up to only perform the necessary calculation on each dynamic update -->
 
+<!-- provides clear low-level access to plot space for all kinds of content -->
 <!-- todo:  refinement options tick-dashing sync (+ origin merging)-->
 <!-- todo: Supports export into a clean structured svg -->
   </ul>
@@ -61,7 +62,7 @@
 
   <h3 id="plot">Plot element</h3>
   <p>
-    Plots are constructed as container elements holding multiple layers of <a href="#layers">various types</a>. Example structure:
+    Plots are composed as a container marked with the <code>Plot</code> class and holding multiple layers of <a href="#layers">various types</a>. Example structure:
 
     <code class="block" highlight="HTML">
       &lt;div class="Plot" PlotRange="[0, 7]" PlotLabel="Example"&gt;<br>
@@ -71,10 +72,10 @@
       &lt;/div&gt;
     </code>
 
-    The layers are rendered in reverse order: the first is put at the bottom with each next being placed on top of the previous one. To draw the axes underneath everything else in the example above, the first two layers should be swapped.
+    The layers are rendered in reverse order: the first one is placed at the bottom of the final illustration with each next layer getting stacked on top of the previous one. To draw the axes underneath everything else in the code above, for example, the first two layers should be swapped.
   </p>
   <p>
-    Graphical content can be added using the provided <a href="#plotting">plotting methods</a> and combined with static elements hardcoded directly inside the respective layers, e.g.:
+    Graphical content can be added using the provided <a href="#plotting">plotting methods</a> and combined with static elements hardcoded directly into the respective layers:
     <code class="block" highlight="HTML">
       &lt;svg class="Layer" id="plotCanvas"&gt;<br>
       &nbsp;&lt;circle r="0.5" cx="2" cy="1" &gt;&lt;/circle&gt;<br>
@@ -82,7 +83,7 @@
     </code>
   </p>
   <p>
-        Primary plot properties are set up via <a href="#attributes">html attributes</a>, while the appearance of any component is customized with CSS rules written for the <a href="#CSS">provided classes</a>. Interactive plot controls can be made from standard HTML inputs and connected to responsive graphical components using simple update queue (see the section on <a href="#dynamic">dynamic evaluation</a>).
+    Overall plot properties are set up via <a href="#attributes">html attributes</a>, while the appearance of any component is customized with <a href="#styling_css">CSS rules</a> written for the <a href="#styling_classes">provided classes</a>. <a href="#dynamic">Interactive controls</a> can be made from standard HTML inputs and connected to responsive graphical components using simple <a href="#queue">update queue</a>.
   </p>
 
   <fieldset class="downloads-block todo">
@@ -94,13 +95,9 @@
   <h3>Boilerplate</h3>
 <!-- &lt;!DOCTYPE html&gt; is important ! -->
   
-  <p>
-  Individual illustrations are intended to be coded in separate <code>.html</code> files (each can contain <a href="#layout">multiple</a> <code>.Plot</code> objects), which then could be embedded into a common article page.
-  </p>
-
   <h4 id="import">Import</h4>
   <p>
-    The code to be included in the <code>&lt;head&gt;</code> of a plot html file: 
+    The code for importing the framework: 
 
     <code class="block" highlight="HTML">
       &lt;script defer src="https://cdn.jsdelivr.net/gh/Eltaurus-Lt/SquirrelsAndSpace/pLTlib/pLTlib.js"&gt;&lt;/script&gt;<br>
@@ -108,68 +105,85 @@
       &lt;script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"&gt;&lt;/script&gt;
     </code>
 
-    The last line is for importing <a href="https://docs.mathjax.org/en/v4.0/basic/mathjax.html" target="_blank">MathJax</a> and can be ommited if <a href="#labels">LaTeX fonts and formatting</a> are not used.
+    Should be appended to the <code>&lt;head&gt;</code> of an <code>.html</code> file. The last line is for importing <a href="https://docs.mathjax.org/en/v4.0/basic/mathjax.html" target="_blank">MathJax</a> and can be ommited if <a href="#labels">LaTeX fonts and formatting</a> are not used.
   </p>
 
   <h4>Scripting</h4>
   <p>
-    Scripts relying on pLTlib methods should be wrapped in a <code>DOMContentLoaded</code> callback to make sure the dependencies are loaded before they are used
+    Scripts relying on pLTlib methods should be wrapped in a <code>DOMContentLoaded</code> callback to make sure the dependencies are loaded before being used:
     <code class="block" highlight="JS">
       document.addEventListener("DOMContentLoaded", () => {<br>
       &nbsp;&nbsp; ... <br>
       });<br>
     </code>
-    (scripts outside of the <code>DOMContentLoaded</code> can be used to modify framework's input parameters programmatically).
+    (scripts outside of the <code>DOMContentLoaded</code> can predefine framework's input parameters programmatically ahead of its initialization).
   </p>
 
-  <h4>Embedding</h4>
+  <h4 id="embedding">Embedding</h4>
   <p>
-    The code for embedding into a parent document:
+  Independent illustrations are intended to be coded in individual <code>.html</code> files (each can contain <a href="#layout">multiple</a> <code>.Plot</code> objects), which then could be embedded into a collective article using the following tag:
     <code class="block" highlight="HTML">
     &lt;iframe src="plot.html" width="600px" onload="window.addEventListener('message', e=>{if(e.source===this.contentWindow && e.data && e.data.type==='embed-height'){this.style.height=e.data.height+'px';}});"&gt;&lt;/iframe&gt;
     </code>
   </p>
   <p>
     Replace <code>plot.html</code> with the actual path to the plot file being embedded. The <code>width</code> attribute can be <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units#lengths" target="_blank">modified</a> as needed and additional attributes, like classes and styling, can be appended as usual. 
-The included onload function ensures the height of the embedded plot is fit to the proper size of the source html and accurately reacts to page resizing. 
+The included onload function ensures the height of the embedded plot is fit to the proper aspect ratio of the referenced plot html and accurately reacts to page resizing. 
   </p>
 
 
 
 
 
-  <h2 id="layers">Layer types</h2>
+  <h2 id="layers">Layers</h2>
   <p>
-    A plot can contain any number of layers of any kind.
+    Types of layers to be used in <a href="#plot">plot composition</a>. A plot can contain any number of layers of any kind.
   </p>
   <h3 id="svg">Vector layers</h3>
   <p>
+    Layers for adding various <a href="#plotting">plot lines</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch/Basic_shapes" target="_blank">elements of vector graphics</a> to the overall illustration.
     <code class="block" highlight="HTML">
       &lt;svg class="Layer"&gt;&lt;/svg&gt;
     </code>
-    Layers for adding <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch/Basic_shapes" target="_blank">vector graphical elements</a> to a plot. Coordinates and their units are matched with the plot space. In particular, vertical axis is directed upward, as expected from a mathematical plot, instead of going down, as is the default for svg. Note, that if a plot has <a href="#plot_attributes">different scales</a> on horizontal and vertical axes, graphical elements will appear stretched or squished, accordingly. Line <a href="https://developer.mozilla.org/ru/docs/Web/SVG/Reference/Attribute/stroke-width">stroke thickness</a> is set in screen space in pixels and remains fixed, independently of the plot's display size. For adding dots, that appear round inidependently of the plot <code>ScaleRatio</code>, use <a href="#markers">Markers (WiP)</a> instead of <code>&lt;circle&gt;</code>.
+    Coordinates and their units are matched with the plot space. In particular, vertical axis is directed upward, as expected from a mathematical plot, instead of going down, as is the default for svg (and 2D images in general). Note, that if a plot has <a href="#plot_attributes">different scales</a> on horizontal and vertical axes, graphical elements will appear accordingly stretched or squashed. Line <a href="https://developer.mozilla.org/ru/docs/Web/SVG/Reference/Attribute/stroke-width">stroke thickness</a> is an exception from this rule and is set in pixels of the screen space, remaining fixed independently of the plot's display size. When plotting points, to ensure circular appearance at arbitrary <code>ScaleRatio</code>, a markup layer with <a href="#markers">markers</a> should be used instead of a vector layer with <code>&lt;circle&gt;</code> tags.
   </p>
   <h3 id="markup">Markup layers</h3>
   <p>
+    Layers for adding elements, that should be positioned in the plot space, but sized in the screen space. This includes construction elements, such as <a href="#html_attributes">axes, grids, ticks, etc.</a>, plot <a href="#markers">markers</a>, <a href="#labels">labels</a>, as well as any kind of custom insets.
     <code class="block" highlight="HTML">
       &lt;div class="Layer"&gt;&lt;/div&gt;
     </code>
-    Layers for adding text and other elements (such as a legend and similar overlays), that should be sized and positioned using screen space <code>px</code> (or <code>%</code>, for fractions of the plot canvas). <a href="#html_attributes">Axes, Ticks, and Labels</a>, in particular, are placed in HTML layers.
-
+    The plot-space coordinates of a markup-layer element can be set via <code>left</code> and <code>bottom</code>  CSS properties for the <code>x</code> and <code>y</code> respectively (note that <code>top</code> and <code>right</code> cannot be used for this purpose). For the respective values, the <code>%</code> unit is getting repurposed as the universal plot-space length unit (and, consequently, loses its standard CSS meaning). For example, the following CSS rules put an element exactly at the point with coordinates <code>(1.4, 2)</code>:
+    <code class="block" highlight="CSS">
+      left: 1.4%; /* x = 1.4 */<br>
+      bottom: 2%; /* y = 2 */
+    </code>
+    By default, all elements are aligned to the specified position with their centers. To change the location of an anchor point, <code>translate</code> CSS property should be set to
+    <code class="block" highlight="CSS">
+     translate: Ah Av;
+    </code>
+    with <code>Ah</code> being the anchor point's relative horizontal position (<code>0</code> = left side, <code>-100%</code> = right side, <code>-50%</code> = horizontal middle) and <code>Av</code> being the relative vertical position (<code>0</code> = bottom side, <code>-100%</code> = top side, <code>-50%</code> = vertical middle). For example:
+    <code class="block" highlight="CSS">
+     translate: 0 -100%; /* sets the top left corner as the anchor point */
+    </code>
   </p>
+
+
   <h3>Raster layers (WIP)</h3>
   <p>
+    Layers for drawing with <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Reference/Elements/canvas" target="_blank">canvas methods</a>.
     <code class="block" highlight="HTML">
       &lt;canvas class="Layer"&gt;&lt;/canvas&gt;
     </code>
-    Layers for drawing with <a href="https://developer.mozilla.org/ru/docs/Web/HTML/Reference/Elements/canvas" target="_blank">canvas methods</a>. Resolution is defined using <a href="#canvas_attributes">layer attributes</a> and stays fixed independently of the actual displayed plot size. Useful for ArrayPlot's, in particular.
+    Resolution is defined using <a href="#canvas_attributes">layer attributes</a> and stays fixed independently of the actual displayed plot size. Useful for ArrayPlot's, in particular.
     </p>
   <h3>Shader layers (WIP)</h3>
   <p>
+    Layers for producing raster assets rendered at screen resolution, regardless of the overall displaying size of the plot.
     <code class="block" highlight="HTML">
       &lt;canvas class="Layer glsl"&gt;&lt;/canvas&gt;
     </code>
-    Layers for producing raster assets rendered at screen resolution, regardless of the plot canvas scaling, using <a href="https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_on_the_web/GLSL_Shaders" target="_blank">GLSL fragment shaders</a>. Plot coordinates are accessible from within a shader as
+    Serve as attachment points for <a href="https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_on_the_web/GLSL_Shaders" target="_blank">GLSL fragment shaders</a>. Plot-space coordinates are accessible from within a shader as
     <code class="block todo" highlight="GLSL">
       vec2 xy = (gl_FragCoord.xy - plotOrigin) / plotResolution;
     </code>
@@ -178,7 +192,10 @@ The included onload function ensures the height of the embedded plot is fit to t
     <h4>References</h4>
     <li><a href="https://eltaurus-lt.github.io/ChaosAndCats/tools/glsl_renderer.html" target="_blank">GLSL editor</a></li>
   </ul>
-
+  <h3>Non-layer elements</h3>
+  <p>
+    Any element inside a <a href="#plot"><code>.Plot</code></a> container, if not marked with the <code>Layer</code> class, keeps its access to the default page space and can be positioned and sized as ordinary HTML, using <code>px</code>, <code>%</code> (which, in this case, would measure fractions of the width and height of the <code>.Plot</code> itself), or any other <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units#lengths" target="_blank">HTML length units</a>. This, in particular, can be used to add plot legends, buttons, and other overlays. <a href="#attributes">PlotLabels</a> are also generated as non-layer elements.
+  </p>
 
 
   <h2 id="dynamic">Dynamic evalutation</h2>
@@ -201,7 +218,7 @@ The included onload function ensures the height of the embedded plot is fit to t
     <li>Draggable elements</li>
   </ul>
 
-  <h3>Update queue</h3>
+  <h3 id="queue">Update queue</h3>
   <p>
     For components of the plot to dynamically respond to changing inputs, their parameters should be updated on each interaction. To automate the associated setup, plt provides the <code>dynamic</code> object, which can be used to push individual update functions into a unified queue:
 
@@ -290,7 +307,7 @@ function source code analysis to only call functions if the changed value is amo
       <br>Similarly to <code>Arrowheads</code> and <code>Axes</code>, <code>Ticks</code> can be split into two separate attributes – <code>TicksX</code> and <code>TicksY</code> – for horizontal and vertical directions respectively. For the frame ticks, <code>TicksX</code> can be further split into <code>TicksTop</code> and <code>TicksBottom</code> and <code>TicksY</code> can be split into <code>TicksLeft</code> and <code>TicksRight</code>. All variants of the attribute can be used in combination, with the more specialized one always taking priority. Note that empty specialized setting, like <code>TicksRight=""</code>, overwrites more general ones, effectively removing any ticks from the provided side or direction.</li>
       <li><code>Ticks="[X1, X2, X3, ...]"</code> is an alternative form for the <code>Tick</code> attribute value to put the ticks at the explicitly set positions <code>X1</code>, <code>X2</code>, etc. Same specialized attributes for each individual side and direction are supported.
       <br>The <code>Xi</code> themselves can be either numbers, or a pair of a number and a string, like in the example above. The latter labels the respective tick with the text from the provided string, instead of the number itself. The string should be enclosed in single quotes. <code>Xi</code> do not have to all be of the same type, the two formats can be freely mixed. </li>
-      <li><code>Subticks="n" (WiP)</code> uniformily subdivides interval between consecutive ticks into <code>n</code> parts. Works only with the equidistant format of <code>Ticks</code>. Similar to the <code>Ticks</code> attribute itself, <code>SubticksX</code>, <code>…Y</code>, <code>…Bottom</code>, <code>…Left</code>, <code>…Top</code>, <code>…Bottom</code> are available for axes and the frame. </li>
+      <li><code>Subticks="n"</code> uniformily subdivides interval between consecutive ticks into <code>n</code> parts. Works only with the equidistant format of <code>Ticks</code>. Similar to the <code>Ticks</code> attribute itself, <code>SubticksX</code>, <code>…Y</code>, <code>…Bottom</code>, <code>…Left</code>, <code>…Top</code>, <code>…Bottom</code> are available for axes and the frame. </li>
       <li><code>Grid</code> toggles a coordinate grid on the back of the HTML layer. Relies on the <code>Tick</code> attribute (<code>TicksX</code> / <code>TicksY</code>) to control the spacing of the grid lines.      </li>
     </ul>
 
@@ -307,28 +324,14 @@ function source code analysis to only call functions if the changed value is amo
   <p>
     All text labels (including manual tick labels) support <a href="https://docs.mathjax.org/en/v4.0/basic/mathematics.html#tex-and-latex-input" target="_blank">MathJax</a> for LaTeX expressions.
   </p>
-  <ul>
-    <li><code>PlotSpace (WIP)</code> is a special toggle attribute that changes HTML layer coordinate system. It offsets the origin, so that standard <code>bottom</code> and <code>left</code> CSS properties would match respective positions in the plot space. The unit lengths along horizontal and vertical axes equal <a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Values_and_units" target="_blank"><code>em</code> and <code>lh</code></a> respectively. These units are being repurposed from their standard CSS meaning, but the values are reset for all the layer children and can be used for typesetting text content inside them normally. To put an HTML element at the desired position, the following style can be used:
-    <code class="block" highlight="CSS">
-      left: 1em;<br>
-      bottom: 2lh;
-    </code>
-    This aligns the bottom left corner with the point <code>(1, 2)</code> in the plot space. To align top right corner instead, the following transform can be applied:
-    <code class="block" highlight="CSS">
-      transform: translate(-100%, 100%);
-    </code>
- (using <code>top</code> and <code>right</code> properties wouldn't lead to the desired result). To align the element to the coordinates with its center, transform values <code>(-50%, 50%)</code> can be used. This, in particular, is the method for adding plot <a href=#markers">Markers</a>.
-<!-- todo: axes, grid, etc. on the html layer with PlotSpace -->
-    </li>
-  </ul>
 
 
-  <h3 id="CSS">Styling</h3>
+  <h3 id="styling">Styling</h3>
   <p>
     Appearance of any plot component is controlled directly, using standard CSS. Styling code can be put in a <code>&lt;style&gt;...&lt;/style&gt;</code> tag (or referenced from a separate file) inside the <code>&lt;head&gt;</code> of the document <b>after</b> <a href="#import">pltlib import</a> tags.
   </p>
 
-  <h4>CSS properties (WiP)</h4>
+  <h4 id="styling_css">CSS properties (WiP)</h4>
   <p>
     Inherited. <code>--Color</code>, <code>--Thickness</code>, <code>--PointSize</code>, <code>--TickLength</code>, <code>--Dashing</code>, <code>--DashingPeriod</code>.
 <!--todo: --AbsoluteThickness = calc Thickness * vw * ??? + non-scaling-stroke: off; -->
@@ -340,7 +343,7 @@ function source code analysis to only call functions if the changed value is amo
     </code>
   </p>
 
-  <h4>Selectors (low-level)</h4>
+  <h4 id="styling_classes">Selector classes</h4>
   <p>
     Classes <code>.Axis</code>, <code>.Arrowhead</code>, <code>.Frame</code>, <code>.Gridline</code>, <code>.Tick</code>, as well as general <code>.Label</code> class, are provided for <a href="https://www.w3schools.com/cssref/css_selectors.php" target="_blank">targeting</a> certain kinds of elements <a href="#html_attributes">generated from attributes</a>. Example uses:
 
@@ -395,8 +398,15 @@ Children elements are set up to inherit basic properties from their parents by d
       }
     </code>
   </p>
-  <h4>Positioning ticks and labels</h4>
-<!--   align-items: center; flex-start (default/inner ticks); flex-end (outer ticks); for individual ticks: align-self: --//-- ; -->
+  <h4 >Positioning ticks and labels</h4>
+align-items: center; flex-start (default/inner ticks); flex-end (outer ticks); for individual ticks: align-self
+    To align top right corner instead, the following transform can be applied:
+    <code class="block" highlight="CSS">
+      transform: translate(-100%, 100%);
+    </code>
+ . To align the element to the coordinates with its center, transform values <code>(-50%, 50%)</code> can be used. This, in particular, is the method for adding plot <a href=#markers">Markers</a>.
+
+
   <p>
     For controlling tick alignment relative to its parent axis (or frame edge), the <a hreaf="https://www.w3schools.com/cssref/css_pr_translate.php" target="_blank"><code>translate</code></a> property can be used:
     <ul>
@@ -424,7 +434,7 @@ labels (WiP)
   <!-- todo: custom css props for marker clipping paths -->
    <!--todo: *Adding <code>debug</code> class to a specific element, element container, or the plot html as a whole will render outlines of the contained layers and sliders to help with layout debugging.-->
 
-  <h3>Custom layouts</h3>
+  <h3 id="layout">Custom layouts</h3>
   <p>
     The framework puts no restrictions on the number and positions of <a href="#plot">plot elements</a> and <a href="#controls">inputs</a>. They can be arranged freely, using any means available in HTML. In particular, <a href="https://www.w3schools.com/css/css_grid.asp" target="_blank">CSS Grid</a> is useful for making multi-panel layouts and complex interfaces.
     <br>
@@ -495,11 +505,13 @@ labels (WiP)
       Bezier equivalent of the <code>ListLinePath</code>. Works similarly to Adobe Illuatrator <i>Curvature</i> tool.
     </p></li>
   </ul>
-  <br>
+  <p>
+    Note that multiple paths constructed using different methods can be stitched together with the <a href="#merge">.merge()</a> utility function.
+  </p>
  
   <h4>Plotting methods</h4>
   <p>
-    Methods abstracting the creation of required elements with all required data attributes assigned internally. Take in optional <code>classList</code> argument to mark the created elements for <a href="#CSS">selective styling</a>.
+    Methods abstracting the creation of required elements with all required data attributes assigned internally. Take in optional <code>classList</code> argument to mark the created elements for <a href="#styling_css">selective styling</a>.
   </p>
   <ul>
     <li id="autoplot"><h4><code>Plot(path, classList = "")</code></h4>
@@ -594,7 +606,7 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
 
     <li><h4 id="add"><code>.add(elementType, classList = "")</code></h4>
   <p>
-    Main method for creating <code>svg</code> and <code>html</code> elements and attaching them to <a href="layers">vector and html layers</a> respectivelly. Called from a layer object, returns a reference to the created element. Allows additionally specifying a list of classes (as a single string, separated by spaces) as an optional second argument to mark the element and be used for <a href="#CSS">styling</a>. Example uses:
+    Main method for creating <code>svg</code> and <code>html</code> elements and attaching them to <a href="layers">vector and html layers</a> respectivelly. Called from a layer object, returns a reference to the created element. Allows additionally specifying a list of classes (as a single string, separated by spaces) as an optional second argument to mark the element and be used for <a href="#styling">styling</a>. Example uses:
     <code class="block" highlight="JS">
       const svgLayer = document.getElementById("plotCanvas");<br>
       const lineL = svgLayer.add("line");<br>
@@ -611,15 +623,15 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
     Additionally can be called from a <a href="#intro"><code>div.Plot</code> container</a> to dynamicaly make <a href="#layers">new layers</a> (WiP). The <code>elementType</code> in such case should be one of the following: <code>"svg"</code>, <code>"html"</code>, <code>"canvas"</code>, <code>"glsl"</code>.
   </p></li>
 
-  <li><h4><code>.merge( d_string1, d_string2, ... )</code></h4>
+  <li id="merge"><h4><code>.merge(path_string1, path_string2, ... )</code></h4>
   <p>
-    Method for merging <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-strings</a> returned by the <a href="#plotting">plotting methods</a>. Can be used consruct piecewise lines from individual segments:
+    Method for merging <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">path-strings</a> (returned by the <a href="#pathing">path methods</a>, in particular). Can be used to assemble piecewise contours from individual segments:
     <code class="block" highlight="JS">
-      d_string1 = plt.LinePath(x => Math.pow(x, 3), plt.Subdivide([0, 1], 3));<br> 
-      d_string2 = plt.ParametricBezierPath(t => [1 + Math.cos(t), 1 + Math.sin(t)], t => [-Math.sin(t), Math.cos(t)], plt.Subdivide([0, 1], 2));<br> 
-      d_string3 = "M 2,0 C 4,0 3,2 3,1";<br>
+      path_string1 = plt.LinePath(x => Math.pow(x, 3), plt.Subdivide([0, 1], 3));<br> 
+      path_string2 = plt.ParametricBezierPath(t => [1 + Math.cos(t), 1 + Math.sin(t)], t => [-Math.sin(t), Math.cos(t)], plt.Subdivide([0, 1], 2));<br> 
+      path_string3 = "M 2,0 C 4,0 3,2 3,1";<br>
       <br>
-      joined_line = plt.merge(d_string1, d_string2, d_string3);
+      joined_line = plt.merge(path_string1, path_string2, path_string3);
     </code>
   </p></li>
 
