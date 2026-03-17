@@ -1,7 +1,7 @@
 /* defaults */
 :root {
   --Thickness: 2px;
-  --PointSize: 5px;
+  --PointSize: 8px;
   --Color: black;
 
   --TickLength: 6px;
@@ -17,13 +17,20 @@
   stroke: var(--Color);
   fill: none;
 }
-div.PlotMarker {
+.PlotMarker {
   --Color: var(--wm-color);
+
   position: absolute;
   width: var(--PointSize);
   aspect-ratio: 1;
-  background: limegreen;
+  background: var(--Color);
   border-radius: 100%;
+
+  /* svg markers */
+  stroke: var(--Color);
+  stroke-width: var(--PointSize);
+  stroke-linecap: round;
+  fill: none;
 }
 
 /* WM colors */

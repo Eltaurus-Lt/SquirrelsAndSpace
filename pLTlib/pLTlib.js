@@ -118,7 +118,7 @@ plt._addadddivmethod = function(parentL) {
   return function(classList = "") {
     const childL = document.createElement("div");
     if (classList) {
-      childL.classList.add(...classList.split(" "));
+      childL.classList.add(...classList.split(" ").filter(Boolean));
     }
     parentL.appendChild(childL);
     return childL;
@@ -395,6 +395,26 @@ plt.BezierListPlot = function(xys) {
     }
     path += ` C ${dx[n-1]} ${dy[n-1]} ${.5*(xys[n][0]+dx[n-1])} ${.5*(xys[n][1]+dy[n-1])} ${xys[n].join(" ")}`;  // (0 acceleration condition)
     return path;
+}
+
+plt.ListPlot = function(markupLayer, markers, classList = "") {
+  if (typeof markers[0] === "number") { // solo marker
+    markers = [markers];
+  }
+  return markers.map(([x, y]) => {
+    const marker = markupLayer.add("PlotMarker " + classList);
+    marker.style.left = `${x}%`;
+    marker.style.bottom = `${y}%`;
+    return marker;
+  });
+
+      // path/line versions (for vector layers)
+      //   //markerL.setAttribute("d", `M ${x} ${Math.cos(x)} Z`);
+      // markerL.setAttribute("x1", x);
+      // markerL.setAttribute("x2", x + $Precision);
+      // markerL.setAttribute("y1", x/k + t);
+      // markerL.setAttribute("y2", x/k + t);
+
 }
 
 /* Solvers */

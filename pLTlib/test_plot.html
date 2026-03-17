@@ -16,27 +16,16 @@
     background: white;
     border-radius: 1em;
     border: solid white 2em;
+
   }
   #controlPanel {
     margin-top: 1em;
   }
-  circle.PlotMarker {
-    fill: #f68302;
+
+  .PlotMarker {
+    --Color: #f68302;
   }
-  line.PlotMarker,
-  path.PlotMarker {
-    stroke: #f68302;
-    stroke-width: 12px;
-    stroke-linecap: round;
-    fill: none;
-  }
-  div.PlotMarker {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: limegreen;
-    border-radius: 100%;
-  }
+
   #cosPlot {
     stroke: #777;
   }
@@ -48,7 +37,7 @@
 <div class="Plot" PlotRange="[-10.5, 10.5]" ScaleRatio="2.9">
   <svg class="Layer"></svg>
   <div class="Layer" Axes Arrowheads Ticks="1" TicksX="5" Subticks="5" MergeOrigin></div>
-  <svg class="Layer" id="solutionLayer"></svg>
+  <div class="Layer" id="markerLayer"></div>
 </div>
 
 <div id="controlPanel">
@@ -62,7 +51,7 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   const plotL = document.querySelector(".Layer");
-  const solL = document.getElementById("solutionLayer");
+  const markersL = document.getElementById("markerLayer");
 
   const cosL = plotL.add("path", "PlotLine");
   cosL.id = "cosPlot";
@@ -80,20 +69,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     const sol = plt.NSolve(x=>(x/k + t - Math.cos(ω*x)),x=>(1/k + ω*Math.sin(ω*x)), plt.Subdivide([-15, 15], 20), 10);
-    solL.innerHTML = "";
-    sol.forEach(x => {
-      const markerL = solL.add("line", "PlotMarker");
-      // circle alt
-      //markerL.setAttribute("r", 0.2);
-      //markerL.setAttribute("cx", x);
-      //markerL.setAttribute("cy", Math.cos(x));
-      // path alt
-      //markerL.setAttribute("d", `M ${x} ${Math.cos(x)} Z`);
-      markerL.setAttribute("x1", x);
-      markerL.setAttribute("x2", x + $Precision);
-      markerL.setAttribute("y1", x/k + t);
-      markerL.setAttribute("y2", x/k + t);
-    });
+
+    markerLayer.innerHTML = "";
+    plt.ListPlot(markerLayer, sol.map(x=>[x, x/k + t]), "outlined");
+
   });
 
   plt.update(); /* init */
