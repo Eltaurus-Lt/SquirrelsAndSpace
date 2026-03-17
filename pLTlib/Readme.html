@@ -149,7 +149,7 @@ The included onload function ensures the height of the embedded plot is fit to t
     </code>
     Layers for adding <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch/Basic_shapes" target="_blank">vector graphical elements</a> to a plot. Coordinates and their units are matched with the plot space. In particular, vertical axis is directed upward, as expected from a mathematical plot, instead of going down, as is the default for svg. Note, that if a plot has <a href="#plot_attributes">different scales</a> on horizontal and vertical axes, graphical elements will appear stretched or squished, accordingly. Line <a href="https://developer.mozilla.org/ru/docs/Web/SVG/Reference/Attribute/stroke-width">stroke thickness</a> is set in screen space in pixels and remains fixed, independently of the plot's display size. For adding dots, that appear round inidependently of the plot <code>ScaleRatio</code>, use <a href="#markers">Markers (WiP)</a> instead of <code>&lt;circle&gt;</code>.
   </p>
-  <h3>Markup layers</h3>
+  <h3 id="markup">Markup layers</h3>
   <p>
     <code class="block" highlight="HTML">
       &lt;div class="Layer"&gt;&lt;/div&gt;
@@ -330,7 +330,7 @@ function source code analysis to only call functions if the changed value is amo
 
   <h4>CSS properties (WiP)</h4>
   <p>
-    Inherited. <code>--Thickness</code>, <code>--TickLength</code>, <code>--Dashing</code>,<code>--DashingPeriod</code>, <code>--Color</code>
+    Inherited. <code>--Color</code>, <code>--Thickness</code>, <code>--PointSize</code>, <code>--TickLength</code>, <code>--Dashing</code>, <code>--DashingPeriod</code>.
 <!--todo: --AbsoluteThickness = calc Thickness * vw * ??? + non-scaling-stroke: off; -->
 
     To reset bounding to plot origin for a specific object (e.g., plot legend):
@@ -433,76 +433,95 @@ labels (WiP)
 
 
 
-<h2 id="methods">Numerical methods</h2>
+  <h2 id="methods">Numerical methods</h2>
 
-<p>
+  <p>
   Provided implementations of common numerical methods covering basic needs of plotting functions and solving algebraic and differential equations. Because finalized illustrations imply predefined well-posed conditions, the provided routines perform no data checks and rely on the incoming arguments always having appropriate formats. To further cut on overhead and avoid jittering typically associated with real-time auto-tuning, all parameter values are taken in explicitly.
-</p>
-
-<h3 id="plotting">Plots</h3>
-<p>
-    Plotting methods return line data in the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-string format</a> ready to be applied to a <code>&lt;path&gt;</code> element (inside an <a href="#svg">vector layer</a>): 
-    <code class="block" highlight="JS">
-      const svgLayer = document.querySelector("svg.Layer");<br>
-      svgLayer.add("path", "PlotLine").setAttribute("d", plot_string);
-    </code>
-    Here <code>.add</code> is a <a href="#add">provided utility method</a> for creating and attaching plot elements, white the <code>plot_string</code> is a result returned by either of the methods listed below. All plotting methods are called from the <code>plt</code> object.
   </p>
 
-<ul>
-  <li><h4><code>LinearPlot(f, xs)</code></h4>
+  <h3 id="plotting">Plots</h3>
+
+  <h4 id="pathing">Path methods</h4>
+  <p>
+    Methods called from the <code>plt</code> object that return path data in the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-string format</a> expected by a <code>&lt;path&gt;</code> element of a <a href="#svg">vector layer</a>: 
+    <code class="block" highlight="JS">
+      const vectorLayer = document.querySelector("svg.Layer");<br>
+      vectorLayer.add("path", "PlotLine").setAttribute("d", path_string);
+    </code>
+    Here <code>.add</code> is the <a href="#add">provided utility method</a> for creating and attaching plot elements, white the <code>path_string</code> is a result returned by either of the path methods listed below (for static plots, each has a simplified <a href="#autoplot"><code>Plot</code> counterpart</a>):
+  </p>
+
+  <ul>
+    <li><h4><code>LinePath(f, xs)</code></h4>
       <p>
-        Plot of an analytical single-valued function <code>f(x)</code> drawn as a polyline over an array of argument values <code>xs</code>:
+        Path for an analytical single-valued function <code>f(x)</code> drawn as a polyline over an array of argument values <code>xs</code>:
         <code class="block" highlight="JS">
-          plot_string = plt.LinearPlot(x =&gt; Math.cos(x), plt.Subdivide([0, 10], 25));
+          path_string = plt.LinePath(x =&gt; Math.cos(x), plt.Subdivide([0, 10], 25));
         </code>
         Here <code>x =&gt; Math.cos(x)</code> is a <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions">JS arrow function</a> expression for <code>f(x)=cos(x)</code>, and <code>plt.Subdivide(...)</code> is an array of <code>x</code> values, obtained by applying the <a href="#subdivide">respective utility method</a> to the <code>[0, 10]</code> interval.
       </p>
     </li>
 
-    <li><h4><code>BezierPlot(f, df, xs)</code></h4>
+    <li><h4><code>BezierPath(f, df, xs)</code></h4>
       <p>
-        Method similar to the <code>LinearPlot</code> above, which returns a <a href="https://eltaurus-lt.github.io/ChaosAndCats/en/chapter-03.html" target="_blank">cubic Bezier spline</a> instead of straight-line segments to produce a completely smooth result with fewer points. Requires additionally providing explicit analytical expression for the derivative <code>df(x)</code> of the <code>f(x)</code> function:
+        Method similar to the <code>LinePath</code> above, which returns a <a href="https://eltaurus-lt.github.io/ChaosAndCats/en/chapter-03.html" target="_blank">cubic Bezier spline</a> instead of straight-line segments to produce a completely smooth result with fewer points. Requires additionally providing explicit analytical expression for the derivative <code>df(x)</code> of the <code>f(x)</code> function:
         <code class="block" highlight="JS">
-          plt.BezierPlot(x =&gt; Math.cos(x), x =&gt; -Math.sin(x), xs)
+          plt.BezierPath(x =&gt; Math.cos(x), x =&gt; -Math.sin(x), xs)
         </code>
       </p>
     </li>
 
-    <li><h4><code>LinearParametric(f, ts)</code></h4>
+    <li><h4><code>ParametricLinePath(f, ts)</code></h4>
     <p>
-      Equivalent of the <code>LinearPlot</code> for parametric plots of 2D vector functions, such as
+      Variation of the <code>LinePath</code> for hodographs of 2D vector functions, such as
       <code class="block" highlight="JS">
         t =&gt; [Math.cos(x - 0.3), Math.sin(2 * x)]
       </code>
     </p></li>
 
-    <li><h4><code>BezierParametric(f, df, ts)</code></h4>
+    <li><h4><code>ParametricBezierPath(f, df, ts)</code></h4>
     <p>
-      2D vector equivalent of the <code>BezierPlot</code>. Requires providing the derivative <code>df</code>, which itself should also be a 2D vector function.
+      2D vector version of the <code>BezierPath</code> and the smooth alternative to the <code>ParametricLinePath</code>. Requires providing the derivative <code>df</code>, which itself should also be a 2D vector function.
     </p></li>
 
 
-    <li><h4><code>LinearListPlot(xys)</code></h4>
+    <li><h4><code>ListLinePath(xys)</code></h4>
     <p>
-      Returns a polyline constructed from an array <code>xys</code> of 2D points <code>[x, y]</code>. Appropriate for plotting table functions. In particular, the ones obtained as numerical solitions of differential equations.
+      Returns a polyline constructed from the <code>xys</code> array of 2D points <code>[x, y]</code>. Suited for plotting table functions. In particular, the ones obtained as <a href="#NDSolve">numerical solitions of differential equations</a>.
     </p></li>
 
-    <li id="BezierList"><h4><code>BezierListPlot(xys)</code></h4>
+    <li id="BezierList"><h4><code>ListBezierPath(xys)</code></h4>
     <p>
-      Bezier equivalent of the <code>LinearListPlot</code>. Works similarly to Adobe Illuatrator <i>Curvature</i> tool.
+      Bezier equivalent of the <code>ListLinePath</code>. Works similarly to Adobe Illuatrator <i>Curvature</i> tool.
     </p></li>
   </ul>
   <br>
-
-  <ul>
-  <li><h4><code>ListPlot(xys) (WIP)</code></h4>
+ 
+  <h4>Plotting methods</h4>
   <p>
-    A singular method for plotting a table function as a collection of points instead of a continuous line. In contrast to all the previous methods does not return a d-string, but an array of <a href="#markers">Markers</a>, which can be attached to a vector layer directly:
-    <code class="block" highlight="JS">
-      svgLayer.add(plt.ListPlot(xys), "plotMarker").
-    </code>
+    Methods abstracting the creation of required elements with all required data attributes assigned internally. Take in optional <code>classList</code> argument to mark the created elements for <a href="#CSS">selective styling</a>.
   </p>
+  <ul>
+    <li id="autoplot"><h4><code>Plot(path, classList = "")</code></h4>
+      <p>
+        Called from a <a href="#svg">vector layer</a>, assigns the <code>path</code> as the <code>d</code> attribute, and returns the created <code>&lt;path&gt;</code> element. Better suited for static plots – dynamically modified paths should rely on <a href="#pathing">setting path explicitly</a>, as <code>Plot</code> will create a new element each time it is called instead of updating existing layout. 
+      </p>
+      <p>
+        Specialized versions for each of the <a href="#pathing">path</a> methods are available. For example, <code>LinePlot(f, xs, classList)</code> is equivalent to
+        <code class="block" highlight="JS">
+          vectorLayer.Plot(plt.LinePath(f, xs), classList);
+        </code>
+        Full list of specialized methods consists of <code>LinePlot</code>, <code>BezierPlot</code>, <code>ParametricLinePlot</code>, <code>ParametricBezierPlot</code>, <code>ListLinePlot</code>, <code>ListBezierPlot</code>. Each of the methods takes in the arguments equivalent to their <code>…Path</code> counterpart plus an optional <code>classList</code>.
+      </p>
+    </li>
+    <li><h4><code>ListPlot(xys, classList = "")</code></h4>
+      <p>
+        A method for plotting a table function as a collection of points instead of a continuous line. Called from a  <a href="#markup">markup layer</a>, returns an array of <a href="#markers">marker</a> elements:
+        <code class="block" highlight="JS">
+          markupLayer.ListPlot(plt.ListPlot(xys));
+        </code>
+      </p>
+    </li>
   </ul>
 
 <!-- todo: css and svg animations -->
@@ -541,7 +560,7 @@ labels (WiP)
 
   <li><h4 id="NDSolve"><code>NDSolve(f, x0, ts)</code></h4>
   <p>
-    Integrates differential equation <code>x'(t)=f(t, x)</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4) with initial conditions <code>x(ts[0])=x0</code>. The method supports <code>x</code> being both a real number and a vector (array) of arbitrary length. In the vector case, <code>f(t, x)</code> must return an array of the same length and expect its <code>x</code> argument to be an array as well.
+    Integrates differential equation <code>x'(t)=f(t, x)</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4) with initial conditions <code>x(ts[0])=x0</code>. The method supports <code>x</code> being either a real number or a vector (array) of arbitrary length. In the vector case, <code>f(t, x)</code> must expect its <code>x</code> argument to be an array and return the result as an array of the same length.
 Example use:
     <code class="block" highlight="JS">
       function f(t, [x, y, z]) {<br>
@@ -555,8 +574,8 @@ Example use:
     </code>
 Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting example:
     <code class="block" highlight="JS">
-      plot_string = LinearListPlot(sol.map( ([t, [x, y, z]]) => [x, z] ));<br>
-      svgLayer.add("path", "PlotLine").setAttribute("d", plot_string);
+      path_string = ListLinePath(sol.map( ([t, [x, y, z]]) => [x, z] ));<br>
+      svgLayer.add("path", "PlotLine").setAttribute("d", path_string);
     </code>
   </p></li>
   </ul>
@@ -596,15 +615,15 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
   <p>
     Method for merging <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">d-strings</a> returned by the <a href="#plotting">plotting methods</a>. Can be used consruct piecewise lines from individual segments:
     <code class="block" highlight="JS">
-      d_string1 = plt.LinearPlot(x => Math.pow(x, 3), plt.Subdivide([0, 1], 3));<br> 
-      d_string2 = plt.BezierParametric(t => [1 + Math.cos(t), 1 + Math.sin(t)], t => [-Math.sin(t), Math.cos(t)], plt.Subdivide([0, 1], 2));<br> 
+      d_string1 = plt.LinePath(x => Math.pow(x, 3), plt.Subdivide([0, 1], 3));<br> 
+      d_string2 = plt.ParametricBezierPath(t => [1 + Math.cos(t), 1 + Math.sin(t)], t => [-Math.sin(t), Math.cos(t)], plt.Subdivide([0, 1], 2));<br> 
       d_string3 = "M 2,0 C 4,0 3,2 3,1";<br>
       <br>
       joined_line = plt.merge(d_string1, d_string2, d_string3);
     </code>
   </p></li>
 
-  <li><h4><code>.unwrap(obj)</code></h4>
+  <li><h4><code>.unwrap(obj) (WIP)</code></h4>
     <p>
       Unwraps methods contained in an object into the global scope. Useful for <code>Math</code> to simplify writing long math expressions. Can also be used on the <code>plt</code> itself.
     </p>
