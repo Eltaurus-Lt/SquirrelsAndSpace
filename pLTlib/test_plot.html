@@ -11,12 +11,14 @@
   <script defer src="pLTlib.js"></script>
   <link rel="stylesheet" href="pLTlib.css">
 
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+
 <style>
   .Plot {
     background: white;
     border-radius: 1em;
     border: solid white 2em;
-
+    border-top-width: 4.5em;
   }
   #controlPanel {
     margin-top: 1em;
@@ -30,20 +32,26 @@
     stroke: #777;
   }
 
+  .Plot > .Label {
+    font-size: 1.25em;
+    top: -2.5em;
+  }
+
 </style>
 </head>
 <body>
 
-<div class="Plot" PlotRange="[-10.5, 10.5]" ScaleRatio="2.9">
+<div class="Plot" PlotRange="[-10.5, 10.5]" ScaleRatio=2.9>
   <svg class="Layer"></svg>
-  <div class="Layer" Axes Arrowheads Ticks="1" TicksX="5" Subticks="5" MergeOrigin></div>
+  <div class="Layer" Axes Arrowheads AxesLabels="['$$x$$','$$y$$']" Ticks=1 TicksX=5 Subticks=5 MergeOrigin></div>
   <div class="Layer" id="markerLayer"></div>
+  <div class="Label">$$k x + b = cos(\omega x)$$</div>
 </div>
 
 <div id="controlPanel">
-  <input pltvar="t" autoplay loop="true" type="range" min="-1.2" max="1.2" step="any" value="0">
-  <input pltvar="k" autoplay loop="true" type="range" min="1" max="10" step="any" value="5">
-  <input pltvar="ω" autoplay loop="true" type="range" min="0.2" max="1.5" step="any" value="5">
+  <input pltvar="t" autoplay loop=true type=range min=-1.2 max=1.2 step=any value=0>
+  <input pltvar="k" autoplay loop=true type=range min=1 max=10 step=any value=5>
+  <input pltvar="ω" autoplay loop=true type=range min=0.2 max=1.5 step=any value=5>
 </div>
 
 

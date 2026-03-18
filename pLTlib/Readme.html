@@ -297,6 +297,7 @@ function source code analysis to only call functions if the changed value is amo
     <code class="block" highlight="HTML">
       &lt;div class="Layer" Frame Grid Ticks="1" TicksRight="[[.5, '$\\frac{1}{2}$'], 1, [1.618, '$\\varphi$']]" ... &gt;
     </code>
+<!-- todo: \\ and $$ -->
     Primarily control overlayed details, such as ticks and text labels. The details do not have any default values – plots display what have been explicitly declared. Attributes that appear without values practically serve as toggles, with the result depending only on whether their name is attached to the <code>&lt;div&gt;</code> at all:
   </p>
     <ul>
@@ -440,7 +441,7 @@ labels (WiP)
     <br>
     It should be noted, that, by default, height of a <code>.Plot</code> element is connected to its width through the <a href="#plot_attributes"><code>AspectRatio</code></a>. If a different CSS rule is manually set for the height, it might be practical to change <code>AspectRatio</code> to a sufficiently small value and add <code>overflow-y: hidden;</code> to the <code>.Plot</code> styles.
   </p>
-
+<!--todo: LaTeX selection and rightclick-->
 
 
   <h2 id="methods">Numerical methods</h2>

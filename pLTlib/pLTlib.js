@@ -95,7 +95,7 @@ plt._getMarkupAttributes = function(layer) {
     return general;
   }
 
-  attributes["Ticks"] = this._parsedAttribute(layer, "Ticks");
+  attributes["Ticks"] = plt._parsedAttribute(layer, "Ticks");
   attributes["TicksX"] = moreSpecial("TicksX", attributes["Ticks"]);
   attributes["TicksY"] = moreSpecial("TicksY", attributes["Ticks"]);
   attributes["TicksBottom"] = moreSpecial("TicksBottom", attributes["TicksX"]);
@@ -103,13 +103,18 @@ plt._getMarkupAttributes = function(layer) {
   attributes["TicksTop"] = moreSpecial("TicksTop", attributes["TicksX"]);
   attributes["TicksRight"] = moreSpecial("TicksRight", attributes["TicksY"]);
 
-  attributes["Subticks"] = this._parsedAttribute(layer, "Subticks");
+  attributes["Subticks"] = plt._parsedAttribute(layer, "Subticks");
   attributes["SubticksX"] = moreSpecial("SubticksX", attributes["Subticks"]);
   attributes["SubticksY"] = moreSpecial("SubticksY", attributes["Subticks"]);
   attributes["SubticksBottom"] = moreSpecial("SubticksBottom", attributes["SubticksX"]);
   attributes["SubticksLeft"] = moreSpecial("SubticksLeft", attributes["SubticksY"]);
   attributes["SubticksTop"] = moreSpecial("SubticksTop", attributes["SubticksX"]);
   attributes["SubticksRight"] = moreSpecial("SubticksRight", attributes["SubticksY"]);
+
+  /* Labels */
+  attributes["AxesLabels"] = plt._parsedAttribute(layer, "AxesLabels");
+  attributes["AxisLabelX"] = moreSpecial("AxisLabelX", attributes["AxesLabels"]?.[0]);
+  attributes["AxisLabelY"] = moreSpecial("AxisLabelY", attributes["AxesLabels"]?.[1]);
 
   return attributes;
 }
@@ -159,10 +164,13 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
     const iEnd = Math.ceil((plotSettings[end] - 0) / ticks) * subs;
     for (let i = iStart; i <= iEnd; i++) {
       const pos = ticks * i / subs + 0;
-      if (pos <= plotSettings[start] || pos >= plotSettings[end]) continue;
+      if (pos < plotSettings[start] || pos > plotSettings[end]) continue;
       const tickL = axisL.add(`Tick ${tag}`);
       if (i % subs !== 0 ) {
         tickL.classList.add("Sub");
+      } else {
+        tickL.add = plt._addadddivmethod(tickL);
+        tickL.add("Label").innerText = `${String(pos)}`;
       }
       if ( Math.abs(pos - 0) < $Precision ) {
         tickL.classList.add("zero");
@@ -206,6 +214,12 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
       if (attrs["ArrowheadBottom"]) {
         axisY.add("Arrowhead Y Bottom");
       }
+
+      /* Label */
+      if (attrs["AxisLabelY"]) {
+        axisY.add("Label Y").innerText = attrs["AxisLabelY"];
+      }
+
     }
 
     if (attrs["AxisY"]) {
@@ -227,6 +241,11 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
       }
       if (attrs["ArrowheadLeft"]) {
         axisX.add("Arrowhead X Left");
+      }
+
+       /* Label */
+      if (attrs["AxisLabelX"]) {
+        axisX.add("Label X").innerText = attrs["AxisLabelX"];
       }
     }
 

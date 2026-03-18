@@ -69,6 +69,7 @@ svg .PlotMarker {
 body {
   margin: 0;
   overflow: hidden;
+  font-family: sans-serif;
 }
 
 
@@ -104,7 +105,7 @@ div.Plot svg.Layer:first-of-type {
   vector-effect: non-scaling-stroke;
 }
 /* Markup */
-div.Plot div.Layer > * { 
+div.Layer > * { 
   display: block;
   position: absolute;
   translate: -50% 50%;
@@ -112,26 +113,25 @@ div.Plot div.Layer > * {
 
 
 /* Axes */
-
-div.Plot div.Layer .Axis {
+.Axis {
   background-color: var(--Color);
-  display: flex;
-  justify-content: center;
+  display: flex !important;
+  align-items: flex-start;
 }
-div.Plot div.Layer .Axis > * {
+.Axis > * {
   position: absolute;
 }
-div.Plot div.Layer .Axis.X {
+.Axis.X {
   height: 0;
   padding: calc(var(--Thickness) / 2) 0;
   translate: 0 50%;
   bottom: 0; /* fallback */
   scale: 1 -1;
 }
-div.Plot div.Layer .Axis.X > * {
+.Axis.X > * {
   scale: 1 -1;
 }
-div.Plot div.Layer .Axis.Y {
+.Axis.Y {
   width: 0;
   padding: 0 calc(var(--Thickness) / 2);
   translate: -50% 0;
@@ -158,11 +158,11 @@ div.Plot div.Layer .Axis.X > .Arrowhead.X {
   height: calc( 100% * var(--ArrowheadsWidth) );
 }
 .Arrowhead.Right {
-  translate: 50% 0;
+  translate: 75% 0;
   right: 0;
 }
 .Arrowhead.Left {
-  translate: -50% 0;
+  translate: -75% 0;
   rotate: 180deg;
   left: 0;
 }
@@ -170,21 +170,23 @@ div.Plot div.Layer .Axis.X > .Arrowhead.X {
   width: calc( 100% * var(--ArrowheadsWidth) );
 }
 .Arrowhead.Top {
-  translate: 0 -50%;
+  translate: 0 -75%;
   rotate: -90deg;
   top: 0;
 }
 .Arrowhead.Bottom {
-  translate: 0 50%;
+  translate: 0 75%;
   rotate: 90deg;
   bottom: 0;
 }
 
 /* Ticks */
+.Tick {
+  background: var(--Color);
+}
 .Tick.X {
   width: var(--Thickness);
   height: var(--TickLength);
-  background: var(--Color);
   translate: -50% 0;
 }
 .Sub.Tick.X {
@@ -194,7 +196,6 @@ div.Plot div.Layer .Axis.X > .Arrowhead.X {
 .Tick.Y {
   height: var(--Thickness);
   width: var(--TickLength);
-  background: var(--Color);
   translate: 0 50%;
 }
 .Sub.Tick.Y {
@@ -206,15 +207,63 @@ div.Plot div.Layer .Axis.X > .Arrowhead.X {
   --Thickness: calc(.5 * var(--TickLength)); */
 }
 
-/* Text labels (todo) */
-#plotlabel {
-  width: 6.5em;
-  position: absolute;
-  left: 50vw;
-  bottom: calc(100% + .1rlh + .1em);
-  transform: translate(-50%);
+/* Text labels */
+.Label {
+  width: max-content;
+  height: min-content;
+}
+.Plot .Label mjx-container {
+  padding: 0; 
+  margin: 0;
+}
 
-  font-size: 1.5em;
+
+.Plot > .Label {
+  margin: 0 auto;
+  position: absolute;
+  top: 0.5em;
+  left: 50%;
+  translate: -50% 0;
+}
+
+
+.Axis > .Label {
+  padding: .5em calc(.5em + var(--TickLength));
+  align-self: flex-start;
+  font-size: 1.25em;
+}
+.Axis.X > .Label {
+  right: 0;
+  translate: 50% 0;
+}
+.Axis.Y > .Label {
+  top: 0;
+  translate: 0 -50%;
+}
+
+
+.Tick {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.Tick.X {
+  scale: 1 1;
+}
+.Tick.X > * {
+  scale: 1 -1;
+}
+.Tick.X .Label {
+  padding: calc(.2em + var(--TickLength)) .5em;
+}
+.Tick.Y {
+  flex-direction: column;
+}
+.Tick.Y .Label {
+  padding: 0.15em calc(.5em + var(--TickLength)) 0.2em;
+}
+.Axis .Label {
+//  translate: -50% -50%;
 }
 
 
@@ -252,7 +301,19 @@ div.Layer.debug::after,
   position: absolute;
   width: 1%;
   height: 1%;
-  outline: limegreen 1px solid;
+  outline: orange 1px solid;
   left: 0;
   bottom: 0;
+}
+
+.debug .Label {
+  outline: solid 1px tan;
+}
+.debug.Plot > .Label,
+.debug .Plot > .Label {
+  outline: solid 1px limegreen;
+}
+.debug.Axis > .Label,
+.debug .Axis > .Label {
+  outline: solid 1px forestgreen;
 }
