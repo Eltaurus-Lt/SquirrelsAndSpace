@@ -217,7 +217,7 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
 
       /* Label */
       if (attrs["AxisLabelY"]) {
-        axisY.add("Label Y").innerText = attrs["AxisLabelY"];
+        axisY.add("Label Y").innerHTML = attrs["AxisLabelY"];
       }
 
     }
@@ -245,7 +245,7 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
 
        /* Label */
       if (attrs["AxisLabelX"]) {
-        axisX.add("Label X").innerText = attrs["AxisLabelX"];
+        axisX.add("Label X").innerHTML = attrs["AxisLabelX"];
       }
     }
 

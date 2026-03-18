@@ -262,9 +262,7 @@ div.Plot div.Layer .Axis.X > .Arrowhead.X {
 .Tick.Y .Label {
   padding: 0.15em calc(.5em + var(--TickLength)) 0.2em;
 }
-.Axis .Label {
-//  translate: -50% -50%;
-}
+
 
 
 /* Manipulators */

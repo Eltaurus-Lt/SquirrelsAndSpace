@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="-debug">
+  <head>
+
+  <script defer src="pLTlib.js"></script>
+  <link rel="stylesheet" href="pLTlib.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+
+<style>
+
+svg.Layer {
+ border: 1px black solid;
+}
+
+body {
+ max-width: 600px;
+ margin: 0 auto;
+}
+@media(min-width: 600px) {
+  body {
+    font-size: 24px !important;
+  }
+}
+
+.ceiling {
+  stroke-width: 4px;
+  stroke: black;
+}
+
+.cline {
+  stroke-width: 1.5px;
+  stroke: black;
+ fill: none;
+}
+
+.hatching {
+  stroke: black;
+  stroke-width: 2px;
+}
+
+.solid {
+  fill: white;lightgreen;
+  stroke: black;
+  stroke-width: 3px;
+}
+
+.PlotMarker {
+  --Color: black;
+}
+
+.Gamma {
+  fill: none;
+  stroke-width: 1px;
+}
+.Gamma.Zero {
+  stroke-width:4px;
+  marker-end: url(#arrowheadMarker);
+}
+.L {
+  stroke: color-mix(#FF4433 50%, orange);
+}
+.alpha {
+  stroke: color-mix(darkblue 20%, royalblue);
+}
+
+.q {
+  background: #fffc;
+  border-radius: 12px;
+}
+#q1 {
+  translate: 0 100%;
+}
+#q2 {
+  translate: 25% -25%;
+}
+
+#LL {
+  marker-end: url(#arrowheadEnd);
+  marker-start: url(#arrowheadEnd);
+}
+
+mjx-container {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+</style>
+  </head>
+  <body>
+
+<div class="Plot" PlotRange=5 AspectRatio=1>
+  <svg class="Layer">
+  <defs>
+    <marker id="arrowheadMarker" markerWidth="14" markerHeight="5" refX="7" refY="3.5" orient="auto-start-reverse" viewBox="0 0 10 7">
+      <polygon points="10 3.5, 0 0, 1.5 3.5, 0 7" fill="context-stroke"/>
+    </marker>
+    <marker id="arrowheadEnd" markerWidth="14" markerHeight="5" refX="9" refY="3.5" orient="auto-start-reverse" viewBox="0 0 10 7">
+      <polygon points="10 3.5, 0 0, 1.5 3.5, 0 7" fill="context-stroke"/>
+    </marker>
+  </defs>
+</svg> 
+  <div class="Layer">
+    <div id="Calpha">$$\alpha$$</div>
+    <div id="Cl">$$l$$</div>
+    <div id="q1" class="q">$$q^{\alpha}$$</div>
+    <div id="q2" class="q">$$q^l$$</div>
+  </div>
+</div>
+
+q
+<input pltvar="α" type=range min=.5 max=1.5 step=any value=0.5> 
+<input pltvar="l" type=range min=.2 max=.9 step=any value=4> 
+A
+<input pltvar="r" type=range min=0 max=1 step=any value=4> 
+<input pltvar="φ" type=range min=0 max=6.283183 step=any value=4> 
+
+
+
+
+<script>
+const π = Math.PI;
+const cos = Math.cos; 
+const sin = Math.sin;
+
+const R = 1.4;
+const L = 8;
+const O = [-3.7, 3.7];
+const d = 0.4;
+const h = .2;
+
+function q2xy({α, l, r, φ}) {
+  const Ψ = l * L / R - φ;
+  const u = l * L + R * r * sin(Ψ);
+  const v = R * (1 + r * cos(Ψ)) + h/2;
+  
+  return [O[0] + u * cos(α) + v * sin(α), O[1] - u * sin(α) + v * cos(α)];
+}
+
+const imgL = document.querySelector("svg.Layer");
+const markL = document.querySelector("div.Layer");
+
+document.addEventListener("DOMContentLoaded", () => {
+  imgL.add("path", "hinge solid").setAttribute("d", `M ${O[0]} ${O[1]-h/3} L ${O[0]-d} ${O[1]+d-h/3} L ${O[0]+d} ${O[1]+d-h/3} Z`);
+
+  const ceilingL = imgL.add("line", "ceiling");
+  ceilingL.setAttribute("x1", -10);
+  ceilingL.setAttribute("x2", 10);
+  ceilingL.setAttribute("y1", O[1]+d-h/3);
+  ceilingL.setAttribute("y2", O[1]+d-h/3);
+  for (let i = -5.93; i < 6; i+=.3) {
+    const hatchL = imgL.add("line", "hatching");
+    hatchL.setAttribute("x1", i);
+    hatchL.setAttribute("x2", i+.5-h/3);
+    hatchL.setAttribute("y1", O[1]+d-h/3);
+    hatchL.setAttribute("y2", O[1]+d+.5-h/3);
+  }
+  const horL = imgL.add("line", "cline");
+  horL.setAttribute("x1", O[0]);
+  horL.setAttribute("x2", O[0] + 5);
+  horL.setAttribute("y1", O[1]);
+  horL.setAttribute("y2", O[1]);
+  const archL = imgL.add("path", "cline");
+  const archr = 1;
+  const out1 = imgL.add("path", "cline");
+  const out2 = imgL.add("path", "cline");
+  const LL = imgL.add("path", "cline");
+  LL.id = "LL";
+
+
+
+
+
+  const discL = imgL.add("circle", "solid");
+  discL.setAttribute("r", R);
+
+  const stickL = imgL.add("rect", "solid");
+  stickL.setAttribute("x", O[0]-h/2);
+  stickL.setAttribute("y", O[1]);
+  stickL.setAttribute("width", h);
+  stickL.setAttribute("height", L);
+
+
+  const circL = imgL.add("circle", "solid");
+  circL.setAttribute("r", .8*h);
+  circL.setAttribute("cx", O[0]);
+  circL.setAttribute("cy", O[1]);
+
+  const pointA = markL.add("PlotMarker");
+
+  const n = 2;
+  const dl = .06;
+  const dα = .1;
+  const ln1 = [];
+  for (let i = -n; i < n; i++) {
+    ln1.push(imgL.add("path", "Gamma L"));
+  }
+  const ln2 = [];
+  for (let i = -n; i < n; i++) {
+    ln2.push(imgL.add("path", "Gamma alpha"));
+  }
+  ln1.splice(n, 0, imgL.add("path", "Gamma L"));
+  ln2.splice(n, 0, imgL.add("path", "Gamma alpha"));
+  ln1[n].classList.add("Zero");
+  ln2[n].classList.add("Zero");
+
+
+plt.dynamic.push(({α, l, r, φ}) => {
+  const C = q2xy({α, l, r: 0, φ: 0});
+  discL.setAttribute("cx", C[0]);
+  discL.setAttribute("cy", C[1]);
+
+  archL.setAttribute("d", `M ${O[0]+archr} ${O[1]} A ${archr} ${archr} 0 0 0 ${O[0]+archr*cos(α)} ${O[1]-archr*sin(α)}`);
+  window.Calpha.style.left = `${O[0]+1.25*archr*cos(.4 * α)}%`;
+  window.Calpha.style.bottom = `${O[1]-1.25*archr*sin(.4 * α)}%`;
+
+  stickL.setAttribute("transform",`rotate(${-180*α/π - 90}, ${O[0]}, ${O[1]})`);
+
+  const xy = q2xy({α, l, r, φ});
+  pointA.style.left = `${xy[0]}%`;
+  pointA.style.bottom = `${xy[1]}%`;
+
+  for (let i = 0; i <= 2*n; i++) {
+    ln1[i].setAttribute("d", plt.LinearParametric(t=>q2xy({α: α+t, l: l+(i-n)*dl, r, φ}), plt.Subdivide([-(n+.5)*dα , (n+.5)*dα], 15)));
+    ln2[i].setAttribute("d", plt.LinearParametric(t=>q2xy({α: α+(i-n)*dα, l: l+t, r, φ}), plt.Subdivide([-(n+.5)*dl , (n+.5)*dl], 15)));
+  }
+ 
+  const end1 = q2xy({α: α+(n+.5)*dα, l, r, φ});
+  window.q1.style.left = `${end1[0]}%`;
+  window.q1.style.bottom = `${end1[1]}%`;
+
+  const end2 = q2xy({α, l: l+(n+.5)*dl, r, φ});
+  window.q2.style.left = `${end2[0]}%`;
+  window.q2.style.bottom = `${end2[1]}%`;
+
+  const d = .5;
+  out1.setAttribute("d", `M ${O[0]} ${O[1]} L ${O[0] - d*sin(α)} ${O[1] - d*cos(α)}`);
+  out2.setAttribute("d", `M ${O[0]+l*L*cos(α)} ${O[1]-l*L*sin(α)} L ${O[0] - d*sin(α)+l*L*cos(α)} ${O[1] - d*cos(α)-l*L*sin(α)}`);
+  LL.setAttribute("d", `M ${O[0] - .6*d*sin(α)} ${O[1] - .6*d*cos(α)} L ${O[0] - .6*d*sin(α)+l*L*cos(α)} ${O[1] - .6*d*cos(α)-l*L*sin(α)}`);
+  window.Cl.style.left = `${O[0] - 1.1*d*sin(α) + .5*l*L*cos(α)}%`;
+  window.Cl.style.bottom = `${O[1] - 1.1*d*cos(α) - .5*l*L*sin(α)}%`;
+
+
+});
+
+
+plt.update();
+});
+</script>
+
+  </body>
+</html>
