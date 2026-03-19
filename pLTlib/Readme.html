@@ -673,6 +673,56 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
   </ul>
 
   <h2>3D plots (WIP)</h2>
+
+  <p>
+    Layers additionally marked with the <code>.3D</code> class present their inner elements as located in 3D space of the plot with the positions and sizes automatically adjusted with camera movements. Elements added to these layers must have the required 3D data attribute attached (all positions are specified in global plot space<!--todo: parenting-->). In general, all the <a href="#layers">same types of layers</a> as in regular 2D plots can be used for 3D, but each type has its own set of features and differences associated with the extended functionality. 
+  </p>
+  <h3 id="vector3D">3D vector layers</h3>
+  <p>
+    Layers for adding vector lines, wireframes (of 3D plots, in particular), arrows, curves, and other elements that can be drawn with purely vector means. <!-- todo: dashed backlines, gradient fill depending on lighting, css/svg filter for dof blur -->
+    <code class="block" highlight="HTML">
+      &lt;svg class="Layer 3D"&gt;&lt;/svg&gt;
+    </code>
+  </p>
+<!-- .\33D || [class="3D"]-->
+  <h3 id="markup">3D markup layers</h3>
+  <p>
+    Similarly to 2D, markup layers can display axes, ticks, boxes, as well as markers and text labels placed in the 3D space. Elements can be scaled with the distance, or rendered with a constant screen-space size.
+    <code class="block" highlight="HTML">
+      &lt;div class="Layer 3D"&gt;&lt;/div&gt;
+    </code>
+  </p>
+
+  <h3>3D raster layers</h3>
+  <p>
+    Layers for drawing fully-shaded 3D objects and surfaces. Requires additionally importing three.js library. Can be used for displaying imported 3D models or for procedurally generated 3D plots and sets of primitives</a>.
+    <code class="block" highlight="HTML">
+      &lt;canvas class="Layer 3D"&gt;&lt;/canvas&gt;
+    </code>
+    </p>
+  <h3>Shader layers</h3>
+  <p>
+    Shaders do not require any additional attributes for the layers.
+    <code class="block" highlight="HTML">
+      &lt;canvas class="Layer glsl"&gt;&lt;/canvas&gt;
+    </code>
+    Any shader layer within a 3D plot will automatically get access to 3D camera parameters <code>cameraOrigin</code> (vec3), <code>cameraRotation</code> (mat3), <code>fov</code> (float). In combination with the <code>plotResolution</code> they can be used to calculate the direction of a cast ray for the pixel:
+    <code class="block todo" highlight="GLSL">
+      vec3 d = normalize( cameraRotation * ( vec3(0, 0, -1) + fov * vec3(gl_FragCoord.xy - .5 * plotResolution, 0) / plotResolution ) );
+    </code>
+  </p>
+  <ul class="references">
+    <h4>References</h4>
+    <li><a href="https://eltaurus-lt.github.io/ChaosAndCats/tools/glsl_renderer.html" target="_blank">GLSL editor</a></li>
+  </ul>
+  <h3>2D layers and elements</h3>
+  <p>
+    
+  </p>
+
+
+
+  <h2>4D plots (WIP)</h2>
   
 </body>
 </html>
