@@ -293,12 +293,10 @@ plt.controls.forEach(control => {
 /* NUMERICAL METHODS */
 /* Utility */
 
-plt.unwrap = function(obj) { /* todo? -> unwrap into local scope */
-  for (const [key, value] of Object.entries(obj)) {
-    if (typeof value === "function") {
-      window[key] = value;
-    }
-  }
+plt.unwrap = function(obj) { 
+  Object.getOwnPropertyNames(obj)
+    .filter(key => typeof obj[key] === "function") /* todo? properties (PI) too? */
+    .forEach(key => window[key] = obj[key]); /* todo? -> unwrap into local scope */
 }
 
 plt.Subdivide = function(range, Npoints) {
@@ -515,4 +513,4 @@ window.addEventListener('load', plt._embedHeight);
 window.addEventListener('resize', plt._embedHeight);
 
 
-Object.freeze(plt);
+//  Object.freeze(plt); // (todo) + set enuberable/writable/configurable to ...

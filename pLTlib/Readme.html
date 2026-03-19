@@ -429,6 +429,11 @@ labels (WiP)
     <ul>
       <li><code>.PlotLine</code> for plotted functions automatically assigns them appropriate thickness and different colors depending on the ordinal number of the <a href="#layers">vector layers</a> the lines are added into (in accordance with the default Wolfram Mathematica color scheme).</li>
       <li id="markers"><code>.PlotMarker (WiP)</code></li>
+      <li id="arrowheads"><code>Arrowheads (WiP)</code>
+      <p>
+        Normal and tucked.
+      </p>
+      </li> 
     </ul>
   </p>
 
@@ -595,15 +600,18 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
 
 
   <h3>Utility</h3>
-  <ul>
-
-  <li><h4 id="subdivide"><code>Subdivide([x0, x1], N)</code></h4>
   <p>
-    Uniformly subdivides a specified interval into N subintervals. Returns a single array of values with the first and the last one coinciding with <code>x0</code> and <code>x1</code>. Called from the <code>plt</code> object:
-    <code class="block" highlight="JS">
-      plt.Subdivide( [0, Math.PI / 2], 50 ) // returns [0, 0.01 π, 0.02 π, ..., 0.5 π]
-    </code>
-  </p></li>
+    Quality-of-life features automating certain frequently repeated patterns.
+  </p>
+  <ul>
+    <li><h4 id="subdivide"><code>Subdivide([x0, x1], N)</code></h4>
+      <p>
+      Uniformly subdivides the specified interval into N subintervals. Returns a single array of values with the first and the last one coinciding with <code>x0</code> and <code>x1</code>. Called from the <code>plt</code> object:
+      <code class="block" highlight="JS">
+        plt.Subdivide( [0, Math.PI / 2], 50 ) // returns [0, 0.01 π, 0.02 π, ..., 0.5 π]
+      </code>
+      </p>
+    </li>
 
     <li><h4 id="add"><code>.add(elementType, classList = "")</code></h4>
   <p>
@@ -622,9 +630,15 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
   </p>
   <p>
     Additionally can be called from a <a href="#intro"><code>div.Plot</code> container</a> to dynamicaly make <a href="#layers">new layers</a> (WiP). The <code>elementType</code> in such case should be one of the following: <code>"svg"</code>, <code>"html"</code>, <code>"canvas"</code>, <code>"glsl"</code>.
+  </p>
+  <p>
+    WiP: <code>.addTo()</code> (for <code>&lt;g&gt;</code> groups object), <code>.addBefore()</code>, <code>.addAfter()</code>, as well as <code>.addToBefore()</code> and <code>.addToAfter()</code>.
   </p></li>
-
-  <li id="merge"><h4><code>.merge(path_string1, path_string2, ... )</code></h4>
+  <li><h4><code>.setAttributes(a1, a2, … ) (WIP)</code></h4>
+  <p>
+    Method for setting values of multiple attributes at once. Can only be called from objects created using the <a href="#add">.add()</a> method. Works for <code>circle</code>, <code>line</code>, <code>rect</code>, general <code>path</code> for vector layer object, as well as standard divs from markup layers.
+  </p>
+  <li id="merge"><h4><code>.merge(path_string1, path_string2, … )</code></h4>
   <p>
     Method for merging <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/d" target="_blank">path-strings</a> (returned by the <a href="#pathing">path methods</a>, in particular). Can be used to assemble piecewise contours from individual segments:
     <code class="block" highlight="JS">
@@ -636,9 +650,9 @@ Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting exampl
     </code>
   </p></li>
 
-  <li><h4><code>.unwrap(obj) (WIP)</code></h4>
+  <li><h4><code>.unwrap(obj)</code></h4>
     <p>
-      Unwraps methods contained in an object into the global scope. Useful for <code>Math</code> to simplify writing long math expressions. Can also be used on the <code>plt</code> itself.
+      Unwraps methods contained in the <code>obj</code> object into the global scope. Useful for <code>Math</code> to simplify writing long mathematical expressions. Can also be used on the <code>plt</code> itself.
     </p>
   </li>
  
