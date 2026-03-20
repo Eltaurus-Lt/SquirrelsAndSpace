@@ -551,34 +551,40 @@ labels (WiP)
   </p>
  
   <ul>
-    <li><h4><code>FindRoot(f, df, x0, iter, damp = 1)</code></h4>
-  <p>
-    Finds a root of an algebraic equation <code>f(x)=0</code> using <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton–Raphson</a> method starting from the point <code>x0</code> and performing <code>iter</code> number of steps. Requires providing analytical derivative <code>df(x)</code> of the function <code>f(x)</code> (both should be single-valued functions).<br>
-    Allows specifying an optional damping factor, which serves as a step multiplier (when the function is called with 4 arguments, <code>damp</code> defaults to <code>1</code>). Values less than <code>1</code> improve stability, but require more steps to converge. Values greater than <code>1</code> can be useful for improving convergence near roots with multiplicity&nbsp;<code>&gt;&nbsp;1</code>.<br>
-  Returns the root and the error. Example use:
-    <code class="block" highlight="JS">
-      xr = plt.FindRoot(x => (Math.cos(x) - 1), x => -Math.sin(x), 0, 10)[0];
-    </code>
-  </p></li>
-
-  <li><h4><code>LocateRoot(f, [xa, xb], iter)</code></h4>
-  <p>
-    Finds a root of an algebraic equation <code>f(x)=0</code> using the <a href="https://en.wikipedia.org/wiki/Bisection_method" target="_blank">Bisection</a> method starting on an interval <code>[xa, xb]</code> and performing <code>iter</code> number of steps. In general, converges slower than <code>FindRoot</code>, but is always stable and ensures that the result belongs to the specified interval. Relies on <code>f(xa)</code> and <code>f(xb)</code> having opposite signs (returns <code>Null</code> otherwise).
-  </p></li>
-
-  <li><h4><code>NSolve(f, df, x0s, iter, damp = 1)</code></h4>
-  <p>
-    Searches for multiple roots of the <code>f(x)=0</code> equation using <code>FindRoot</code> for each of the <code>x0</code> values from the array <code>x0s</code>. Filters out repeated results, based on <a href="#Precision">$Precision</a>.
-  </p></li>
-<!-- => NRSolve, NSolve = Brent’s method -->
-  <li><h4><code>NBSolve(f, x0s, iter)</code></h4>
-  <p>
-    Searches for multiple roots of the <code>f(x)=0</code> equation using <code>LocateRoot</code> for each of the pairs of consecutive values from the <code>x0s</code> array. Filters out <code>Null</code> resutls, does not search for more than one root per interval.
-  </p></li>
+    <li><h4><code>LocateRoot(f, [xa, xb], Imax = Infinity)</code></h4>
+      <p>
+        Calculates a root located in the interval <code>[xa, xb]</code> of an algebraic equation <code>f(x)=0</code> using the <a href="https://en.wikipedia.org/wiki/Brent%27s_method" target="_blank">Brent–Dekker method</a> up to the precision set by <a href="#Precision">$Precision</a>. Returns <code>undefined</code> if <code>f(xa)</code> and <code>f(xb)</code> do not have opposite signs. <code>Imax</code> is an optional parameter that allows placing a hard limit on the number of iterations performed, although even with the infinite value (default) the method is guaranteed to take no more than <code>Log₂(|xb-xa|/$Precision)</code> steps (if the hard limit is reached, the error of the returned value will be greater than <code>$Precision</code>).
+        <code class="block" highlight="JS">
+          xroot = plt.LocateRoot(x => (Math.tan(x) - x/5), [2, 5]);
+        </code>
+      </p>
+    </li>
+    <li><h4><code>FindRoot(f, df, x0, Imax, damp = 1)</code></h4>
+      <p>
+        Searches for a root of an algebraic equation <code>f(x)=0</code> using <a href="https://en.wikipedia.org/wiki/Newton%27s_method" target="_blank">Newton–Raphson method</a> starting from the point <code>x0</code>. Executes until precision <a href="#Precision">$Precision</a> is achieved or the maximum number of iterations <code>Imax</code> is reached. In the latter case, returns <code>undefined</code>. The argumet <code>Imax</code> should be set explicitly to a finite value, because unlike <code>LocateRoot</code> the method is not guaranteed to converge. Requires providing analytical derivative <code>df(x)</code> of the function <code>f(x)</code> (both should be single-valued functions).<br>
+        For sufficiently well-behaved functions with simple derivatives converges faster than <code>LocateRoot</code> and does not require a pre‑estimated interval, but does not guarantee that the returned root will be close to <code>x0</code> or that any root will be found at all.<br>
+        Allows specifying an optional damping factor, which serves as a step multiplier (when the function is called with 4 arguments, <code>damp</code> defaults to <code>1</code>). Values less than <code>1</code> improve stability, but require more steps to converge. Values greater than <code>1</code> can be useful for improving convergence near roots with multiplicity&nbsp;<code>&gt;&nbsp;1</code>.<br>
+      </p>
+    </li>
+    <li><h4><code>NSolve(f, x0s, Imax)</code></h4>
+      <p>
+        Searches for multiple roots of the <code>f(x)=0</code> equation using <code>LocateRoot</code> for each interval between the consecutive values from the <code>x0s</code> array. Returns either an array of the found roots (filtering out <code>undefined</code> results) or an empty array (if no roots were detected). Does not search for more than one root per interval.<br>
+        Recommended for most cases. Use example:
+        <code class="block" highlight="JS">
+          sol = plt.NSolve(x => (Math.tan(x) - x/5), plt.Subdivide([2, 25], 10));
+        </code>
+      </p>
+    </li>
+    <li><h4><code>NRSolve(f, df, x0s, Imax, damp = 1)</code></h4>
+      <p>
+        Searches for multiple roots of the <code>f(x)=0</code> equation using <code>FindRoot</code> for each of the <code>x0</code> values from the array <code>x0s</code>. Filters out repeated results, based on <a href="#Precision">$Precision</a>.
+      </p>
+    </li>
+<!-- todo: RefineRoot and NBSolve for bisection method (max stability) -->
 
   <li><h4 id="NDSolve"><code>NDSolve(f, x0, ts)</code></h4>
   <p>
-    Integrates differential equation <code>x'(t)=f(t, x)</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4) with initial conditions <code>x(ts[0])=x0</code>. The method supports <code>x</code> being either a real number or a vector (array) of arbitrary length. In the vector case, <code>f(t, x)</code> must expect its <code>x</code> argument to be an array and return the result as an array of the same length.
+    Integrates differential equation <code>x'(t)=f(t, x)</code> with initial conditions <code>x(ts[0])=x0</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4). The method supports <code>x</code> being either a real number or a vector (array) of arbitrary length. In the vector case, <code>f(t, x)</code> must expect its <code>x</code> argument to be an array and return the result as an array of the same length.
 Example use:
     <code class="block" highlight="JS">
       function f(t, [x, y, z]) {<br>
@@ -588,12 +594,11 @@ Example use:
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x * y - 0.2 * z<br>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;];<br>
       };<br>
-      sol = plt.NDSolve(f, [1, 1, 10], plt.Subdivide([0, 100], 1000)));
+      sol = plt.NDSolve(f, [1, 1, 10], plt.Subdivide([0, 100], 1000));
     </code>
-Returns result as an array of value pairs <code>[ti, xi]</code>. Plotting example:
+Returns the result as an array of value pairs <code>[ti, xi]</code>. Plotting example:
     <code class="block" highlight="JS">
-      path_string = ListLinePath(sol.map( ([t, [x, y, z]]) => [x, z] ));<br>
-      svgLayer.add("path", "PlotLine").setAttribute("d", path_string);
+      svgLayer.ListLinePlot( sol.map( ([t, [x, y, z]]) => [x, z] ));
     </code>
   </p></li>
   </ul>
