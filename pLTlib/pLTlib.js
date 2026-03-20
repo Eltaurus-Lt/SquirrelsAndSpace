@@ -436,14 +436,73 @@ plt.ListPlot = function(markupLayer, markers, classList = "") {
 
 /* Solvers */
 
-plt.FindRoot = function(f, df, x0, iter, damp = 1) {
+plt.FindRoot = function(f, df, x0, iter, damp = 1) { // Newton-Raphson
   for (let i = 0; i < iter; i++) {
     x0 -= damp * f(x0) / df(x0);
   }
   return([x0, f(x0)]);
 }
 
-plt.NSolve = function(f, df, x0s, iter, damp = 1) {
+plt.LocateRoot = function(f, [a, b], Imax = Infinity) { // Brent-Dekker
+  // init
+  var fa = f(a), fb = f(b);
+  if (fa*fb >= 0) {
+    return fa === 0 ? a : undefined;
+  }
+  const swap = () => {if (Math.abs(fa) < Math.abs(fb)) {
+    [a, b] = [b, a];
+    [fa, fb] = [fb, fa];
+  }};
+  swap();
+  var c = a, fc = fa, s, fs, c_old = c;
+  var m = true; // bisection flag
+
+  for (i = 0; Math.abs(b - a) > $Precision && Math.abs(fb) > 0 && i < Imax ; i++) {
+    const ifafb = 1 / (fa-fb);
+    if (fa !== fc && fb !== fc) { // IQI step
+      const ifafc = 1 / (fa-fc), ifbfc = 1 / (fb-fc);
+      s = a*fb*fc*ifafb*ifafc - b*fa*fc*ifafb*ifbfc + c*fa*fb*ifafc*ifbfc;
+    } else { // secant step
+      s = b - fb * (b-a) * ifafb;
+    }
+    const Asb = 2*Math.abs(s-b), Abc = Math.abs(b-c), Aco = Math.abs(c-c_old);
+    const δ = 2 * Number.EPSILON * Math.abs(b) + $Precision;
+    if ((s - b) * (4*s - 3*a - b) >= 0 || // s ∉ [(3a+b)/4, b]
+      (m && Asb >= Abc) || (!m && Asb >= Aco) ||
+      (m && Abc < δ) || (!m && Aco < δ) ) {
+        s = (a+b) / 2; // bisection step
+        m = true;
+    } else {
+      m = false;
+    }
+
+    fs = f(s);
+
+    c_old = c;
+    c = b;
+    if (fa * fs < 0) {
+      b = s;
+    } else {
+      a = s;
+    }
+    swap();
+  }
+  return b;
+}
+
+plt.NSolve = function(f, x0s, Imax = Infinity) {
+  const sol = [];
+  var x;
+  for (let i = 1; i < x0s.length; i++) {
+    x = plt.LocateRoot(f, [x0s[i-1], x0s[i]], Imax);
+    if (x !== undefined) {
+      sol.push(x);
+    }
+  }
+  return(sol);
+}
+
+plt.NRSolve = function(f, df, x0s, iter, damp = 1) {
   const sol = x0s.map(x0 => plt.FindRoot(f, df, x0, iter, damp))
                  .filter(([x, f]) => (Math.abs(f) < 10*$Precision))
                  .map(([x, f]) => x);

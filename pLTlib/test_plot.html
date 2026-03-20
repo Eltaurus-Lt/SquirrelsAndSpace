@@ -51,7 +51,7 @@
 <div id="controlPanel">
   <input pltvar="t" autoplay loop=true type=range min=-1.2 max=1.2 step=any value=0>
   <input pltvar="k" autoplay loop=true type=range min=1 max=10 step=any value=5>
-  <input pltvar="ω" autoplay loop=true type=range min=0.2 max=1.5 step=any value=5>
+  <input pltvar="ω" autoplay loop=true type=range min=0.2 max=4 step=any value=1.5>
 </div>
 
 
@@ -73,10 +73,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   plt.dynamic.push(({k, t, ω}) => {
-    cosL.setAttribute("d", plt.BezierPlot(t=>Math.cos(ω*t),t=>-ω*Math.sin(ω*t), plt.Subdivide([-10, 10], 30)));
+    cosL.setAttribute("d", plt.BezierPlot(t=>Math.cos(ω*t),t=>-ω*Math.sin(ω*t), plt.Subdivide([-10, 10], 50)));
 
 
-    const sol = plt.NSolve(x=>(x/k + t - Math.cos(ω*x)),x=>(1/k + ω*Math.sin(ω*x)), plt.Subdivide([-15, 15], 20), 10);
+    const sol = plt.NSolve(x=>(x/k + t - Math.cos(ω*x)), plt.Subdivide([-10, 10], 1000));
 
     markerLayer.innerHTML = "";
     plt.ListPlot(markerLayer, sol.map(x=>[x, x/k + t]), "outlined");
