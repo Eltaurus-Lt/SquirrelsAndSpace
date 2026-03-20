@@ -571,36 +571,37 @@ labels (WiP)
         Searches for multiple roots of the <code>f(x)=0</code> equation using <code>LocateRoot</code> for each interval between the consecutive values from the <code>x0s</code> array. Returns either an array of the found roots (filtering out <code>undefined</code> results) or an empty array (if no roots were detected). Does not search for more than one root per interval.<br>
         Recommended for most cases. Use example:
         <code class="block" highlight="JS">
-          sol = plt.NSolve(x => (Math.tan(x) - x/5), plt.Subdivide([2, 25], 10));
+          sol = plt.NSolve(x => (Math.sin(1/x) - x*x), plt.Subdivide([.05, 1], 100));
         </code>
       </p>
     </li>
     <li><h4><code>NRSolve(f, df, x0s, Imax, damp = 1)</code></h4>
       <p>
-        Searches for multiple roots of the <code>f(x)=0</code> equation using <code>FindRoot</code> for each of the <code>x0</code> values from the array <code>x0s</code>. Filters out repeated results, based on <a href="#Precision">$Precision</a>.
+        Searches for multiple roots of the <code>f(x)=0</code> equation using <code>FindRoot</code> for each of the <code>x0</code> values from the array <code>x0s</code>. Returns the roots sorted in ascending order, filters out repeated values based on <a href="#Precision">$Precision</a>.
       </p>
     </li>
 <!-- todo: RefineRoot and NBSolve for bisection method (max stability) -->
 
   <li><h4 id="NDSolve"><code>NDSolve(f, x0, ts)</code></h4>
-  <p>
-    Integrates differential equation <code>x'(t)=f(t, x)</code> with initial conditions <code>x(ts[0])=x0</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4). The method supports <code>x</code> being either a real number or a vector (array) of arbitrary length. In the vector case, <code>f(t, x)</code> must expect its <code>x</code> argument to be an array and return the result as an array of the same length.
-Example use:
-    <code class="block" highlight="JS">
-      function f(t, [x, y, z]) {<br>
-      &nbsp;&nbsp;return [<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 * (y - x),<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x * (15 - z) - y,<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x * y - 0.2 * z<br>
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;];<br>
-      };<br>
-      sol = plt.NDSolve(f, [1, 1, 10], plt.Subdivide([0, 100], 1000));
-    </code>
-Returns the result as an array of value pairs <code>[ti, xi]</code>. Plotting example:
-    <code class="block" highlight="JS">
-      svgLayer.ListLinePlot( sol.map( ([t, [x, y, z]]) => [x, z] ));
-    </code>
-  </p></li>
+    <p>
+      Integrates differential equation <code>x'(t)=f(t, x)</code> with initial conditions <code>x(ts[0])=x0</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4). The method supports <code>x</code> being either a real number or a vector (array) of arbitrary length. In the vector case, <code>f(t, x)</code> must expect its <code>x</code> argument to be an array and return the result as an array of the same length.
+      Example use:
+        <code class="block" highlight="JS">
+          function f(t, [x, y, z]) {<br>
+          &nbsp;&nbsp;return [<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2 * (y - x),<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x * (15 - z) - y,<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x * y - 0.2 * z<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;];<br>
+          };<br>
+          sol = plt.NDSolve(f, [1, 1, 10], plt.Subdivide([0, 100], 1000));
+        </code>
+        Returns the result as an array of value pairs <code>[ti, xi]</code>. Plotting example:
+        <code class="block" highlight="JS">
+          svgLayer.ListLinePlot( sol.map( ([t, [x, y, z]]) => [x, z] ));
+        </code>
+      </p>
+    </li>
   </ul>
 
 

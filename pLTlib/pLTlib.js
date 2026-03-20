@@ -482,8 +482,10 @@ plt.LocateRoot = function(f, [a, b], Imax = Infinity) { // Brent-Dekker
     c = b;
     if (fa * fs < 0) {
       b = s;
+      fb = fs;
     } else {
       a = s;
+      fa = fs;
     }
     swap();
   }
