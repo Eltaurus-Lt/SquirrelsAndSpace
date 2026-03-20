@@ -8,10 +8,10 @@
   <title>Quadratic transform</title>
   <meta name="author" content="Eltaurus">
 
-  <link rel="stylesheet" href="styles.css">
-
   <script defer src="../../pLTlib/pLTlib.js"></script>
   <link rel="stylesheet" href="../../pLTlib/pLTlib.css">
+
+  <link rel="stylesheet" href="styles.css">
 
   <!--<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> 
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
@@ -23,15 +23,15 @@
 </head>
 <body>
 
-<div class="plot" PlotRange="2.64" AspectRatio="1.33">
-  <svg class="layer"></svg>
-  <svg class="layer"><line class="seam" x2="5"></line></svg>
-  <div class="layer axes" TicksX="[[.5, '\(\frac{1}{2}\)'], 1 ,2, 3]" TicksY="[[.5, '\(\frac{i}{2}\)'], 1 ,2, 3]" MergeOrigin></div>
-  <svg class="layer"></svg>
+<div class="Plot" PlotRange="2.64" AspectRatio="1.33">
+  <svg class="Layer"></svg>
+  <svg class="Layer"><line class="seam" x2="5"></line></svg>
+  <div class="Layer" Axes TicksX="[[.5, '$\\frac{1}{2}$'], 1 ,2, 3]" TicksY="[[.5, '$\\frac{i}{2}$'], 1 ,2, 3]" MergeOrigin></div>
+  <svg class="Layer" id="frame"></svg>
 </div>
 
 <div id="controlPanel">
-  <input var="t" class="plotSlider" autoplay loop="true" type="range" min="0" max="1" step="any" value="0">
+  <input pltvar="t" autoplay loop=true type=range min=0 max=1 step=any value=0>
 </div>
 
 
@@ -39,7 +39,7 @@
 const arcRs = [1/2, 1, 1.5, 2, 2.5, 3, 4];
 
 document.addEventListener("DOMContentLoaded", () => {
-const plotL = document.querySelector(".layer");
+const plotL = document.querySelector(".Layer");
 
 /* sectors */
 for (let i = 1; i <= 8; i++) {
@@ -51,7 +51,7 @@ for (let i = 1; i <= 8; i++) {
       secL.classList.add(i <= 4 ? "bgSec2" : "bgSec4");
     }
     if ((i + Ri) % 2 === 0) {secL.classList.add("pale")};
-    dynamic.push(({t}) => {
+   plt.dynamic.push(({t}) => {
       const r0 = Ri > 0 ? Math.pow( arcRs[Ri-1], 1 + t ) : 0;
       const r1 = Math.pow( arcRs[Ri], 1 + t );
       const da = (1 + t) * Math.PI / 8;
@@ -64,14 +64,13 @@ for (let i = 1; i <= 8; i++) {
          A ${r1} ${r1} 0 0 0 ${r1 * Math.cos(a0)} ${r1 * Math.sin(a0)}
          Z`);
     });
- }
+  }
 }
 
 /* rays */
 for (let i = 1; i <= 8; i++) {
-  const lineL = plotL.add("line");
-  lineL.classList.add('thickGrid');
-  dynamic.push(({t}) => {
+  const lineL = plotL.add("line", "PlotLine");
+  plt.dynamic.push(({t}) => {
     const a = i * (1 + t) * Math.PI / 8;
     lineL.setAttribute("x2", arcRs.at(-1) * Math.cos(a));
     lineL.setAttribute("y2", arcRs.at(-1) * Math.sin(a));
@@ -80,16 +79,15 @@ for (let i = 1; i <= 8; i++) {
 
 /* arcs */
 for (const R of arcRs) {
-  const arcL = plotL.add("path");
-  arcL.classList.add('thickGrid');
-  dynamic.push(({t}) => {
+  const arcL = plotL.add("path", "PlotLine");
+  plt.dynamic.push(({t}) => {
     const a = (1 + t) * Math.PI;
     const r = Math.pow(R, 1 + t);
     arcL.setAttribute("d", `M ${r} 0 A ${r} ${r} 0 1 1 ${r * Math.cos(a)} ${r * Math.sin(a)}`);
   });
 }
 
-update(); /* init */
+plt.update(); /* init */
 
 });
 </script>
