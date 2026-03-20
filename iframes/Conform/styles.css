@@ -1,10 +1,22 @@
-.plot {
+.Plot {
+  border: none;
   background: black;
 }
 
-.plot > :last-child {
+.Plot > :last-child {
   outline: 5px solid white;
   outline-offset: -5px;
+}
+
+:root {
+  --cf-orange: #ff9c59;
+  --cf-orange-pale: #ffc8a3;
+  --cf-yellow: #ffdf57;
+  --cf-yellow-pale: #ffefa3;
+  --cf-blue: #59c7ff;
+  --cf-blue-pale: #b5e6ff;
+  --cf-green: #62ffc6;
+  --cf-green-pale: #a3ffde;
 }
 
 .bgSec1 {
@@ -36,10 +48,9 @@
 }
 
 
-.thickGrid {
-  fill: none;
-  stroke: white;
-  stroke-width: 2px;
+.PlotLine {
+  --Color: white;
+  --Thickness: 2.5px;
 }
 
 .seam {

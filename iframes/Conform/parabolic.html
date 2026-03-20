@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" class="-debug">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Quadratic transform</title>
+  <meta name="author" content="Eltaurus">
+
+  <script defer src="../../pLTlib/pLTlib.js"></script>
+  <link rel="stylesheet" href="../../pLTlib/pLTlib.css">
+
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="gradientMap.js"></script>
+
+  <!--
+<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> 
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+-->
+
+<style>
+
+.shape1 {
+  opacity: 0.125;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+.shape2 {
+  opacity: 0.25;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+.shape3 {
+  opacity: 0.5;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+.shape4 {
+  opacity: 0.125;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+</style>
+</head>
+<body>
+
+<div class="Plot" PlotRange=5.25 AspectRatio=1.3333>
+  <svg id="BG" class="Layer" style="background: black" filter="url(#gradientMap)">
+  <defs>
+    <filter id="gradientMap" color-interpolation-filters="sRGB">
+      <feComponentTransfer>
+        <feFuncR type="table"/>
+        <feFuncG type="table"/>
+        <feFuncB type="table"/>
+        <feFuncA type="identity" />
+      </feComponentTransfer>
+    </filter>
+  </defs>
+
+</svg>
+<svg id="mesh" class="Layer"></svg>
+<div class="Layer" Axes></div>
+<svg id="frame" class="Layer"><line class="seam" x2="7"></line></svg>
+</div>
+
+<div id="controlPanel">
+  <input pltvar="t" autoplay loop=true type=range min=0 max=1 step=any value=0>
+</div>
+
+
+<script>
+
+
+
+
+const π=Math.PI;
+const Nlines = 11, Len = 10;
+document.addEventListener("DOMContentLoaded", () => {
+const meshL = document.getElementById('mesh');
+const bgL = document.getElementById('BG');
+
+
+/* vertical lines */
+const vl = [];
+for (let i = 0; i < Nlines; i++) {
+  vl.push(meshL.add("path","PlotLine"));
+}
+const vl2 = [];
+for (let i = 0; i < Nlines; i++) {
+  vl2.push(meshL.add("path", "PlotLine"));
+}
+const hl = [];
+for (let i = 0; i < Nlines; i++) {
+  hl.push(meshL.add("path", "PlotLine"));
+}
+
+const bnd = meshL.add("path", "PlotLine");
+const div = meshL.add("path", "PlotLine");
+
+/* shapes */
+const shapes1 = [bgL.add("path", "shape1")]; // vertical stripes
+for (let i = 1; i < Nlines-1; i += 2) {
+  shapes1.push(bgL.add("path", "shape1"));
+  shapes1.push(bgL.add("path", "shape1"));
+}
+const shapes2 = [bgL.add("path", "shape2")]; // horizontal stripes
+for (let i = 0; i < Nlines-1; i+=2) { // horizontal stripes
+  shapes2.push(bgL.add("path", "shape2"));
+  shapes2.push(bgL.add("path", "shape2"));
+}
+const shape3 = bgL.add("path", "shape3"); // quadrant
+const shape4 = bgL.add("path", "shape4"); // area
+
+
+const conf = function(x0, alpha) {
+  return (y) => {
+    const A = Math.pow(x0*x0 + y*y, .5*alpha);
+    const arg = alpha * Math.atan2(y, x0);
+    return [A * Math.cos(arg), A * Math.sin(arg)];
+  };
+}
+
+plt.dynamic.push(({t}) => {
+  const pathStringsV1 = [];
+  const pathStringsV2 = [];
+  const pathStringsH = [];
+  const ca = Math.cos(π*t), sa = Math.sin(π*t);
+  const hca = Math.cos(π*t/2), hsa = Math.sin(π*t/2);
+  for (let i = 0; i < Nlines; i++) { // cartesian mesh
+    const f = conf((i + 1)/2, t + 1);
+
+    const points = plt.Subdivide(i % 2 === 0 ? [0, Len] : [Len, 0], 4*Len).map(f);
+    pathStringsV1.push(plt.BezierListPlot(points));
+    const pointsh1 = points.map(([x,y])=>[y*hca-x*hsa, x*hca+y*hsa]);
+
+    points.reverse();
+    pathStringsV2.push(plt.BezierListPlot(points.map(([x,y])=>[-x*ca-y*sa, y*ca-x*sa])));
+    const pointsh2 = points.map(([x,y])=>[-y*hca-x*hsa, x*hca-y*hsa]);
+
+    pathStringsH.push(plt.BezierListPlot(i % 2 === 0 ? [...pointsh2, ...pointsh1.slice(1)] : [...pointsh1, ...pointsh2.slice(1)]));
+
+    vl[i].setAttribute("d", pathStringsV1[i]);
+    vl2[i].setAttribute("d", pathStringsV2[i]);
+    hl[i].setAttribute("d", pathStringsH[i]);
+
+    bnd.setAttribute("d", `M ${Len} 0 L 0 0 L ${-Len*ca} ${-Len*sa}`);
+    div.setAttribute("d", `M 0 0 L ${-Len*hsa} ${Len*hca}`);
+
+  }
+
+  shapes1[0].setAttribute("d", pathStringsV2[0] + "L 0 0 L" + pathStringsV1[0].slice(1));
+  for (let i = 1; i < Nlines-1; i+=2) { // vertical stripes
+    shapes1[i].setAttribute("d", pathStringsV1[i] + "L" + pathStringsV1[i+1].slice(1));
+    shapes1[i+1].setAttribute("d", pathStringsV2[i] + "L" + pathStringsV2[i+1].slice(1));
+  }
+  for (let i = 0; i < Nlines-1; i+=2) { // horizontal stripes
+    shapes2[i].setAttribute("d", pathStringsH[i] + "L" + pathStringsH[i+1].slice(1));
+  }
+  shape3.setAttribute("d", `M 0 0 L ${-Len*hsa} ${Len*hca} A ${Len} ${Len} 0 0 0 ${Len} 0`);
+  shape4.setAttribute("d", `M 0 0 L ${-Len*ca}  ${-Len*sa} A ${Len} ${Len} 0 1 0 ${Len} 0`);
+
+});
+
+
+plt.update(); /* init */
+
+});
+</script>
+
+</body>
+</html>
