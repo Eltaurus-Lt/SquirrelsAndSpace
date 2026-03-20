@@ -128,7 +128,17 @@ plt._addadddivmethod = function(parentL) {
     parentL.appendChild(childL);
     return childL;
   }
-}  
+} 
+
+// .add() method to all SVG elements
+SVGElement.prototype.add = function(childType, classList = "") {
+    const childL = document.createElementNS("http://www.w3.org/2000/svg", childType);
+    if (classList) {
+      childL.classList.add(...classList.split(" "));
+    }
+    this.appendChild(childL);
+    return childL;
+}
 
 document.querySelectorAll("div.Plot").forEach(plotL => {
   const plotSettings = plt.getPlotSettings(plotL);
@@ -143,21 +153,11 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
     layer.style.aspectRatio = plotSettings["AspectRatio"];
     layer.setAttribute("preserveAspectRatio", "none");
 
-    /* general method for adding elements */
-    layer.add = (childType, classList = "") => {
-      const childL = document.createElementNS("http://www.w3.org/2000/svg", childType);
-      if (classList) {
-        childL.classList.add(...classList.split(" "));
-      }
-      layer.appendChild(childL);
-      return childL;
-    }
-
     // set viewboxes
     layer.setAttribute('viewBox', `${plotSettings["Left"]} ${plotSettings["Bottom"]} ${RangeX} ${RangeY}`);
   });
 
-  /* Web Layers */
+  /* Markup Layers */
   function addTicks([axisL, tag, P], [start, end], [ticks, subticks]) {
     const subs = Math.round(subticks) || 1;
     const iStart = Math.floor((plotSettings[start] - 0) / ticks) * subs;
