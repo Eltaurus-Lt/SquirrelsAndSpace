@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" class="-debug">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Exponential transform</title>
+  <meta name="author" content="Eltaurus">
+
+  <script defer src="../../pLTlib/pLTlib.js"></script>
+  <link rel="stylesheet" href="../../pLTlib/pLTlib.css">
+
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="gradientMap.js"></script>
+
+  <!--
+<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> 
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+-->
+
+<style>
+
+.shape0 {
+  opacity: 0.125;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+.shape1 {
+  opacity: 0.25;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+.shape2 {
+  opacity: 0.5;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+#controlPanel {
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<div class="Plot" PlotRange=6.7 AspectRatio=1.3333>
+  <svg id="BG" class="Layer" style="background: black" filter="url(#gradientMap)">
+  <defs>
+    <filter id="gradientMap" color-interpolation-filters="sRGB">
+      <feComponentTransfer>
+        <feFuncR type="table"/>
+        <feFuncG type="table"/>
+        <feFuncB type="table"/>
+        <feFuncA type="identity" />
+      </feComponentTransfer>
+    </filter>
+  </defs>
+
+</svg>
+<svg id="mesh" class="Layer"></svg>
+<div class="Layer" Axes></div>
+<svg id="frame" class="Layer"><line class="seam" x2="-10"/></svg>
+</div>
+
+<div id="controlPanel">
+  k
+  <input pltvar="k" autoplay loop=true type=range min=0 max=1 step=any value=0>
+  t
+  <input pltvar="t" autoplay loop=true type=range min=0 max=1 step=any value=0>
+</div>
+
+
+<script>
+
+
+
+
+const π = Math.PI;
+const Nin = 24, Nout = 8; // both must be even
+const seamL = document.querySelector(".seam");
+
+document.addEventListener("DOMContentLoaded", () => {
+plt.unwrap(Math);
+
+function hors(k, t, y0) {
+  if (t === 0) {
+    return (x) => [x*(1-k)+k*exp(x), y0];
+  }
+  return (x) => {
+    const R = k*(1+t*(exp(x)-1))+(1-k)*exp(x*t);
+    const it = 1/t;
+    return [it*(R*cos(t*y0)-1)+(k+t-k*t), it*R*sin(t*y0)];
+  }
+}
+function cx(k, t) {
+  return (k+t-k*t)-1/t;
+}
+function R(k,t) {
+  return x0 => ((k*(1+t*(exp(x0)-1))+(1-k)*exp(x0*t)) / t);
+}
+const mirror = ([x,y]) => [x, -y];
+
+const meshL = document.getElementById('mesh');
+const bgL = document.getElementById('BG');
+
+
+const CircLines = [];
+for (let i = 0; i < Nin+Nout+1; i++) {
+  CircLines.push(meshL.add("path", "PlotLine"));
+}
+const RadialLines = [];
+for (let i = 0; i < 3; i++) {
+  RadialLines.push(meshL.add("path", "PlotLine"));
+}
+
+// Regions
+const fillR = bgL.add("path", "shape0");
+const checkerR = bgL.add("path", "shape0");
+const bottomR = bgL.add("path", "shape1");
+const outerR = bgL.add("path", "shape2");
+
+
+plt.dynamic.push(({k, t}) => {
+  const Ox = cx(k, t);
+
+  const Rs = plt.Subdivide([-Nin, Nout], Nin+Nout).map(R(k,t));
+  const es = plt.Subdivide([-Nin, Nout], Nin+Nout).map(hors(k,t,π));
+
+  checkerString = "";
+  outerString = "";
+  for (let i = 0; i < Nin+Nout+1; i++) {
+    const s = (i%2 === 0) ? 1 : -1;
+    if (t > 0) {
+      pathString = `M ${es[i][0]} ${-s*es[i][1]} A ${Rs[i]} ${Rs[i]} 0 0 ${Number(s>0)} ${Ox+Rs[i]} 0 A ${Rs[i]} ${Rs[i]} 0 0 ${Number(s>0)} ${es[i][0]} ${s*es[i][1]}`;
+    } else {
+      pathString = `M ${es[i][0]} ${-s*π} L ${es[i][0]} ${s*π}`;
+    }
+    checkerString += "L"+pathString.slice(1);
+    if (i === 0) {
+      pathString = `M ${mirror(es.at(-1)).join(" ")} L` + pathString.slice(1) + ` L ${es.at(-1).join(" ")}`
+      if (t > 0.4) {
+        fillR.setAttribute("d", `M 20 -20 L -20 -20 L` + pathString.slice(1) + " L -20 20 L 20 20");
+      } else {
+        fillR.setAttribute("d", pathString);
+      }
+    }
+    if (i === Nin) {
+      outerString = pathString;
+    }
+    if (i === Nin+Nout) {
+      if (t > 0) {
+         outerString += `L ${es[i][0]} ${s*es[i][1]} A ${Rs[i]} ${Rs[i]} 0 0 ${Number(s<0)} ${Ox+Rs[i]} 0 A ${Rs[i]} ${Rs[i]} 0 0 ${Number(s<0)} ${es[i][0]} ${-s*es[i][1]} `;
+      } else {
+         outerString += `L ${es[i][0]} ${s*π} L ${es[i][0]} ${-s*π}`;
+      }
+    }
+    CircLines[i].setAttribute("d", pathString);
+  }
+  outerR.setAttribute("d", outerString);
+  if (t > 0) {
+    pathString = `M ${es[0][0]} ${-es[0][1]} A ${Rs[0]} ${Rs[0]} 0 0 1 ${Ox+Rs[0]} 0 L ${Ox+Rs.at(-1)} 0 A ${Rs.at(-1)} ${Rs.at(-1)} 0 0 0 ${es.at(-1)[0]} ${-es.at(-1)[1]}`;
+  } else {
+    pathString = `M ${es[0][0]} ${-π} L ${es[0][0]} 0 L ${es.at(-1)[0]} 0 L ${es.at(-1)[0]} ${-π}`;
+  }
+  bottomR.setAttribute("d", pathString);
+  
+  const innerPoints = [hors(k,t,0)(-Nin), hors(k,t,.5*π)(-Nin)];
+  const outerPoints = [hors(k,t,0)(Nout), hors(k,t,.5*π)(Nout)];
+  RadialLines[0].setAttribute("d", `M ${mirror(innerPoints[1]).join(" ")} L ${mirror(outerPoints[1]).join(" ")}`);
+  RadialLines[1].setAttribute("d", `M ${innerPoints[0].join(" ")} L ${outerPoints[0].join(" ")}`);
+  RadialLines[2].setAttribute("d", `M ${innerPoints[1].join(" ")} L ${outerPoints[1].join(" ")}`);
+
+  if (t > 0) {
+    checkerString += `A ${Rs[Nin+Nout]} ${Rs[Nin+Nout]} 0 0 0 ${outerPoints[1].join(" ")} 
+                      L ${innerPoints[1].join(" ")} A ${Rs[0]} ${Rs[0]} 0 0 0 ${innerPoints[0].join(" ")} 
+                      L ${outerPoints[0].join(" ")} A ${Rs[Nin+Nout]} ${Rs[Nin+Nout]} 0 0 0 ${mirror(outerPoints[1]).join(" ")}
+                      L ${mirror(innerPoints[1]).join(" ")}`;
+  } else {
+    checkerString += `L ${outerPoints[1].join(" ")} 
+                      L ${innerPoints[1].join(" ")} L ${innerPoints[0].join(" ")} 
+                      L ${outerPoints[0].join(" ")} L ${mirror(outerPoints[1]).join(" ")}
+                      L ${mirror(innerPoints[1]).join(" ")}`;
+  }  
+  checkerR.setAttribute("d", "M" + checkerString.slice(1));
+
+  seamL.setAttribute("x1", max(Ox, -10));
+  });
+
+plt.update(); /* init */
+
+});
+</script>
+
+</body>
+</html>
