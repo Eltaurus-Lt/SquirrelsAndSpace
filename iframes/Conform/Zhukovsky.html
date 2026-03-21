@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" class="-debug">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Zhukovsky transform</title>
+  <meta name="author" content="Eltaurus">
+
+  <script defer src="../../pLTlib/pLTlib.js"></script>
+  <link rel="stylesheet" href="../../pLTlib/pLTlib.css">
+
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="gradientMap.js"></script>
+
+  <!--
+<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> 
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+-->
+
+<style>
+
+.shape0 {
+  opacity: 0.125;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+.shape1 {
+  opacity: 0.25;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+.shape2 {
+  opacity: 0.5;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="Plot" PlotRange=3 AspectRatio=1.3333>
+  <svg id="BG" class="Layer" style="background: black" filter="url(#gradientMap)">
+  <defs>
+    <filter id="gradientMap" color-interpolation-filters="sRGB">
+      <feComponentTransfer>
+        <feFuncR type="table"/>
+        <feFuncG type="table"/>
+        <feFuncB type="table"/>
+        <feFuncA type="identity" />
+      </feComponentTransfer>
+    </filter>
+  </defs>
+
+</svg>
+<svg id="mesh" class="Layer"></svg>
+<div class="Layer" Axes></div>
+<svg id="frame" class="Layer"><line class="seam" x1="1" x2="7"/><line class="seam" x1="-1" x2="-7"/></svg>
+</div>
+
+<div id="controlPanel">
+  <input pltvar="t" autoplay loop=true type=range min=0 max=1 step=any value=0>
+</div>
+
+
+<script>
+
+
+
+
+const π = Math.PI;
+const Dmax = 4;
+
+function Power(x, y, alpha) {
+  const A = Math.pow(x*x + y*y, .5*alpha);
+  const arg = alpha * Math.atan2(y, x);
+  return [A * Math.cos(arg), A * Math.sin(arg)];
+}
+function KarmanTrefftzF(alpha) {
+  return (x, y) => {
+    if (y === 0 && Math.abs(x) === 1) return [x, 0];
+    const [Rl, Il] = Power(x+1, y, alpha);
+    const [Rr, Ir] = Power(x-1, y, alpha);
+
+    const iD = 1 / ((Il-Ir)*(Il-Ir) + (Rl-Rr)*(Rl-Rr));
+  
+    return [ ( Il*Il - Ir*Ir + Rl*Rl - Rr*Rr )*iD, 2*( Ir*Rl - Il*Rr )*iD ];
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+plt.unwrap(Math);
+
+const meshL = document.getElementById('mesh');
+const bgL = document.getElementById('BG');
+
+
+const meshLines = [];
+for (let i = 0; i < 6; i++) {
+  meshLines.push(meshL.add("path", "PlotLine"));
+}
+const shapes = [];
+shapes.push(bgL.add("path", "shape0")); // fill
+shapes.push(bgL.add("path", "shape0")); // left hyperbolic stripe
+shapes.push(bgL.add("path", "shape0")); // right hyperboic stipe
+shapes.push(bgL.add("path", "shape1")); // ellipse
+shapes.push(bgL.add("path", "shape2")); // half-plane
+
+
+
+const mirror = ([x,y]) => [-x,y];
+
+plt.dynamic.push(({t}) => {
+  const Oy = -Math.tan(.5*π*t);
+
+  const KT = KarmanTrefftzF(t + 1);
+
+  // ellipse top
+  points = plt.Subdivide([π, 0], 15).map(φ=>KT( 2*cos(φ), 2*sin(φ) ));
+  const ellipseTop = plt.BezierListPlot(points);
+  meshLines[1].setAttribute("d", ellipseTop);
+  // ellipse mid
+  points = plt.Subdivide([0, π], 15).map(φ=>KT( cos(φ), sin(φ) ));
+  const midLine = plt.BezierListPlot(points);
+  meshLines[2].setAttribute("d", midLine);
+  // ellipse bottom
+  points = plt.Subdivide([0, π], 15).map(φ=>KT( .5*cos(φ), .5*sin(φ) ));
+  const ellipseBottom = plt.BezierListPlot(points);
+  meshLines[3].setAttribute("d", ellipseBottom);
+  
+  // hyperbolae
+  points = [];  
+  const as = plt.Subdivide([2*Dmax, -2* Dmax], 20).map(y1 => (y1 + sqrt(y1*y1+.5))); // remap initial distribution for more uniformity after transform
+  for (const a of as) {
+    points.push(KT(a, a));
+  };
+  if (points.at(-1)[1] > -Dmax) { // refine the tip
+    for (const a1 of plt.Subdivide([as.at(-1), 0], 10).slice(1, -1) ) {
+      points.push(KT(a1, a1));
+    }
+    points.push([0, Oy]);
+  }
+  const hyperRight = plt.BezierListPlot(points);
+  meshLines[4].setAttribute("d", hyperRight);
+  let hyperLeft = plt.BezierListPlot(points.map(mirror));
+  meshLines[5].setAttribute("d", hyperLeft);
+
+  // bottom edge
+  points = []; let cut = false;
+  pointsShort = [];
+  for (let x0 = 1; x0 > 0; x0-=.01) {
+    const pt = KT(x0, 0);
+    points.push(pt);
+    if (x0 > .5) pointsShort.push(pt);
+    if (pt[1] < -Dmax || pt[0] > Dmax) {cut = true; break;}
+  }
+  let bottomLine, bottomLeft;
+  if (!cut) {
+    const bottomLeftPoints = [...points].reverse().map(mirror);
+    bottomLine = plt.BezierListPlot([...points, [0, Oy], ...bottomLeftPoints]);
+    bottomLeft = plt.BezierListPlot(bottomLeftPoints);
+  } else {
+    bottomLine = plt.BezierListPlot(points);
+    if (points.at(-1)[0] > Dmax) {
+      bottomLine += `L ${Dmax} ${-Dmax}`;
+      bottomLine += `L ${-Dmax} ${-Dmax}`;
+      hyperLeft += `L ${-Dmax} ${-Dmax}`;
+    }
+    bottomLeft = "L" + plt.BezierListPlot(points.reverse().map(mirror)).slice(1);
+    bottomLine += bottomLeft;
+  }
+  meshLines[0].setAttribute("d", bottomLine);
+
+  // regions
+  shapes[0].setAttribute("d", bottomLine + `L ${-Dmax} 0 L ${-Dmax} ${Dmax} L ${Dmax} ${Dmax} L ${Dmax} 0` );
+  shapes[1].setAttribute("d", hyperLeft + "L" + bottomLeft.slice(1) + `L ${-Dmax} 0`);
+  shapes[2].setAttribute("d", hyperRight + `L 0 ${max(Oy , -Dmax)} L 0 ${Dmax}`);
+  shapes[3].setAttribute("d", plt.BezierListPlot(pointsShort) 
+                              + "L" + ellipseBottom.slice(1)
+                              + "L" + plt.BezierListPlot(pointsShort.map(mirror).reverse()).slice(1)
+                              + "L" + ellipseTop.slice(1));
+  shapes[4].setAttribute("d", midLine + `L ${-Dmax} 0 L ${-Dmax} ${Dmax} L ${Dmax} ${Dmax} L ${Dmax} 0` );
+});
+
+
+plt.update(); /* init */
+
+});
+</script>
+
+</body>
+</html>
