@@ -26,8 +26,13 @@
 }
 
 body {
-  max-width: 900px;
-  margin: 0 auto;
+ max-width: 900px;
+ margin: 0 auto;
+}
+@media(min-width: 750px) {
+  body {
+    font-size: 24px !important;
+  }
 }
 
 .PlotLine {
@@ -64,9 +69,15 @@ stroke-width: 0.15;
 </div> 
 </div>
 
+ρ
 <input pltvar="ρ" type="range" min="0" max="28" step="any" value="15"> 
+σ
 <input pltvar="σ" type="range" min="0" max="10" step="any" value="2"> 
+β
 <input pltvar="β" type="range" min="0" max="2.66667" step="any" value="0.2"> 
+<br>
+<br>
+rotation
 <input pltvar="φ" type="range" min="0" max="6.28318530" step="any" value="1"> 
 
 
