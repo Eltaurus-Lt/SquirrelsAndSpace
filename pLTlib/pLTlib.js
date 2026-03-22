@@ -158,6 +158,31 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
   });
 
   /* Markup Layers */
+  function addTick([axisL, tag, P], [start, tick], sub = false) {
+    let pos, label;
+    if (typeof tick === "number") {
+      pos = tick; label = String(pos);
+    } else { // custom tick
+      pos = tick[0];
+      label = tick[1];
+    }
+    const tickL = axisL.add(`Tick ${tag}`);
+    if (sub) {
+      tickL.classList.add("Sub");
+    } else {
+      tickL.add = plt._addadddivmethod(tickL);
+      if (label) {
+        tickL.add("Label").innerText = label;
+      }
+    }
+    if ( Math.abs(pos - 0) < $Precision ) {
+      tickL.classList.add("zero");
+    } else if (pos - 0 < 0) {
+      tickL.classList.add("negative");
+    }
+    tickL.style[start.toLowerCase()] = `${(pos - plotSettings[start]) * P}%`;
+    return tickL;
+  }
   function addTicks([axisL, tag, P], [start, end], [ticks, subticks]) {
     const subs = Math.round(subticks) || 1;
     const iStart = Math.floor((plotSettings[start] - 0) / ticks) * subs;
@@ -165,17 +190,7 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
     for (let i = iStart; i <= iEnd; i++) {
       const pos = ticks * i / subs + 0;
       if (pos < plotSettings[start] || pos > plotSettings[end]) continue;
-      const tickL = axisL.add(`Tick ${tag}`);
-      if (i % subs !== 0 ) {
-        tickL.classList.add("Sub");
-      } else {
-        tickL.add = plt._addadddivmethod(tickL);
-        tickL.add("Label").innerText = `${String(pos)}`;
-      }
-      if ( Math.abs(pos - 0) < $Precision ) {
-        tickL.classList.add("zero");
-      }
-      tickL.style[start.toLowerCase()] = `${(pos - plotSettings[start]) * P}%`;
+      addTick([axisL, tag, P], [start, pos], i % subs !== 0);
     }
   }
 
@@ -205,6 +220,8 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
       /* Ticks */
       if (typeof attrs["TicksY"] === "number") {
         addTicks([axisY, "Y", Py], ["Bottom", "Top"], [attrs["TicksY"], attrs["SubticksY"]] );
+      } else if (Array.isArray(attrs["TicksY"])) {
+        attrs["TicksY"].forEach(tick => addTick([axisY, "Y", Py], ["Bottom", tick]));
       }
 
       /* Arrowheads */
@@ -233,6 +250,8 @@ document.querySelectorAll("div.Plot").forEach(plotL => {
       /* Ticks */
       if (typeof attrs["TicksX"] === "number") {
         addTicks([axisX, "X", Px], ["Left", "Right"], [attrs["TicksX"], attrs["SubticksX"]] );
+      } else if (Array.isArray(attrs["TicksX"])) {
+        attrs["TicksX"].forEach(tick => addTick([axisX, "X", Px], ["Left", tick]));
       }
 
       /* Arrowheads */
