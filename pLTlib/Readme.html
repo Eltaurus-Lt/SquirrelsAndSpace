@@ -65,10 +65,11 @@
     Plots are composed as a container marked with the <code>Plot</code> class and holding multiple layers of <a href="#layers">various types</a>. Example structure:
 
     <code class="block" highlight="HTML">
-      &lt;div class="Plot" PlotRange="[0, 7]" PlotLabel="Example"&gt;<br>
+      &lt;div class="Plot" PlotRange="[0, 7]"&gt;<br>
       &nbsp;&lt;svg class="Layer" id="plotCanvas"&gt;&lt;/svg&gt;<br>
-      &nbsp;&lt;div class="Layer" Axes Arrowheads Ticks="1"&gt;&lt;/div&gt;<br>
+      &nbsp;&lt;div class="Layer" Axes Arrowheads Ticks=1&gt;&lt;/div&gt;<br>
       &nbsp;&lt;svg class="Layer" id="epilog"&gt;&lt;/svg&gt;<br>
+      &nbsp;&lt;div class="Label"&gt;Example&lt;/div&gt;<br>
       &lt;/div&gt;
     </code>
 
@@ -78,7 +79,7 @@
     Graphical content can be added using the provided <a href="#plotting">plotting methods</a> and combined with static elements hardcoded directly into the respective layers:
     <code class="block" highlight="HTML">
       &lt;svg class="Layer" id="plotCanvas"&gt;<br>
-      &nbsp;&lt;circle r="0.5" cx="2" cy="1" &gt;&lt;/circle&gt;<br>
+      &nbsp;&lt;circle r=0.5 cx=2 cy=1 &gt;&lt;/circle&gt;<br>
       &lt;/svg&gt;
     </code>
   </p>
@@ -204,7 +205,7 @@ The included onload function ensures the height of the embedded plot is fit to t
   <p>
     Basic controls can be build using native <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input#input_types" target="_blank">html <code>&lt;input&gt;</code> elements</a>. To make a slider, for example, the following should be put anywhere inside the body of the plot html file (outside of the <code>.Plot</code> container itself):
     <code class="block" highlight="HTML">
-      &lt;input pltvar="k" type="range" min="0" max="1" step="any" value="0.5"&gt;
+      &lt;input pltvar="k" type="range" min=0 max=1 step="any" value=0.5&gt;
     </code>
     The attributes here are <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/range" target="_blank">standard html slider</a> parameters, which can be used to configure the inputs. The only part essential for the plt framework is the <code>pltvar</code> property that indicate a text name for the JavaScript variable to be controlled by the slider. No other setup for the input element itself, regardless of the type, is required to make it fully functional.
   </p>
@@ -249,7 +250,7 @@ function source code analysis to only call functions if the changed value is amo
   <p>
     Extra interactivity, such as plot reacting to keyboard events or mouse clicks on its canvas, can be developed by adding a suitable <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener" target="_blank">event listener</a>. The values of auxiliary dynamic variables not represented by any explicit <code>&lt;input&gt;</code> controls are to be stored in dummy html elements, which can be placed anywhere inside the document (by default, they are not being displayed in any way):
     <code class="block" highlight="HTML">
-      &lt;var pltvar="ω" value="42" &gt;&lt;/var&gt;
+      &lt;var pltvar="ω" value=42 &gt;&lt;/var&gt;
     </code>
 <!-- can be displayed overwriting display: block !important; property and adding ::after with content: attr(value). can even be added to an html layer of the plot -->
     Code for modifying the value of the respective variable from the event listener:
@@ -268,7 +269,7 @@ function source code analysis to only call functions if the changed value is amo
   <p>
     Attributes are used to define structural parameters of the plots and are included inside the opening tag of the respective element:
     <code class="block" highlight="HTML">
-      &lt;div class="Plot" PlotRange="5" AspectRatio="1" ... &gt;
+      &lt;div class="Plot" PlotRange=5 AspectRatio=1 ... &gt;
     </code>
     Can be listed in arbitrary order. The only mandatory attribute is <code>PlotRange</code> – any other can be ommited, if the respective setting is not needed.
   </p>
@@ -280,10 +281,9 @@ function source code analysis to only call functions if the changed value is amo
 
   <ul>
     <li><code>PlotRange="[Xmin, Xmax]"</code> sets horizontal range of the plot. Providing a number <code>A</code> instead of an interval is interpreted as <code>[-A, A]</code>.</li>
-    <li><code>AspectRatio="X"</code> defines the width-to-height ratio of the plot in screen space. If not explicitly set, defaults to the golden ratio <code>≈1.618</code>.</li>
-    <li><code>ScaleRatio="X"</code> defines the <code>1<sub>Y</sub>:1<sub>X</sub></code> ratio of unit lengths along vertical and horizontal axes. Equals <code>1</code> by default, asserting uniform scaling of the plot space to the screen space mapping.</li>
+    <li><code>AspectRatio=X</code> defines the width-to-height ratio of the plot in screen space. If not explicitly set, defaults to the golden ratio <code>≈1.618</code>.</li>
+    <li><code>ScaleRatio=X</code> defines the <code>1<sub>Y</sub>:1<sub>X</sub></code> ratio of unit lengths along vertical and horizontal axes. Equals <code>1</code> by default, asserting uniform scaling of the plot space to the screen space mapping.</li>
     <li><code>RangePivot="[X0, Y0]" (WiP)</code> . </li>
-    <li><code>PlotLabel="label"</code> can be used to label the plot as a whole. </li>
     <!-- todo: plot padding and layer clipping -->
   </ul>
   <p>
@@ -295,7 +295,7 @@ function source code analysis to only call functions if the changed value is amo
   <p>
     Attributes attached to a <code>div.Layer</code> element:
     <code class="block" highlight="HTML">
-      &lt;div class="Layer" Frame Grid Ticks="1" TicksRight="[[.5, '$\\frac{1}{2}$'], 1, [1.618, '$\\varphi$']]" ... &gt;
+      &lt;div class="Layer" Frame Grid Ticks=1 TicksRight="[[.5, '$\\frac{1}{2}$'], 1, [1.618, '$\\varphi$']]" ... &gt;
     </code>
 <!-- todo: \\ and $$ -->
     Primarily control overlayed details, such as ticks and text labels. The details do not have any default values – plots display what have been explicitly declared. Attributes that appear without values practically serve as toggles, with the result depending only on whether their name is attached to the <code>&lt;div&gt;</code> at all:
@@ -304,11 +304,11 @@ function source code analysis to only call functions if the changed value is amo
       <li><code>Axes</code> toggles axes on the HTML layer. Individually, horizontal and vertical axes can be toggled by <code>AxisX</code> and <code>AxisY</code> respectively. </li>
       <li><code>Arrowheads</code> toggles arrowheads on the ends of axes (have no effect on layers without any of the <code>Axes</code> attributes). <code>ArrowheadRight</code>, <code>ArrowheadTop</code> (as well as <code>ArrowheadLeft</code> and <code>ArrowheadBottom</code>) control individual ends of each axis. </li>
       <li><code>Frame</code> toggles frame around the HTML layer. </li>
-      <li><code>Ticks="X"</code> puts equidistant tick marks with interval "X" (in plot units) on <code>Axes</code> or <code>Frame</code> of the layer. When both attributes are present, <code>Ticks</code> applies the same setting to both of them. If that is not the desired effect, a separate HTML layer should be created so that either <code>Axes</code> or <code>Frame</code> could be moved over to it. This way, two independent <code>Ticks</code> setups could be made.
+      <li><code>Ticks=X</code> puts equidistant tick marks with interval "X" (in plot units) on <code>Axes</code> or <code>Frame</code> of the layer. When both attributes are present, <code>Ticks</code> applies the same setting to both of them. If that is not the desired effect, a separate HTML layer should be created so that either <code>Axes</code> or <code>Frame</code> could be moved over to it. This way, two independent <code>Ticks</code> setups could be made.
       <br>Similarly to <code>Arrowheads</code> and <code>Axes</code>, <code>Ticks</code> can be split into two separate attributes – <code>TicksX</code> and <code>TicksY</code> – for horizontal and vertical directions respectively. For the frame ticks, <code>TicksX</code> can be further split into <code>TicksTop</code> and <code>TicksBottom</code> and <code>TicksY</code> can be split into <code>TicksLeft</code> and <code>TicksRight</code>. All variants of the attribute can be used in combination, with the more specialized one always taking priority. Note that empty specialized setting, like <code>TicksRight=""</code>, overwrites more general ones, effectively removing any ticks from the provided side or direction.</li>
       <li><code>Ticks="[X1, X2, X3, ...]"</code> is an alternative form for the <code>Tick</code> attribute value to put the ticks at the explicitly set positions <code>X1</code>, <code>X2</code>, etc. Same specialized attributes for each individual side and direction are supported.
       <br>The <code>Xi</code> themselves can be either numbers, or a pair of a number and a string, like in the example above. The latter labels the respective tick with the text from the provided string, instead of the number itself. The string should be enclosed in single quotes. <code>Xi</code> do not have to all be of the same type, the two formats can be freely mixed. </li>
-      <li><code>Subticks="n"</code> uniformily subdivides interval between consecutive ticks into <code>n</code> parts. Works only with the equidistant format of <code>Ticks</code>. Similar to the <code>Ticks</code> attribute itself, <code>SubticksX</code>, <code>…Y</code>, <code>…Bottom</code>, <code>…Left</code>, <code>…Top</code>, <code>…Bottom</code> are available for axes and the frame. </li>
+      <li><code>Subticks=N</code> uniformily subdivides interval between consecutive ticks into <code>N</code> parts. Works only with the equidistant format of <code>Ticks</code>. Similar to the <code>Ticks</code> attribute itself, <code>SubticksX</code>, <code>…Y</code>, <code>…Bottom</code>, <code>…Left</code>, <code>…Top</code>, <code>…Bottom</code> are available for axes and the frame. </li>
       <li><code>Grid</code> toggles a coordinate grid on the back of the HTML layer. Relies on the <code>Tick</code> attribute (<code>TicksX</code> / <code>TicksY</code>) to control the spacing of the grid lines.      </li>
     </ul>
 
@@ -584,7 +584,7 @@ labels (WiP)
 
   <li><h4 id="NDSolve"><code>NDSolve(f, x0, ts)</code></h4>
     <p>
-      Integrates differential equation <code>x'(t)=f(t, x)</code> with initial conditions <code>x(ts[0])=x0</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta</a> method (rk4). The method supports <code>x</code> being either a real number or a vector (array) of arbitrary length. In the vector case, <code>f(t, x)</code> must expect its <code>x</code> argument to be an array and return the result as an array of the same length.
+      Integrates differential equation <code>x'(t)=f(t, x)</code> with initial conditions <code>x(ts[0])=x0</code> over the array <code>ts</code> of <code>t</code> values using <a href="https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods" target="_blank">Runge–Kutta method</a> (rk4). The method supports <code>x</code> being either a real number or a vector (array) of arbitrary length. In the vector case, <code>f(t, x)</code> must expect its <code>x</code> argument to be an array and return the result as an array of the same length.
       Example use:
         <code class="block" highlight="JS">
           function f(t, [x, y, z]) {<br>
@@ -638,7 +638,7 @@ labels (WiP)
     Additionally can be called from a <a href="#intro"><code>div.Plot</code> container</a> to dynamicaly make <a href="#layers">new layers</a> (WiP). The <code>elementType</code> in such case should be one of the following: <code>"svg"</code>, <code>"html"</code>, <code>"canvas"</code>, <code>"glsl"</code>.
   </p>
   <p>
-    WiP: <code>.addTo()</code> (for <code>&lt;g&gt;</code> groups object), <code>.addBefore()</code>, <code>.addAfter()</code>, as well as <code>.addToBefore()</code> and <code>.addToAfter()</code>.
+    WiP: <code>.addN()</code>, <code>.addBefore()</code>, <code>.addAfter()</code>, as well as <code>.addNBefore()</code> and <code>.addNAfter()</code>.
   </p></li>
   <li><h4><code>.setAttributes(a1, a2, … ) (WIP)</code></h4>
   <p>
@@ -669,13 +669,6 @@ labels (WiP)
       $Precision = 1e-9;
     </code>
   </p></li>
-  </ul>
-
-  <br>
-  <ul class="references">
-    <h4>Practical examples</h4>
-    <li><a href="../en/ConformalMaps.html">Conformal Maps</a></li>
-    <li><a href="../en/NormalForms.html">Normal Forms</a></li>
   </ul>
 
   <h2>3D plots (WIP)</h2>
@@ -730,5 +723,12 @@ labels (WiP)
 
   <h2>4D plots (WIP)</h2>
   
+
+  <br>
+  <ul class="references">
+    <h4>Practical examples</h4>
+    <li><a href="../en/ConformalMaps.html">Conformal Maps</a></li>
+    <li><a href="../en/NormalForms.html">Normal Forms</a></li>
+  </ul>
 </body>
 </html>
