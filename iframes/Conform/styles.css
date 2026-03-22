@@ -1,6 +1,7 @@
 .Plot {
   border: none;
   background: black;
+  --TickLength: 12px;
 }
 
 .Plot > :last-child {
@@ -51,6 +52,30 @@
 .PlotLine {
   --Color: white;
   --Thickness: 2.5px;
+}
+
+.Axis {
+  align-items: center;
+}
+
+.Tick {
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+.Tick.X.negative {
+  justify-content: center;
+  align-items: flex-end;
+}
+.Tick.Y.negative {
+  justify-content: flex-start;
+}
+
+.Tick.X .Label {
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+.Tick.Y .Label {
+  padding-left: calc(0.2em + var(--TickLength));
 }
 
 .seam {

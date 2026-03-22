@@ -14,10 +14,7 @@
   <link rel="stylesheet" href="styles.css">
   <script defer src="gradientMap.js"></script>
 
-  <!--
-<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> 
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
--->
 
 <style>
 
@@ -37,6 +34,17 @@
   opacity: 0.5;
   fill: white;
   mix-blend-mode: plus-lighter;
+}
+
+.Tick.X {
+  justify-content: center;
+  align-items: flex-start !important;
+}
+.Tick.Y:not(.negative) {
+  justify-content: center;
+}
+.Tick.Y:not(.negative) .Label {
+  padding-left: calc(0.5em + var(--TickLength));
 }
 
 
@@ -59,7 +67,7 @@
 
 </svg>
 <svg id="mesh" class="Layer"></svg>
-<div class="Layer" Axes></div>
+<div class="Layer" Axes TicksX="[[-2,''],[-1,'$$-1$$'],[0,'$$0$$'],[1,'$$1$$'],[2,'']]" TicksY="[[-.75,'$$-\\frac{3}{4}$$'],[.5,'$$\\frac{i}{2}$$'],[1,'$$i$$'],[2,'$$2i$$']]"></div>
 <svg id="frame" class="Layer"><line class="seam" x1="1" x2="7"/><line class="seam" x1="-1" x2="-7"/></svg>
 </div>
 

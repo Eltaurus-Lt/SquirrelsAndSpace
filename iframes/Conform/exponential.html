@@ -14,10 +14,8 @@
   <link rel="stylesheet" href="styles.css">
   <script defer src="gradientMap.js"></script>
 
-  <!--
-<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script> 
   <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
--->
+
 
 <style>
 
@@ -42,11 +40,46 @@
 #controlPanel {
   color: white;
 }
+
+#preLabels .Axis,
+#postLabels .Axis {
+  visibility: hidden;
+}
+#preLabels .Axis > *,
+#postLabels .Axis > * {
+  visibility: visible;
+}
+
+.Plot #postLabels {
+  opacity: 0;
+}
+.Plot.post #postLabels {
+  opacity: 1;
+}
+.Plot.post #preLabels {
+  opacity: 0;
+}
+
+#postLabels, #preLabels {
+  transition: opacity 1s;
+}
+
+#preLabels .Tick.Y:nth-child(2) {
+  justify-content: center;
+}
+#preLabels .Tick.Y:nth-child(1) {
+  justify-content: flex-end;
+}
+#preLabels .Tick.Y:nth-child(3) {
+  justify-content: flex-start;
+}
+
+
 </style>
 </head>
 <body>
 
-<div class="Plot" PlotRange=6.7 AspectRatio=1.3333>
+<div class="Plot post" PlotRange=6.7 AspectRatio=1.3333>
   <svg id="BG" class="Layer" style="background: black" filter="url(#gradientMap)">
   <defs>
     <filter id="gradientMap" color-interpolation-filters="sRGB">
@@ -61,7 +94,9 @@
 
 </svg>
 <svg id="mesh" class="Layer"></svg>
-<div class="Layer" Axes></div>
+<div class="Layer" Axes TicksX="[[0,'$$0$$'],[1,'$$1$$'],[2.71828,'$$e$$']]"></div>
+<div id="preLabels" class="Layer" Axes TicksY="[[-3.141593,'$$-i \\pi$$'],[1.570796,'$$\\frac{i \\pi}{2}$$'],[3.141593,'$$i \\pi$$']]"></div>
+<div id="postLabels" class="Layer" Axes TicksY="[[1,'$$i$$'],[2.71828,'$$ie$$']]"></div>
 <svg id="frame" class="Layer"><line class="seam" x2="-10"/></svg>
 </div>
 
@@ -81,6 +116,7 @@
 const π = Math.PI;
 const Nin = 24, Nout = 8; // both must be even
 const seamL = document.querySelector(".seam");
+const plotL = document.querySelector(".Plot");
 
 document.addEventListener("DOMContentLoaded", () => {
 plt.unwrap(Math);
@@ -124,10 +160,22 @@ const outerR = bgL.add("path", "shape2");
 
 
 plt.dynamic.push(({k, t}) => {
+
+  // toggling Y labels
+  if (t < .4 && plotL.classList.contains("post")) {
+    plotL.classList.remove("post");
+  }
+  if (t > .6 && !plotL.classList.contains("post")) {
+    plotL.classList.add("post");
+  }
+
   const Ox = cx(k, t);
 
   const Rs = plt.Subdivide([-Nin, Nout], Nin+Nout).map(R(k,t));
   const es = plt.Subdivide([-Nin, Nout], Nin+Nout).map(hors(k,t,π));
+
+  const innerPoints = [hors(k,t,0)(-Nin), hors(k,t,.5*π)(-Nin)];
+  const outerPoints = [hors(k,t,0)(Nout), hors(k,t,.5*π)(Nout)];
 
   checkerString = "";
   outerString = "";
@@ -138,14 +186,20 @@ plt.dynamic.push(({k, t}) => {
     } else {
       pathString = `M ${es[i][0]} ${-s*π} L ${es[i][0]} ${s*π}`;
     }
-    checkerString += "L"+pathString.slice(1);
     if (i === 0) {
+      if (t > 0) {
+        checkerString = `M ${innerPoints[1][0]} ${-s*innerPoints[1][1]} A ${Rs[0]} ${Rs[0]} 0 0 ${Number(s>0)} ${Ox+Rs[0]} 0 A ${Rs[0]} ${Rs[0]} 0 0 ${Number(s>0)} ${es[0][0]} ${s*es[0][1]}`;
+      } else {
+        checkerString = `M ${es[i][0]} ${-s*.5*π} L ${es[i][0]} ${s*π}`;
+      }
       pathString = `M ${mirror(es.at(-1)).join(" ")} L` + pathString.slice(1) + ` L ${es.at(-1).join(" ")}`
       if (t > 0.4) {
         fillR.setAttribute("d", `M 20 -20 L -20 -20 L` + pathString.slice(1) + " L -20 20 L 20 20");
       } else {
         fillR.setAttribute("d", pathString);
       }
+    } else {
+      checkerString += "L"+pathString.slice(1);
     }
     if (i === Nin) {
       outerString = pathString;
@@ -167,8 +221,7 @@ plt.dynamic.push(({k, t}) => {
   }
   bottomR.setAttribute("d", pathString);
   
-  const innerPoints = [hors(k,t,0)(-Nin), hors(k,t,.5*π)(-Nin)];
-  const outerPoints = [hors(k,t,0)(Nout), hors(k,t,.5*π)(Nout)];
+
   RadialLines[0].setAttribute("d", `M ${mirror(innerPoints[1]).join(" ")} L ${mirror(outerPoints[1]).join(" ")}`);
   RadialLines[1].setAttribute("d", `M ${innerPoints[0].join(" ")} L ${outerPoints[0].join(" ")}`);
   RadialLines[2].setAttribute("d", `M ${innerPoints[1].join(" ")} L ${outerPoints[1].join(" ")}`);
@@ -184,7 +237,7 @@ plt.dynamic.push(({k, t}) => {
                       L ${outerPoints[0].join(" ")} L ${mirror(outerPoints[1]).join(" ")}
                       L ${mirror(innerPoints[1]).join(" ")}`;
   }  
-  checkerR.setAttribute("d", "M" + checkerString.slice(1));
+  checkerR.setAttribute("d", checkerString);
 
   seamL.setAttribute("x1", max(Ox, -10));
   });
