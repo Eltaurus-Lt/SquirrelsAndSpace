@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" class="-debug">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Zhukovsky transform</title>
+  <meta name="author" content="Eltaurus">
+
+  <script defer src="../../pLTlib/pLTlib.js"></script>
+  <link rel="stylesheet" href="../../pLTlib/pLTlib.css">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+
+<style>
+
+.shape0 {
+  opacity: 0.125;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+.shape1 {
+  opacity: 0.25;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+.shape2 {
+  opacity: 0.5;
+  fill: white;
+  mix-blend-mode: plus-lighter;
+}
+
+.Tick.X {
+  justify-content: center;
+  align-items: flex-start !important;
+}
+.Tick.Y:not(.negative) {
+  justify-content: center;
+}
+.Tick.Y:not(.negative) .Label {
+  padding-left: calc(0.5em + var(--TickLength));
+}
+
+.PlotLine {
+  --Color: #ade3ff;
+}
+
+.wing {
+  --Color: white;
+  --Thickness: 5px;
+}
+
+body {
+//background: gray;
+font-size: 16px;
+}
+
+.maskBlack {
+  fill: black;
+  stroke: none;
+}
+.maskWhite {
+  fill: white;
+  stroke: none;
+}
+
+.redsq {
+  fill: red;
+  stroke: none;
+}
+
+
+#gridContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  aspect-ratio: 1.8;
+
+  gap: 5px;
+  transition: grid-template-columns 0.5s ease;
+  background: white;
+  position: relative;
+}
+#gridContainer:after {
+  content: '';
+  outline-offset: -5px;
+  outline: solid white 5px;
+  display: block;
+  position: absolute;
+  inset: 0;
+}
+
+.gridCell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+
+.Plot {
+  width: auto;
+  height: 100%;
+}
+
+#gridContainer.full {
+  grid-template-columns: 0fr 1fr;
+
+}
+
+.full .gridCell:after {
+  outline-width: 15px;
+}
+
+#plotToggle {
+  position: absolute;
+  bottom: 1.5em;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
+html {
+ background: var(--bg-col);
+}
+
+.cline {
+  stroke-width: 1.5px;
+  stroke: black;
+ fill: none;
+}
+.Rline {
+  marker-start: url(#arrowheadEnd);
+}
+.Aline {
+  stroke-dasharray: 10;
+}
+
+mjx-container {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.PlotMarker {
+  --Color: white;
+}
+
+#LTXalpha {
+  transform: translateY(-.75em);
+}
+#LTXR {
+  transform: translateY(-.75em);
+}
+
+
+#controlParams {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1em;
+}
+.param {
+  margin-top: -.5em;
+}
+</style>
+
+
+<style>
+/* button */
+
+:root {
+    --header-col: #eee;white;
+    --bg-col: #383b43;
+    --border-col: #556065b0;#607080b0;
+    --border-text-col: #556065;
+    --hover-col: #2b2f37;#484b53;
+}
+
+button.btn {
+    width: 2em;
+    height: 2em;
+    padding: 0;
+    min-width: unset;
+}
+button.btn.wide {
+  /*  min-width: 4rem; */
+    width: max-content;
+    padding: 0 0.75rem; 
+}
+
+button {
+    background: var(--bg-col);
+    color: var(--header-col);
+    border: 2px var(--border-col) solid;
+    border-radius: .25em;
+    padding: .5em 1em;
+    min-width: 5.5em;
+    box-sizing: border-box;
+}
+button:hover {
+    background: var(--border-text-col) !important;
+    cursor: pointer;
+}
+button:active {
+    box-shadow: 0 0 10px -5px black inset;
+    background: var(--hover-col) !important;
+}
+
+#gridContainer:not(.full) button.toggle {
+    background: var(--hover-col);
+}
+
+</style>
+
+</head>
+<body>
+
+<div id="gridContainer" class="full">
+<div class="gridCell">
+
+<div class="Plot" PlotRange=3 AspectRatio=1.8 style="background: #69a0fe">
+  <svg id="initial" class="Layer">
+    <marker id="arrowheadEnd" markerWidth="14" markerHeight="5" refX="9" refY="3.5" orient="auto-start-reverse" viewBox="0 0 10 7">
+      <polygon points="10 3.5, 0 0, 1.5 3.5, 0 7" fill="context-stroke"/>
+    </marker>
+    <circle class="PlotLine" r=.5 />
+    <circle class="PlotLine" r=1 />
+    <circle class="PlotLine" r=2 />
+    <line class="PlotLine" x1=-5 y1=-5 x2=5 y2=5 />
+    <line class="PlotLine" x1=5 y1=-5 x2=-5 y2=5 />
+  </svg>
+  <div class="Layer" Axes Ticks="[[-2,''],[-1,''],[0,''],[1,''],[2,'']]">
+    <div id="LTXalpha">$$\alpha$$</div>
+    <div id="LTXR">$$R$$</div>
+  </div>
+</div>
+
+</div>
+<div class="gridCell">
+
+<div class="Plot" PlotRange=3 AspectRatio=1.8 style="background: #69a0fe">
+  <svg id="mesh" class="Layer">
+    <defs>
+      <clipPath id="clipTop"></clipPath>
+      <mask id="maskBottom">
+        <rect width="100%" height="100%" class="maskBlack"/>
+      </mask>
+    </defs>
+    <line class="PlotLine" x1="1" x2="7"/><line class="PlotLine" x1="-1" x2="-7"/>
+  </svg>
+  <div class="Layer" Axes Ticks="[[-2,''],[-1,''],[0,''],[1,''],[2,'']]"></div>
+</div>
+
+</div>
+<button id="plotToggle" class="btn wide toggle" onclick="window.gridContainer.classList.toggle('full')">Split view</button>
+
+</div>
+
+
+<div id="controlPanel">
+  parameters
+  <div id="controlParams">
+    <div class="param">
+      <span>$$\alpha$$</span>
+      <input pltvar="α" autoplay loop=true type=range min=0 max=.2 step=any value=0.1>
+    </div>
+    <div class="param">
+      <span>$$R$$</span>
+      <input pltvar="R" autoplay loop=true type=range min=1.05 max=1.15 step=any value=1.1>
+    </div>
+  </div>
+  <br>
+  transform
+  <input pltvar="t" autoplay loop=true type=range min=0 max=1 step=any value=0>
+  <br><br>
+</div>
+
+
+<script>
+const π = Math.PI;
+const Dmax = 4;
+
+function Power(x, y, alpha) {
+  const A = Math.pow(x*x + y*y, .5*alpha);
+  const arg = alpha * Math.atan2(y, x);
+  return [A * Math.cos(arg), A * Math.sin(arg)];
+}
+function KarmanTrefftzF(alpha) {
+  return (x, y) => {
+    if (y === 0 && Math.abs(x) === 1) return [x, 0];
+    const [Rl, Il] = Power(x+1, y, alpha);
+    const [Rr, Ir] = Power(x-1, y, alpha);
+
+    const iD = 1 / ((Il-Ir)*(Il-Ir) + (Rl-Rr)*(Rl-Rr));
+  
+    return [ ( Il*Il - Ir*Ir + Rl*Rl - Rr*Rr )*iD, 2*( Ir*Rl - Il*Rr )*iD ];
+  }
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+plt.unwrap(Math);
+
+const meshL = document.getElementById('mesh');
+
+const unclippedLines = [];
+for (let i = 0; i < 2; i++) {
+  unclippedLines.push(meshL.add("path", "PlotLine"));
+}
+
+const groupTop = meshL.add("g");
+groupTop.setAttribute("clip-path", "url(#clipTop)");
+const maskTop = document.getElementById("clipTop").add("path");
+
+const meshLines = [];
+for (let i = 0; i < 6; i++) {
+  meshLines.push(groupTop.add("path", "PlotLine"));
+}
+
+const groupBottom = meshL.add("g");
+groupBottom.setAttribute("mask", "url(#maskBottom)");
+const mask1 = document.getElementById("maskBottom").add("path", "maskWhite");
+const mask2 = document.getElementById("maskBottom").add("path", "maskWhite");
+
+const bottomLines = [];
+for (let i = 0; i < 3; i++) {
+  bottomLines.push(groupBottom.add("path", "PlotLine"));
+}
+
+const wingL = meshL.add("path", "PlotLine wing");
+
+const mirror = ([x,y]) => [-x,y];
+const mirrorY = ([x,y]) => [x,-y];
+
+// initial plot
+const pointC = document.querySelector("#initial + div.Layer").add("PlotMarker");
+const initPlot = document.getElementById("initial");
+const wingInit = initPlot.add("circle", "PlotLine wing");
+const archLine = initPlot.add("path", "cline");
+const Rline = initPlot.add("line", "cline Rline");
+const Aline = initPlot.add("line", "cline Aline");
+const Rangle = .5;
+Aline.setAttribute("x1", 1);
+
+plt.dynamic.push(({t,R,α}) => {
+  const Oy = -Math.tan(.5*π*t);
+  const δ = asin(sin(α)/sqrt(1+R*R-2*R*cos(α))); // the angle between C_R-[0,0] and C_R-[1,0]
+
+  const KT = KarmanTrefftzF(t + 1);
+  function airfoil(φ) {
+    return KT( 1 + R*(- cos(α) + cos(φ - α)), R*(sin(α) + sin(φ - α)));
+  }
+
+  points = plt.Subdivide([0, 2*π], 25).map(airfoil);
+  wingL.setAttribute("d", plt.BezierListPlot(points));
+  wingInit.setAttribute("r", R);
+  const [Cx, Cy] = [1 - R*cos(α), R*sin(α)];
+  wingInit.setAttribute("cx", Cx );
+  wingInit.setAttribute("cy", Cy);
+  Rline.setAttribute("x2", Cx);
+  Rline.setAttribute("y2", Cy);
+  Rline.setAttribute("x1", Cx + R*cos(Rangle));
+  Rline.setAttribute("y1", Cy + R*sin(Rangle));
+  Aline.setAttribute("x2", Cx);
+  Aline.setAttribute("y2", Cy);
+  pointC.style.left = `${Cx}%`;
+  pointC.style.bottom = `${Cy}%`;
+  const archR = .3;
+  archLine.setAttribute("d", `M ${1-archR} 0 A ${archR} ${archR} 0 0 1 ${1-archR*cos(α)} ${archR*sin(α)}`);
+
+  window.LTXR.style.left = `${Cx + .5*R*cos(Rangle) - .05*sin(Rangle)}%`;
+  window.LTXR.style.bottom = `${Cy + .5*R*sin(Rangle) + .05*cos(Rangle)}%`;
+  window.LTXalpha.style.left = `${1-archR*cos(α)}%`;
+  window.LTXalpha.style.bottom = `${archR*sin(α)}%`;
+
+
+
+  const bottomEdge = "L" + plt.BezierListPlot(plt.Subdivide([π, 2*(π - δ - α)], 15).map(φ=>KT( cos(φ), sin(φ) ))).slice(1) + 
+                     "L" + plt.BezierListPlot(plt.Subdivide([ 2*(π - δ), 2*π ], 25).map(airfoil)).slice(1);
+  maskTop.setAttribute("d", `M -${Dmax} ${Dmax} L -${Dmax} 0 ` + bottomEdge + `L ${Dmax} 0 L ${Dmax} ${Dmax}`);
+  mask1.setAttribute("d", `M ${-Dmax} ${-Dmax} L ${-Dmax} 0 ` + bottomEdge + `L ${Dmax} 0 L ${Dmax} ${-Dmax}`);
+
+
+
+  // ellipse top
+  points = plt.Subdivide([π, 0], 15).map(φ=>KT( 2*cos(φ), 2*sin(φ) ));
+  const ellipseTop = plt.BezierListPlot(points);
+  meshLines[1].setAttribute("d", ellipseTop);
+  unclippedLines[0].setAttribute("d", plt.BezierListPlot(points.map(mirrorY)));
+  // ellipse mid
+  points = plt.Subdivide([0, π], 15).map(φ=>KT( cos(φ), sin(φ) ));
+  const midLine = plt.BezierListPlot(points);
+  meshLines[2].setAttribute("d", midLine);
+  unclippedLines[1].setAttribute("d", plt.BezierListPlot(points.map(mirrorY)));
+  // ellipse bottom
+  points = plt.Subdivide([0, π], 15).map(φ=>KT( .5*cos(φ), .5*sin(φ) ));
+  const ellipseBottom = plt.BezierListPlot(points);
+  meshLines[3].setAttribute("d", ellipseBottom);
+  bottomLines[2].setAttribute("d", plt.BezierListPlot(points.map(mirrorY)));
+  
+  // hyperbolae
+  points = [];  
+  const as = plt.Subdivide([2*Dmax, -2* Dmax], 20).map(y1 => (y1 + sqrt(y1*y1+.5))); // remap initial distribution for more uniformity after transform
+  for (const a of as) {
+    points.push(KT(a, a));
+  };
+  if (points.at(-1)[1] > -Dmax) { // refine the tip
+    for (const a1 of plt.Subdivide([as.at(-1), 0], 10).slice(1, -1) ) {
+      points.push(KT(a1, a1));
+    }
+    points.push([0, Oy]);
+  }
+  const hyperRight = plt.BezierListPlot(points);
+  meshLines[4].setAttribute("d", hyperRight);
+  bottomLines[0].setAttribute("d", plt.BezierListPlot(points.map(mirrorY)));
+  let hyperLeft = plt.BezierListPlot(points.map(mirror));
+  meshLines[5].setAttribute("d", hyperLeft);
+  bottomLines[1].setAttribute("d", plt.BezierListPlot(points.map(mirror).map(mirrorY)));
+
+  // bottom edge
+  points = []; let cut = false;
+  pointsShort = [];
+  for (let x0 = 1; x0 > 0; x0-=.01) {
+    const pt = KT(x0, 0);
+    points.push(pt);
+    if (x0 > .5) pointsShort.push(pt);
+    if (pt[1] < -Dmax || pt[0] > Dmax) {cut = true; break;}
+  }
+  let bottomLine, bottomLeft;
+  if (!cut) {
+    const bottomLeftPoints = [...points].reverse().map(mirror);
+    bottomLine = plt.BezierListPlot([...points, [0, Oy], ...bottomLeftPoints]);
+    bottomLeft = plt.BezierListPlot(bottomLeftPoints);
+  } else {
+    bottomLine = plt.BezierListPlot(points);
+    if (points.at(-1)[0] > Dmax) {
+      bottomLine += `L ${Dmax} ${-Dmax}`;
+      bottomLine += `L ${-Dmax} ${-Dmax}`;
+      hyperLeft += `L ${-Dmax} ${-Dmax}`;
+    }
+    bottomLeft = "L" + plt.BezierListPlot(points.reverse().map(mirror)).slice(1);
+    bottomLine += bottomLeft;
+  }
+  meshLines[0].setAttribute("d", bottomLine);
+  mask2.setAttribute("d", `M ${Dmax} ${-Dmax} L ${Dmax} 0 ` + "L"+bottomLine.slice(1) + `L ${-Dmax} 0 L ${-Dmax} ${-Dmax}`);
+
+});
+
+
+plt.update(); /* init */
+
+});
+</script>
+
+</body>
+</html>

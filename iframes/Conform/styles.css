@@ -4,7 +4,7 @@
   --TickLength: 12px;
 }
 
-.Plot > :last-child {
+.Plot > svg:last-child {
   outline: 5px solid white;
   outline-offset: -5px;
 }
@@ -76,6 +76,10 @@
 }
 .Tick.Y .Label {
   padding-left: calc(0.2em + var(--TickLength));
+}
+
+#controlPanel {
+  color: white;
 }
 
 .seam {

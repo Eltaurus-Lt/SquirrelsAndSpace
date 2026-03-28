@@ -92,7 +92,7 @@ div.Plot > * {
 }
 /* Vector */
 div.Plot svg.Layer {
-  width: 100%;
+  width: auto;
   height: 100%;
   inset: 0;
 
