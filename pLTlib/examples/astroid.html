@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html class="-debug">
+  <head>
+
+  <script defer src="pLTlib.js"></script>
+  <link rel="stylesheet" href="pLTlib.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+
+<style>
+
+body {
+ max-width: 1600px;
+ margin: 0 auto;
+}
+@media(min-width: 600px) {
+  body {
+    font-size: 24px !important;
+  }
+}
+
+.line0 {
+  fill: none;
+  stroke-width: 1;
+  stroke: black;
+}
+
+.line1 {
+  fill: none;
+  stroke-width: 1;
+  stroke: gray;
+}
+
+.line2 {
+  stroke-width: 1;
+  stroke: black;
+  opacity: .25;
+}
+
+</style>
+  </head>
+  <body>
+
+<div class="Plot" PlotRange=1.1 AspectRatio=1>
+  <svg class="Layer"><circle r=1 class="line1"/></svg> 
+  <svg class="Layer" id="main"><line x1=-2 x2=2 class="line0"/><line y1=-2 y2=2 class="line0"/></svg> 
+</div>
+
+<input pltvar="φ" type=range min=0 max=6.283183 step=any value=1>
+
+<script>
+const π = Math.PI;
+const cos = Math.cos; 
+const sin = Math.sin;
+
+const imgL = document.querySelector("svg.Layer");
+const mainL = document.getElementById("main");
+
+document.addEventListener("DOMContentLoaded", () => {
+
+horLine = imgL.add("line", "line2");
+horLine.setAttribute( "x1", -2 );
+horLine.setAttribute( "x2", 2 );
+verLine = imgL.add("line", "line2");
+verLine.setAttribute( "y1", -2 );
+verLine.setAttribute( "y2", 2 );
+
+diagLine = imgL.add("line", "line2");
+diam1 = imgL.add("line", "line2");
+diam2 = imgL.add("line", "line2");
+
+imgL.add("path", "line1").setAttribute("d", plt.LinearParametric(φ=>[cos(φ)*cos(φ)*cos(φ), sin(φ)*sin(φ)*sin(φ)], plt.Subdivide([0, 2*π], 160)));
+
+smallCircle = imgL.add("circle", "line1");
+smallCircle.setAttribute("r", .25);
+
+horde = imgL.add("line", "line0");
+
+mainDot = imgL.add("circle");
+mainDot.setAttribute("r", .01);
+
+smallDot = imgL.add("circle");
+smallDot.setAttribute("r", .0066);
+
+horDot = imgL.add("circle");
+horDot.setAttribute("r", .0066);
+verDot = imgL.add("circle");
+verDot.setAttribute("r", .0066);
+  
+plt.dynamic.push(({φ}) => {
+
+smallCircle.setAttribute( "cx", .75*cos(φ) );
+smallCircle.setAttribute( "cy", .75*sin(φ) );
+
+horde.setAttribute( "x1", cos(φ) );
+horde.setAttribute( "y2", sin(φ) );
+horDot.setAttribute( "cx", cos(φ) );
+verDot.setAttribute( "cy", sin(φ) );
+
+mainDot.setAttribute( "cx", cos(φ)*cos(φ)*cos(φ) );
+mainDot.setAttribute( "cy", sin(φ)*sin(φ)*sin(φ) );
+
+diagLine.setAttribute( "x1", cos(φ)*cos(φ)*cos(φ) + 4*sin(φ) );
+diagLine.setAttribute( "y1", sin(φ)*sin(φ)*sin(φ) + 4*cos(φ) );
+diagLine.setAttribute( "x2", cos(φ)*cos(φ)*cos(φ) - 4*sin(φ) );
+diagLine.setAttribute( "y2", sin(φ)*sin(φ)*sin(φ) - 4*cos(φ) );
+
+diam1.setAttribute( "x1", .75*cos(φ) + .25*sin(3*φ) );
+diam1.setAttribute( "y1", .75*sin(φ) + .25*cos(3*φ) );
+diam1.setAttribute( "x2", .75*cos(φ) - .25*sin(3*φ) );
+diam1.setAttribute( "y2", .75*sin(φ) - .25*cos(3*φ) );
+
+diam2.setAttribute( "x1", .75*cos(φ) + .25*cos(3*φ) );
+diam2.setAttribute( "y1", .75*sin(φ) - .25*sin(3*φ) );
+diam2.setAttribute( "x2", .75*cos(φ) - .25*cos(3*φ) );
+diam2.setAttribute( "y2", .75*sin(φ) + .25*sin(3*φ) );
+
+smallDot.setAttribute( "cx", cos(φ) );
+smallDot.setAttribute( "cy", sin(φ) );
+
+horLine.setAttribute( "y1", sin(φ) );
+horLine.setAttribute( "y2", sin(φ) );
+verLine.setAttribute( "x1", cos(φ) );
+verLine.setAttribute( "x2", cos(φ) );
+
+});
+plt.update();
+});
+</script>
+
+  </body>
+</html>
