@@ -9,6 +9,10 @@
   --ArrowheadsLength: 7;
 
 /* todo */  --Dashing: ; 
+
+  /* arrowhead markers */
+  --ArrowheadFree: url("data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg'><marker id='m' markerWidth='14' markerHeight='5' refX='7' refY='3.5' orient='auto-start-reverse' viewBox='0 0 10 7'><polygon points='10 3.5,0 0,1.5 3.5,0 7' fill='context-stroke'/></marker></svg>#m");
+  --ArrowheadLimited: url("data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg'><marker id='m' markerWidth='14' markerHeight='5' refX='9' refY='3.5' orient='auto-start-reverse' viewBox='0 0 10 7'><polygon points='10 3.5,0 0,1.5 3.5,0 7' fill='context-stroke'/></marker></svg>#m");
 }
 
 .PlotLine {
