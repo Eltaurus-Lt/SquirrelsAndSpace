@@ -79,9 +79,11 @@ font-size: 16px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   aspect-ratio: 1.8;
+  box-sizing: border-box;
 
   gap: 5px;
-  transition: grid-template-columns 0.5s ease;
+  padding: 0 5px;
+  transition: grid-template-columns 0.5s ease, padding 0.5s ease;
   background: white;
   position: relative;
 }
@@ -110,7 +112,7 @@ font-size: 16px;
 
 #gridContainer.full {
   grid-template-columns: 0fr 1fr;
-
+  padding-left: 0;
 }
 
 .full .gridCell:after {
@@ -135,7 +137,7 @@ html {
  fill: none;
 }
 .Rline {
-  marker-start: url(#arrowheadEnd);
+  marker-start: var(--ArrowheadLimited);
 }
 .Aline {
   stroke-dasharray: 10;
@@ -224,9 +226,6 @@ button:active {
 
 <div class="Plot" PlotRange=3 AspectRatio=1.8 style="background: #69a0fe">
   <svg id="initial" class="Layer">
-    <marker id="arrowheadEnd" markerWidth="14" markerHeight="5" refX="9" refY="3.5" orient="auto-start-reverse" viewBox="0 0 10 7">
-      <polygon points="10 3.5, 0 0, 1.5 3.5, 0 7" fill="context-stroke"/>
-    </marker>
     <circle class="PlotLine" r=.5 />
     <circle class="PlotLine" r=1 />
     <circle class="PlotLine" r=2 />
