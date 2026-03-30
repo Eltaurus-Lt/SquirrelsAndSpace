@@ -1,8 +1,11 @@
 // load the stylesheet
 (() => {
+  const scriptURL = document.currentScript.src;
+  const scriptRoot = scriptURL.substring(0, scriptURL.lastIndexOf('/'));
+
   const stylesheetL = document.createElement("link");
   stylesheetL.rel = "stylesheet";
-  stylesheetL.href = "/SquirrelsAndSpace/styles/_codeBlocks.css";
+  stylesheetL.href = scriptRoot + "/../styles/_codeBlocks.css";
   document.head.appendChild(stylesheetL);
 })();
 
