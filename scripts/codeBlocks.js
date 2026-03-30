@@ -2,7 +2,7 @@
 (() => {
   const stylesheetL = document.createElement("link");
   stylesheetL.rel = "stylesheet";
-  stylesheetL.href = "/styles/_codeBlocks.css";
+  stylesheetL.href = "/SquirrelsAndSpace/styles/_codeBlocks.css";
   document.head.appendChild(stylesheetL);
 })();
 
