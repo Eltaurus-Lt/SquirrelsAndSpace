@@ -7,12 +7,25 @@
   --TickLength: 6px;
   --ArrowheadsWidth: 5;
   --ArrowheadsLength: 7;
-
 /* todo */  --Dashing: ; 
+
+  /* PlotMarker shapes */
+  --Ring: shape(evenodd from 50% 0%, arc to 50% 100% of 50% cw, arc to 50% 0% of 50% cw, close, move to 50% var(--Thickness), arc to 50% calc(100% - var(--Thickness)) of calc(50% - var(--Thickness)) cw, arc to 50% var(--Thickness) of calc(50% - var(--Thickness)) cw, close);
+  --Diamond: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  --Plus: polygon(calc(50% - 0.5 * var(--Thickness)) 0, calc(50% + 0.5 * var(--Thickness)) 0, calc(50% + 0.5 * var(--Thickness)) calc(50% - 0.5 * var(--Thickness)), 100% calc(50% - 0.5 * var(--Thickness)), 100% calc(50% + 0.5 * var(--Thickness)), calc(50% + 0.5 * var(--Thickness)) calc(50% + 0.5 * var(--Thickness)), calc(50% + 0.5 * var(--Thickness)) 100%, calc(50% - 0.5 * var(--Thickness)) 100%, calc(50% - 0.5 * var(--Thickness)) calc(50% + 0.5 * var(--Thickness)), 0 calc(50% + 0.5 * var(--Thickness)), 0 calc(50% - 0.5 * var(--Thickness)), calc(50% - 0.5 * var(--Thickness)) calc(50% - 0.5 * var(--Thickness)));
+  --Times: polygon( 50% calc(50% - 0.7071 * var(--Thickness)), calc(100% - 0.7071 * var(--Thickness)) 0, 100% calc(0.7071 * var(--Thickness)), calc(50% + 0.7071 * var(--Thickness)) 50%, 100% calc(100% - 0.7071 * var(--Thickness)), calc(100% - 0.7071 * var(--Thickness)) 100%, 50% calc(50% + 0.7071 * var(--Thickness)), calc(0.7071 * var(--Thickness)) 100%, 0 calc(100% - 0.7071 * var(--Thickness)), calc(50% - 0.7071 * var(--Thickness)) 50%, 0 calc(0.7071 * var(--Thickness)), calc(0.7071 * var(--Thickness)) 0 );
+  --Pentagon: polygon(50% 0%, 97.5528% 34.5492%, 79.3893% 90.4508%, 20.6107% 90.4508%, 2.44717% 34.5492%);
+  --Hexagon: polygon(50% 0%, 93.3013% 25%, 93.3013% 75%, 50% 100%, 6.69873% 75%, 6.69873% 25%);
+  --Heptagon: polygon(50% 0%, 89.0916% 18.8255%, 98.7464% 61.126%, 71.6942% 95.0484%, 28.3058% 95.0484%, 1.2536% 61.126%, 10.9084% 18.8255%);
+  --Octagon: polygon(50% 0%, 85.3553% 14.6447%, 100% 50%, 85.3553% 85.3553%, 50% 100%, 14.6447% 85.3553%, 0% 50%, 14.6447% 14.6447%);
+  --Star: polygon(50% 0%, 61.2257% 34.5492%, 97.5528% 34.5492%, 68.1636% 55.9017%, 79.3893% 90.4508%, 50% 69.0983%, 20.6107% 90.4508%, 31.8364% 55.9017%, 2.44717% 34.5492%, 38.7743% 34.5492%);
+  --HeptaStar: polygon(50% 0%, 57.7426% 33.9224%, 89.0916% 18.8255%, 67.3974% 46.0292%, 98.7464% 61.126%, 63.9516% 61.126%, 71.6942% 95.0484%, 50% 67.8448%, 28.3058% 95.0484%, 36.0484% 61.126%, 1.2536% 61.126%, 32.6026% 46.0292%, 10.9084% 18.8255%, 42.2574% 33.9224%);
+  --Astroid: shape(from 50% 0%, curve to 100% 50% with 50% 37.8% / 62.2% 50%, curve to 50% 100% with 62.2% 50% / 50% 62.2%, curve to 0% 50% with 50% 62.2% / 37.8% 50%, curve to 50% 0% with 37.8% 50% / 50% 37.8%, close);
+  --Cat: shape(evenodd from 50.0595% 0.00992063%, curve to 42.3214% 0.6052% with 47.4206% 0.0099% / 44.8413% 0.2083%, curve to 19.1071% 16.8552% with 24.4048% 3.8393% / 18.9683% 11.4583%, curve to 26.8254% 23.1448% with 19.1667% 18.9187% / 20.7341% 23.1448%, curve to 54.2262% 14.4940% with 36.8651% 23.1448% / 38.6905% 14.2560%, curve to 81.4087% 31.3790% with 76.7659% 14.8512% / 81.4087% 31.3790%, curve to 72.0635% 31.7956% with 81.4087% 31.3790% / 76.1111% 31.0218%, curve to 58.6905% 41.2202% with 67.1032% 32.7480% / 63.7302% 33.9583%, curve to 49.4444% 51.2599% with 54.4048% 47.4306% / 54.1468% 51.0218%, curve to 44.1468% 47.6091% with 47.4802% 51.3591% / 45.6944% 50.5258%, curve to 42.6786% 38.7996% with 43.0357% 45.5060% / 42.6984% 42.5099%, curve to 39.9603% 25.2480% with 42.5992% 29.4345% / 41.5079% 25.4861%, curve to 30.7937% 34.6925% with 37.7579% 24.9107% / 33.5913% 29.1171%, curve to 15.0397% 34.7123% with 26.3095% 33.4425% / 21.2500% 33.3631%, curve to 10.0198% 24.1369% with 15.0397% 34.7123% / 12.6984% 24.2560%, curve to 0.8333% 40.9821% with 7.8175% 24.0575% / 2.7976% 31.5179%, curve to 0.0000% 49.9901% with 0.2976% 43.8988% / 0.0000% 46.9147%, curve to 50.0000% 99.9901% with 0.0000% 77.6091% / 22.3810% 99.9901%, curve to 100.0000% 49.9901% with 77.6190% 99.9901% / 100.0000% 77.6091%, curve to 50.0595% 0.0099% with 100.0000% 22.3710% / 77.6786% 0.0099%, close, move to 26.2897% 47.0734%, arc to 37.2024% 47.0734% of 5.45635% cw, arc to 26.2897% 47.0734% of 5.45635% cw, close, move to 8.96825% 47.0734%, arc to 19.881% 47.0734% of 5.45635% cw, arc to 8.96825% 47.0734% of 5.45635% cw, close);
 
   /* arrowhead markers */
   --ArrowheadFree: url("data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg'><marker id='m' markerWidth='14' markerHeight='5' refX='7' refY='3.5' orient='auto-start-reverse' viewBox='0 0 10 7'><polygon points='10 3.5,0 0,1.5 3.5,0 7' fill='context-stroke'/></marker></svg>#m");
-  --ArrowheadLimited: url("data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg'><marker id='m' markerWidth='14' markerHeight='5' refX='9' refY='3.5' orient='auto-start-reverse' viewBox='0 0 10 7'><polygon points='10 3.5,0 0,1.5 3.5,0 7' fill='context-stroke'/></marker></svg>#m");
+  --ArrowheadFit: url("data:image/svg+xml;utf8, <svg xmlns='http://www.w3.org/2000/svg'><marker id='m' markerWidth='14' markerHeight='5' refX='9' refY='3.5' orient='auto-start-reverse' viewBox='0 0 10 7'><polygon points='10 3.5,0 0,1.5 3.5,0 7' fill='context-stroke'/></marker></svg>#m");
 }
 
 .PlotLine {
@@ -23,6 +36,11 @@
 }
 .PlotMarker {
   --Color: var(--wm-color);
+
+ /* recalculate procedural markers */
+  --Ring: shape(evenodd from 50% 0%, arc to 50% 100% of 50% cw, arc to 50% 0% of 50% cw, close, move to 50% var(--Thickness), arc to 50% calc(100% - var(--Thickness)) of calc(50% - var(--Thickness)) cw, arc to 50% var(--Thickness) of calc(50% - var(--Thickness)) cw, close);
+  --Plus: polygon(calc(50% - 0.5 * var(--Thickness)) 0, calc(50% + 0.5 * var(--Thickness)) 0, calc(50% + 0.5 * var(--Thickness)) calc(50% - 0.5 * var(--Thickness)), 100% calc(50% - 0.5 * var(--Thickness)), 100% calc(50% + 0.5 * var(--Thickness)), calc(50% + 0.5 * var(--Thickness)) calc(50% + 0.5 * var(--Thickness)), calc(50% + 0.5 * var(--Thickness)) 100%, calc(50% - 0.5 * var(--Thickness)) 100%, calc(50% - 0.5 * var(--Thickness)) calc(50% + 0.5 * var(--Thickness)), 0 calc(50% + 0.5 * var(--Thickness)), 0 calc(50% - 0.5 * var(--Thickness)), calc(50% - 0.5 * var(--Thickness)) calc(50% - 0.5 * var(--Thickness)));
+  --Times: polygon( 50% calc(50% - 0.7071 * var(--Thickness)), calc(100% - 0.7071 * var(--Thickness)) 0, 100% calc(0.7071 * var(--Thickness)), calc(50% + 0.7071 * var(--Thickness)) 50%, 100% calc(100% - 0.7071 * var(--Thickness)), calc(100% - 0.7071 * var(--Thickness)) 100%, 50% calc(50% + 0.7071 * var(--Thickness)), calc(0.7071 * var(--Thickness)) 100%, 0 calc(100% - 0.7071 * var(--Thickness)), calc(50% - 0.7071 * var(--Thickness)) 50%, 0 calc(0.7071 * var(--Thickness)), calc(0.7071 * var(--Thickness)) 0 );
 
   position: absolute;
   width: var(--PointSize);
