@@ -8,12 +8,13 @@
   <title>pLTlib manual</title>
   <meta name="author" content="Eltaurus">
 
-  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="../styles/main.css">
-  <link rel="stylesheet" href="../styles/chapterStyles.css">
-  <link rel="stylesheet" href="../styles/Lt.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/chapterStyles.css">
+  <link rel="stylesheet" href="/styles/Lt.css">
   <link rel="icon" type="image/svg+xml" href="">
 
+  <script defer src="../scripts/codeBlocks.js"></script>
   <script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 
 </head>
@@ -89,7 +90,8 @@
 
   <fieldset class="downloads-block todo">
     <legend>Downloads</legend>
-    <a class="dwld" href=".html" download title="template">plt_template.html</a>
+    <a class="dwld" href=".html" download title="minimal template">plt_template.html</a>
+    <a class="dwld" href=".html" download title="use example">plt_example.html</a>
     <a class="dwld" href=".html" download title="template">article_template.html</a>
   </fieldset>
 
@@ -113,9 +115,21 @@
   <p>
     Scripts relying on pLTlib methods should be wrapped in a <code>DOMContentLoaded</code> callback to make sure the dependencies are loaded before being used:
     <code class="block" highlight="JS">
-      document.addEventListener("DOMContentLoaded", () => {<br>
-      &nbsp;&nbsp; ... <br>
-      });<br>
+      &lt;script&gt;<br>
+      &nbsp;&nbsp;<br>
+      &nbsp;&nbsp; … // non-plt scripts<br>
+      &nbsp;&nbsp;<br>
+      &nbsp;&nbsp;document.addEventListener("DOMContentLoaded", () => {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp; … // scripts creating plt objects<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;plt.dynamic.push((dynamic_vars) => {<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; … // scripts fot dynamic plt content<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;});<br>
+      &nbsp;&nbsp;});<br>
+      &lt;/script&gt;<br>
     </code>
     (scripts outside of the <code>DOMContentLoaded</code> can predefine framework's input parameters programmatically ahead of its initialization).
   </p>

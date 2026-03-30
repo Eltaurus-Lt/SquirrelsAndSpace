@@ -1,0 +1,147 @@
+/* code */
+code:not(:is(h1, h2, h3, h4, h5) code) {
+  color: var(--code-col);
+}
+
+/* language colors (GitHub style) */
+[highlight="HTML"] {
+  --code-lang-col: #e34c26;
+}
+[highlight="JS"] {
+  --code-lang: "JS";"JavaScript";
+  --code-lang-col: #f1e05a;
+}
+[highlight="CSS"] {
+  --code-lang-col: #663399;
+}
+[highlight="GLSL"] {
+  --code-lang-col: ForestGreen;DarkGreen;#5686a5;
+}
+[highlight="WM"] {
+  --code-lang: "Wolfram";
+  --code-lang-col: #dd1100;
+}
+[highlight="Py"] {
+  --code-lang: "Python";
+  --code-lang-col: #3572A5;
+}
+[highlight="Cpp"] {
+  --code-lang: "C++";
+  --code-lang-col: #f34b7d;
+}
+
+div.scrollContainer:has(> code.block) {
+  position: relative;
+}
+
+div.scrollContainer button.btn {
+  display: block;
+  position: absolute;
+  top: .6em;
+  right: .6em;
+  min-width: 3em;
+
+  color: var(--code-col);
+  font-family: monospace;
+  font-size: 0.75rem;
+
+  /* button style */
+  background: var(--bg-col);
+  background: var(--hover-col);
+  border: 1px var(--border-col) solid;
+  border-radius: .25em;
+  padding: .2em .4em .1em;
+
+  transition: color .25s, border-color .25s, background-color .1s ease;
+  cursor: pointer;
+}
+div.scrollContainer button.btn::after {
+  content: var(--code-lang, attr(highlight));
+  opacity: 0.5;
+  transition: opacity .25s;
+}
+
+div.scrollContainer button.btn:hover {
+  border-color: color-mix(var(--code-col) 50%, var(--border-col) 50%);
+}
+div.scrollContainer button.btn:active {
+  background: var(--substrate-col);
+}
+div.scrollContainer button.btn:hover::after {
+  opacity: 1;
+}
+div.scrollContainer.check button.btn {
+  transition: none;
+  color: transparent;
+}
+
+div.scrollContainer button.btn svg { /* checkmark */
+  position: absolute;
+  display: block;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+
+  opacity: 0;
+  transition: opacity .5s;
+}
+div.scrollContainer button.btn svg path { 
+  fill: none;
+  stroke: var(--code-lang-col, forestgreen);
+  stroke-width: 2.5px;
+}
+div.scrollContainer.check button.btn svg {
+  opacity: 1;
+  transition: none;
+}
+
+/*
+div.scrollContainer.check button.btn::before {
+  content: '';
+  background: var(--code-lang-col, forestgreen);
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: 1.5em;
+  height: 1em;
+
+  mask-image: var(--checkmark-anim);
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+*/
+
+
+code.block {
+  display: block;
+
+  text-align: left;
+  white-space: nowrap;
+  overflow-X: auto;
+
+  background: var(--hover-col);
+  margin: .5em 0 .5em 0.5em;
+  padding: 1.15em 2em 1.15em 1em;
+  border-radius: 5px;
+  border: 1px solid var(--border-col);
+  font-size: 1rem;
+  box-shadow: 3px 0px 7px #0002 inset;
+  cursor: text;
+}
+
+code.block::selection {
+    background-color: #7775;
+}
+
+code.block {
+  transition: border-color .25s;
+}
+div.scrollContainer:hover code.block {
+  border-color: var(--code-lang-col);
+}
+
+:root {
+  --checkmark-anim: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-1.5 -1.5 4 3'><path fill='none' stroke='gray' stroke-width='2.5px' vector-effect='non-scaling-stroke' stroke-linecap='round' stroke-linejoin='round' d='M -1 0 L 0 1 L 2 -1' stroke-dasharray='20' stroke-dashoffset='0'><animate attributeName='stroke-dashoffset' dur='1s' values='20;15;0' calcMode='spline' keyTimes='0;0.35;1' keySplines='0.25 0 0.75 1; 0.25 0 0.75 1'/></path></svg>");
+}
