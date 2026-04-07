@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en" class="-debug">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <title>Lagrange vs Euler coordinates</title>
+  <meta name="author" content="Eltaurus">
+
+  <script defer src="../../pLTlib/pLTlib.js"></script>
+  <link rel="stylesheet" href="../../pLTlib/pLTlib.css">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+
+<style>
+
+:root {
+    --lagrange-col: gold;
+    --euler-col: white;
+    --particle-col: #ade3ff;
+}
+
+.LC {
+  --Color: var(--lagrange-col);
+}
+
+.EC {
+  --Color: var(--euler-col);
+  stroke-dasharray: 8px;
+}
+
+.particle {
+  r: 0.02px;
+  fill: var(--particle-col);
+}
+
+.Plot {
+  width: auto;
+  height: 100%;
+border: none;
+}
+
+.button-row {
+  position: absolute;
+  bottom: 1em;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+}
+
+html {
+ background: var(--bg-col);
+}
+
+mjx-container {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.PlotMarker {
+  --Color: darkblue;
+}
+</style>
+
+
+<style>
+/* button */
+
+:root {
+    --header-col: #eee;white;
+    --bg-col: #383b43;
+    --border-col: #556065b0;#607080b0;
+    --border-text-col: #556065;
+    --hover-col: #2b2f37;#484b53;
+}
+
+button.btn {
+    width: 2em;
+    height: 2em;
+    padding: 0;
+    min-width: unset;
+}
+button.btn.wide {
+  /*  min-width: 4rem; */
+    width: max-content;
+    padding: 0 0.75rem; 
+}
+
+button {
+    background: var(--bg-col);
+    color: var(--border-text-col);
+    border: 2px var(--border-col) solid;
+    border-radius: .25em;
+    padding: .5em 1em;
+    min-width: 5.5em;
+    box-sizing: border-box;
+}
+button:hover {
+    background: var(--border-text-col) !important;
+    color: white;
+    cursor: pointer;
+}
+button:active {
+    box-shadow: 0 0 10px -5px black inset;
+    background: var(--hover-col) !important;
+}
+
+#particleToggle {
+  --active-col: var(--particle-col);
+}
+#lagrangeToggle {
+  --active-col: var(--lagrange-col);
+}
+#eulerToggle {
+  --active-col: var(--euler-col);
+}
+
+#plotContainer.particles #particleToggle:hover,
+#plotContainer.euler #eulerToggle:hover,
+#plotContainer.lagrange #lagrangeToggle:hover {
+    background: color-mix(var(--active-col) 50%, white) !important;
+    color: var(--border-col);
+}
+
+#plotContainer.particles #particleToggle,
+#plotContainer.euler #eulerToggle,
+#plotContainer.lagrange #lagrangeToggle {
+    background: var(--active-col);var(--hover-col);
+    color: var(--border-text-col);
+}
+
+#plotContainer:not(.euler) .EC,
+#plotContainer:not(.lagrange) .LC,
+#plotContainer:not(.particles) .particle {
+    display: none;
+}
+
+</style>
+
+</head>
+<body>
+
+<div id="plotContainer" class="Plot particles lagrange euler" PlotRange=3.7 style="background: #69a0fe">
+  <svg id="svgLayer" class="Layer"></svg>
+  <div id="divLayer" class="Layer" style="display: none;" Axes Ticks=1></div>
+  <span class="button-row">
+    <button id="lagrangeToggle" class="btn wide toggle" onclick="window.plotContainer.classList.toggle('lagrange')">Lagrange</button>
+    <button id="eulerToggle" class="btn wide toggle" onclick="window.plotContainer.classList.toggle('euler')">Euler</button>
+    <button id="particleToggle" class="btn wide toggle" onclick="window.plotContainer.classList.toggle('particles')">Particles</button>
+  </span>
+</div>
+
+</div>
+
+<div id="controlPanel">
+  <input pltvar="t" autoplay loop=true type=range min=0 max=1 step=any value=0>
+</div>
+
+<script>
+const π = Math.PI;
+const Xmin = -6, Dmax = 4, Npoints = 500, T = 2.5;
+const axesPoints = 500;
+
+const points0 = Array.from({ length: Npoints }, () => [
+    Math.random() * (Dmax - Xmin) + Xmin,
+    2 * Math.random() * Dmax - Dmax
+]);
+
+function GlobalFlow(t, [x, y] ) {
+  const r2 = x*x + y*y;
+  return [1 + .1*(x-1.1) + .05*(y+3), .04 - .1*(y-3) + .05*(x+4)];
+  return [1 - .01 * Math.exp(.8*x) * Math.cos(.8*y+2) + .1*x, .24 + .01 * Math.exp(.8*x) * Math.sin(.8*y+2) - .1*y];
+}
+
+function vortexField( Γ, [x, y] ) {
+  const r2 = x*x + y*y;
+  if (r2 < .0001) return [0, 0]; // 0 self-influence for a vortex
+  const Γ1 = Γ / r2;
+  return [Γ1 * y, - Γ1 * x];
+}
+
+const vortexΓs = [ -.3, .1, .1, .2 , -.9, .5, .7, -.1];
+const Vq0s = [ -2.3,1.2 , 1.,-1.06 , -1,-.534 , -3.2,-1.9 , 2.5,-4.5 , -6,-.4 , 0,6 , -5,1.2 ]; // = [x1_0, y1_0, x2_0, y2_0, ...]
+
+function vortexFlow(t, qs) {
+  const rhs = [];
+  for (let i = 0; i < vortexΓs.length; i++) {
+    const V0 = GlobalFlow(t, [qs[2*i], qs[2*i+1]]);
+    rhs.push(V0[0]);
+    rhs.push(V0[1]);
+  }; 
+  for (let i = 0; i < vortexΓs.length; i++) { // influencing vortex
+    for (let j = 0; j < vortexΓs.length; j++) { // influenced vortex
+      const dv = vortexField(vortexΓs[i], [ qs[2*j]-qs[2*i], qs[2*j+1]-qs[2*i+1] ] );
+      rhs[2*j] += dv[0];
+      rhs[2*j+1] += dv[1];
+    }
+  }
+  return rhs;
+}
+
+function combinedFlow(vortices, dt) {
+  return function(t, [x, y]) {
+    const ti = Math.floor( t / dt );
+    let v = GlobalFlow(t, [x, y]);
+    for (let j = 0; j < vortexΓs.length; j++) { // influencing vortex
+      const dv = vortexField( vortexΓs[j], [x - vortices[ti][1][2*j], y - vortices[ti][1][2*j+1]] );
+      v[0] += dv[0];
+      v[1] += dv[1];
+    }
+    return v;
+  }
+}
+
+// todo: NDSolve for object states
+
+document.addEventListener("DOMContentLoaded", () => {
+
+const ts = plt.Subdivide([0, T], 100);
+
+function transpose(matrix) {
+  return matrix[0].map((_, col) => matrix.map(row => row[col])); // todo: -> to plt.
+}
+const noT = ([t, xy]) => xy;
+
+console.log("integrating vortices ...");
+const vortices = plt.NDSolve(vortexFlow, Vq0s, ts);
+console.log("integrating particles...");
+//console.log(vortices);
+const totalFlow = combinedFlow(vortices, ts[1] - ts[0] );
+const sols = points0.map( q0 => plt.NDSolve(totalFlow, q0, ts) );
+console.log("integrating axes X...");
+const LXpoints = [];
+for(let y0 = 0; y0 <= Dmax; y0+=.8) { 
+  LXpoints.push(transpose(plt.Subdivide([Xmin, Dmax], axesPoints).map(x0 => plt.NDSolve(totalFlow, [x0, y0], ts).map(noT))));
+  if (y0 > 0) {
+    LXpoints.push(transpose(plt.Subdivide([Xmin, Dmax], axesPoints).map(x0 => plt.NDSolve(totalFlow, [x0, -y0], ts).map(noT))));
+  }
+}
+console.log("integrating axes Y...");
+const LYpoints = [];
+for(let x0 = Xmin; x0 <= Dmax; x0+=.8) { 
+  LYpoints.push(transpose(plt.Subdivide([Xmin, Dmax], axesPoints).map(y0 => plt.NDSolve(totalFlow, [x0, y0], ts).map(noT)))); // todo: convert ndsols to dicts (+ interpolation ?)
+}
+console.log("done");
+
+const svgL = document.getElementById('svgLayer');
+const divL = document.getElementById('divLayer');
+const pointLs = points0.map( (p) => svgL.add("circle", "particle"));
+const vortexLs = vortexΓs.map( (p) => divL.add("PlotMarker"));
+const lagrangeXs = LXpoints.map( (pts) => svgL.add("path", "LC PlotLine") );
+const lagrangeYs = LYpoints.map( (pts) => svgL.add("path", "LC PlotLine") );
+
+for(let y0 = 0; y0 <= Dmax; y0+=.8) { 
+  const Eline = svgL.add("line", "EC PlotLine");
+  Eline.setAttribute("x1", -Dmax);
+  Eline.setAttribute("x2", Dmax);
+  Eline.setAttribute("y1", y0);
+  Eline.setAttribute("y2", y0);
+  if (y0 > 0) {
+    const Eline = svgL.add("line", "EC PlotLine");
+    Eline.setAttribute("x1", -4);
+    Eline.setAttribute("x2", 4);
+    Eline.setAttribute("y1", -y0);
+    Eline.setAttribute("y2", -y0);
+  }
+}
+for(let x0 = Xmin; x0 <= Dmax; x0+=.8) { 
+  const Eline = svgL.add("line", "EC PlotLine");
+  Eline.setAttribute("y1", -Dmax);
+  Eline.setAttribute("y2", Dmax);
+  Eline.setAttribute("x1", x0);
+  Eline.setAttribute("x2", x0);
+}
+
+
+plt.dynamic.push( ({t}) => {
+
+  const ti = Math.floor(t * T / (ts[1] - ts[0]));
+
+  for (let i = 0; i < Npoints; i++) {
+    pointLs[i].setAttribute("cx", sols[i][ti][1][0]);
+    pointLs[i].setAttribute("cy", sols[i][ti][1][1]);
+  }
+
+  for (let i = 0; i < vortexΓs.length; i++) {
+    vortexLs[i].style.left = `${vortices[ti][1][2*i]}%`;
+    vortexLs[i].style.bottom = `${vortices[ti][1][2*i+1]}%`;
+  }
+
+  for (let i = 0; i < LXpoints.length; i++) {
+    lagrangeXs[i].setAttribute("d", plt.BezierListPlot(LXpoints[i][ti] ));
+  }
+  for (let i = 0; i < LYpoints.length; i++) {
+    lagrangeYs[i].setAttribute("d", plt.BezierListPlot(LYpoints[i][ti] ));
+  }
+
+});
+
+
+plt.update(); /* init */
+
+});
+</script>
+
+</body>
+</html>
