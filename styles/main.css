@@ -4,6 +4,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@300;400;500;600;700&display=swap');
 
 :root {
+    --accent-col: forestgreen;
+
     --section-col: #eee;white;
     --subsection-col: #1c2027d0;slategray;
     --header-col: #eee;white;
@@ -51,11 +53,11 @@ body:not([rnd="2"]) [rnd="2"] {
     grid-template-rows: 100%;
 
     height: 1.5em;
-    width: calc(100% - 2 * 2em);
-    padding: .5em 2em;
+    width: calc(100% - 2 * 3.5em);
+    padding: .5em 3.5em;
 
     max-width: var(--maxwidth); 
-    margin-left: -2em;
+    margin-left: -3.5em;
 
 
     border-bottom: 1px var(--border-col) solid;
