@@ -12,15 +12,18 @@
   <link rel="stylesheet" href="../styles/main.css">
   <link rel="stylesheet" href="../styles/Lt.css">
   <link rel="icon" type="image/svg+xml" href="">
-</head>
-<body rnd="0" class="Lt">
+  <style>
+  
+  a:not([href]) *,
+  a:not([href]) {
+    pointer-events: none;
+    text-decoration: none;
+    color: gray;
+  }
 
-<script>
-  const variantsN = 2;
-  var rnd = localStorage.getItem("catsRND") || Math.floor(Math.random() * variantsN);
-  document.body.setAttribute("rnd", rnd);
-  localStorage.setItem("catsRND", (parseInt(rnd) + 1) % variantsN);
-</script>
+  </style>
+</head>
+<body class="Lt-link-container">
 
 <div class="header">
   <select id="language-selector">
@@ -28,20 +31,130 @@
     <option lang="ru" value="ru">Rus</option>
   </select>
   <a class="off" href="../ru/program.html">rus</a>
-  <a class="button fwd" href="chapter-01.html">Start ⮞</a>
+  <a class="button fwd" hidden href="chapter-01.html">Start ⮞</a>
 </div>
 
-  <h1>Program</h1>
-
+  <h1>Topics</h1>
 
   <h2>Physics</h2>
 
-  <a href="CurvilinearCoordinates.html">
+  <a>
     <h3>Curvilinear Coordinates</h3>
   </a>
   <div class="section">
+    <img src="../imgs/program/Hyperboloid.svg">
     <p>
-    
+      Geometry in curvilinear coordinates. Coordinate lines, basis, contravariant vector components. Scalar product, metric (Jacobian), contraction, Einstein notation. Tensors, raising and lowering indices.
+      <br>
+      Kinematics in curvilinear coordinates, velocity and acceleration. Geodesics.
+      <br>
+      *Differentiation in curvilinear coodinates, differential, covariant derivative, Christoffel symbols.
+    </p>
+  </div>
+
+  <a href="FluidDynamics.html">
+    <h3>*Fluid Dynamics</h3>
+  </a>  
+  <div class="section">
+    <img src="../imgs/program/Fluid.svg">
+    <p>
+      Lagrange and Euler coordinates. Material derivative.
+    </p>
+  </div>
+
+  <a>
+    <h3>Introduction to General Relativity</h3>
+  </a>
+  <div class="section">
+    <img src="../imgs/program/BlackHole.svg">
+    <p>
+      Mass equivalence principle, kinematics on 4D manifolds. Central field, Binet equation. Schwarzschild metric. Light geodesics: solution, event horizon, photonic sphere, gravitational lensing. Material-point geodesics: solution, orbital stability, classical limit, apsidal precession.
+    </p>
+  </div>
+
+  <a>
+    <h3>Lagrangian Mechanics</h3>
+  </a>
+  <div class="section">
+    <p>
+      Dynamics in curvilinear coordinates. Mechanical systems, generalized coordinates. Generalized potential, Coriolis force, vector potential, the first pair of Maxwell equations.
+    </p>
+  </div>
+
+<!-- todo: quaternions
+           3d rotation, euler equation, lagrange top biffurcations
+           orbial resonances, averaging
+
+           magnetic tensors + wan-huang
+ -->
+
+  <a>
+    <h3>Action principles</h3>
+  </a>
+  <div class="section">
+    <p>
+      Least potential energy, trajectory "weight". Variation of the action, Euler–Lagrange equations. The second pair of Maxwell equations.
+      <br>
+      *Curvature action. Einstein equation, Schwarzschild metric derivation.
+    </p>
+  </div>
+
+  <a>
+    <h3>Noether theorem</h3>
+  </a>
+  <div class="section">
+    <p>
+      First integrals. Multiple time dimensions. Action derivatives.
+    </p>
+  </div>
+
+  <a>
+    <h3>Hamiltonian Mechanics</h3>
+  </a>
+  <div class="section">
+    <p>
+      Legendre transformation. Canonical transforms, criteria. Integral invariants, generating function. Hamilton–Jacobi equation.
+    </p>
+  </div>
+
+  <a>
+    <h3>Introduction to Quantum Mechanics</h3>
+  </a>
+  <div class="section">
+    <p>
+      Fermat principle, Schrödinger equation.
+      <br>
+      Quantization, continuity and probabilities, operators and eigenstates.
+      <br>
+      *Interpretations, Schrödinger's cat.
+    </p>
+  </div>
+
+  <a>
+    <h3 id="chaos">Integrability and Chaos</h3>
+  </a>
+  <div class="section">
+    <p>
+      Hamiltonian flow, involution. Arnold–Liouville theorem, invariant tori. Resonances.
+    </p>
+  </div>
+
+  <a>
+    <h3>Introduction to Statistical Mechanics</h3>
+  </a>
+  <div class="section">
+    <p>
+      Topological obstacles to integrability, destruction of invariant tori. Ergodicity. Adiabatic invariants.
+    </p>
+  </div>
+
+  <a>
+    <h3>KAM Theory</h3>
+  </a>
+  <div class="section">
+    <img src="../imgs/program/KAM.svg">
+    <p>
+      Perturbation of invariant tori. Quasi-integrability. The first KAM theorem. Isoenergetic reduction, the second KAM theorem. 
     </p>
   </div>
 
@@ -54,26 +167,7 @@
     </p>
   </div>
 
-  <a href="Noeter.html">
-    <h3>Noether theorem</h3>
-  </a>
-  <div class="section">
-    <p>
-    
-    </p>
-  </div>
-
-  <a href="KAM.html">
-    <h3>KAM Theory</h3>
-  </a>
-  <div class="section">
-    <p>
-    
-    </p>
-  </div>
-
-
-  <a href="Problems.html">
+  <a>
     <h3>Problems</h3>
   </a>
   <div class="section">
@@ -93,16 +187,18 @@
     </p>
   </div>
 
-  <a href="RNG.html">
+  <a>
     <h3>Random Number Generators</h3>
   </a>
   <div class="section">
     <p>
-    
+      Randomness as a sequential property. Pseudorandom recursive functions. Linear congruential generators. Periodicity and higher-order distribution moments. Sparce-recursion sequences, characteristic equation, prime criterion. <a href="https://en.wikipedia.org/wiki/Mersenne_Twister" target="blank_">Mersenne Twister</a>.
+      <br>
+      *<a href="#chaos">Chaos Theory</a> connections.
     </p>
   </div>
 
-  <a href="Goedel.html">
+  <a>
     <h3>Gödel incompleteness theorem</h3>
   </a>
   <div class="section">
@@ -113,28 +209,33 @@
 
   <h2>Neural Networks</h2>
 
-  <a href="Attention.html">
-    <h3>Attention Mechanism</h3>
-  </a>
-  <div class="section">
-    <p>
-    
-    </p>
-  </div>
-
-  <a href="Diffusion.html">
+  <a href="/ChaosAndCats/en/chapter-04B.html">
     <h3>Diffusion</h3>
   </a>
   <div class="section">
     <p>
-    
+      Image space, random image generation, target manifold. Denoising networks, reverse diffusion, samplers. Mode collapse, stochastic samplers. Guidance.
+      <br>
+      *U-Net, non-text conditioning, ControlNet. Autoencoders, latent diffusion. LoRA.
     </p>
   </div>
+
+  <a>
+    <h3>Attention Mechanism</h3>
+  </a>
+  <div class="section">
+    <p>
+      Semantic space. Embeddings. Recommendation algorithm. Multi-head attention.
+    </p>
+  </div>
+
 
   <h2>Extra</h2>
   <a href="../pLTlib/Readme.html">
     <h3>Interactive mathematical graphics</h3>
   </a>
+
+<a href="/about/me.html" target="blank_" class="Lt-link"></a>
 
   <script src="../scripts/main.js"></script>
 </body>
